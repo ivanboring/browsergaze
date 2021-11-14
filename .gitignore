@@ -1,2 +1,5 @@
-resources/*
+images
 node_modules
+config.yaml
+binaries
+database

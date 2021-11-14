@@ -1,18 +1,20 @@
 const fs = require('fs');
 const os = require('os');
+const yaml = require('js-yaml')
 const cleanup = require('./cleanup');
 const db = require('./db');
+const defaults = require('./defaults')
 
-const configPath = '../resources/config.js';
+const configPath = '../config.yaml';
 const defaultDataPath = '../resources/data';
 
 const initialize = {
     init: function() {
         // Look for the config.
         if (fs.existsSync(__dirname + '/' + configPath)) {
-            global.hawkConfig = require(configPath);
+            global.hawkConfig = yaml.load(fs.readFileSync(__dirname + '/' + configPath));
         } else {
-            throw Error('No config set');
+            throw Error('No config set, please run "npm run install" or read documentation.');
         }
         this.checkRequirements();
     },
@@ -39,32 +41,29 @@ const initialize = {
                 hawkConfig.usedBinaryCommand = 'magick convert';
             }
             if (!hawkConfig.usedBinaryCommand) {
-                throw Error('Could not find ImageMagick');
+                throw Error('Could not find ImageMagick, please run "npm run install" or read documentation.');
             }
         }
     },
     checkDataFolder: function() {
         // Check if the config changed the data folder.
-        if (!('dataFolder' in hawkConfig)) {
-            hawkConfig.dataFolder = __dirname + '/' + defaultDataPath;
+        if (!('databaseLocation' in hawkConfig)) {
+            hawkConfig.databaseLocation = __dirname + '/' + defaults.databaseLocation;
         }
         // Make sure a slash exists and set some base file and directories.
-        hawkConfig.dataFolder = cleanup.rtrim(hawkConfig.dataFolder, '/') + '/';
-        hawkConfig.databaseFile = hawkConfig.dataFolder + 'database/hawk.db';
+        hawkConfig.databaseLocation = cleanup.rtrim(hawkConfig.databaseLocation, '/') + '/';
+        hawkConfig.databaseFile = hawkConfig.databaseLocation + 'hawk.db';
 
         // Check if folder exists and is writable.
         try {
-            fs.accessSync(hawkConfig.dataFolder, fs.constants.W_OK | fs.constants.F_OK)
+            fs.accessSync(defaults.imageLocation, fs.constants.W_OK | fs.constants.F_OK)
         }
         catch (err) {
-            throw Error('The directory ' + hawkConfig.dataFolder  + ' does not exist or is not writable.')
+            throw Error('The directory ' + defaults.imageLocation  + ' does not exist or is not writable.')
         }
-
-        // Create directories if they do not exist.
-        for (let folder of ['database', 'images']) {
-            if (!fs.existsSync(hawkConfig.dataFolder + folder)) {
-                fs.mkdirSync(hawkConfig.dataFolder + folder);
-            }
+    
+        if (!fs.existsSync(hawkConfig.databaseLocation)) {
+            fs.mkdirSync(hawkConfig.databaseLocation);
         }
 
         // Create database if it doesn't exist.

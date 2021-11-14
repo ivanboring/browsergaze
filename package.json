@@ -4,13 +4,21 @@
   "description": "glitch-hawk is a visual regression tool to test regression between runs and differences between browsers",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "install": "node install.js"
   },
   "author": "",
   "license": "GPL-2.0",
   "dependencies": {
+    "argon2": "^0.28.2",
+    "body-parser": "^1.19.0",
+    "colors": "^1.4.0",
+    "cookie-parser": "^1.4.5",
     "express": "^4.17.1",
     "hasbin": "^1.2.3",
+    "js-yaml": "^4.1.0",
+    "prompt-sync": "^4.1.6",
+    "pug": "^3.0.2",
     "semver": "^7.3.5",
     "shelljs": "^0.8.4",
     "sqlite3": "^4.2.0"

@@ -29,8 +29,6 @@ const db = {
                     versions = db.getVersions(row.value, pjson.version, true);
                     grade = 'down';
                 }
-                console.log(grade)
-                console.log(versions)
 
                 for (let version of versions) {
                     let schema = require('../schema/' + version);
@@ -49,6 +47,9 @@ const db = {
                 }
             });
         });
+    },
+    getDb: function() {
+        return db.db;
     },
     setupDbFirstTime: function() {
         this.loadDb();

@@ -1,0 +1,11 @@
+extends page 
+
+block content
+    form(action='/login', method='POST' class='text-center border border-light p-5')
+        label(for="username")
+            | Username
+            input(type='text', name='username', value='' placeholder="Username" required)
+        label(for="password")
+            | Password
+            input(type='password', name='password', value='' placeholder="Password" required)
+        input(type='submit', value='Login')

@@ -3,7 +3,7 @@ module.exports = {
     up: function(db) {
         // Create user table.
         db.run("CREATE TABLE users ( \
-            id INT PRIMARY KEY, \
+            id INTEGER PRIMARY KEY AUTOINCREMENT, \
             username VARCHAR(40), \
             password VARCHAR(40), \
             first_name VARCHAR(100), \
@@ -14,7 +14,7 @@ module.exports = {
 
         // Create project table.
         db.run("CREATE TABLE projects ( \
-            id INT PRIMARY KEY, \
+            id INTEGER PRIMARY KEY AUTOINCREMENT, \
             name VARCHAR(50), \
             fail_directly INT, \
             default_host VARCHAR(255), \
@@ -24,7 +24,7 @@ module.exports = {
 
         // Create generator server.
         db.run("CREATE TABLE generator_servers (\
-            id INT PRIMARY KEY, \
+            id INTEGER PRIMARY KEY AUTOINCREMENT, \
             hostname VARCHAR(255), \
             path VARCHAR(255), \
             port INT, \
@@ -33,7 +33,7 @@ module.exports = {
 
         // Create capability.
         db.run("CREATE TABLE capbilities (\
-            id INT PRIMARY KEY, \
+            id INTEGER PRIMARY KEY AUTOINCREMENT, \
             generator_server_id INT, \
             browser_name VARCHAR(100), \
             platform VARCHAR(100), \
@@ -48,7 +48,7 @@ module.exports = {
 
         // Create job table.
         db.run("CREATE TABLE jobs ( \
-            id INT PRIMARY KEY, \
+            id INTEGER PRIMARY KEY AUTOINCREMENT, \
             project_id INT, \
             name VARCHAR(50), \
             host VARCHAR(255) \
@@ -56,14 +56,14 @@ module.exports = {
 
         // Create page table.
         db.run("CREATE TABLE pages ( \
-            id INT PRIMARY KEY, \
+            id INTEGER PRIMARY KEY AUTOINCREMENT, \
             job_id INT, \
             path VARCHAR(255) \
         )");
 
         // Create components table.
         db.run("CREATE TABLE components ( \
-            id INT PRIMARY KEY, \
+            id INTEGER PRIMARY KEY AUTOINCREMENT, \
             page_id INT, \
             name VARCHAR(255), \
             default_visual_regression_threshold FLOAT, \
@@ -73,7 +73,7 @@ module.exports = {
 
         // Create rules table.
         db.run("CREATE TABLE rules ( \
-            id INT PRIMARY KEY, \
+            id INTEGER PRIMARY KEY AUTOINCREMENT, \
             component_id INT, \
             key VARCHAR(255), \
             value TEXT, \
@@ -92,7 +92,7 @@ module.exports = {
 
         // Create baselines table
         db.run("CREATE TABLE baseline ( \
-            id INT PRIMARY KEY, \
+            id INTEGER PRIMARY KEY AUTOINCREMENT, \
             component_id INT, \
             capability_id INT, \
             created INT, \
@@ -101,14 +101,14 @@ module.exports = {
 
         // Create breakpoints table
         db.run("CREATE TABLE breakpoints ( \
-            id INT PRIMARY KEY, \
+            id INTEGER PRIMARY KEY AUTOINCREMENT, \
             width INT, \
             name VARCHAR(255) \
         )");
         
         // Create finished jobs table.
         db.run("CREATE TABLE finished_jobs ( \
-            id INT PRIMARY KEY, \
+            id INTEGER PRIMARY KEY AUTOINCREMENT, \
             project_id INT, \
             job_id INT, \
             status INT, \
@@ -123,7 +123,7 @@ module.exports = {
 
         // Create screenshots table.
         db.run("CREATE TABLE screenshots ( \
-            id INT PRIMARY KEY, \
+            id INTEGER PRIMARY KEY AUTOINCREMENT, \
             project_id INT, \
             job_id INT, \
             finished_job_id INT, \
@@ -136,7 +136,7 @@ module.exports = {
 
         // Create capabilities per component.
         db.run("CREATE TABLE component_capability ( \
-            id INT PRIMARY KEY, \
+            id INTEGER PRIMARY KEY AUTOINCREMENT, \
             component_id INT, \
             capabilities_id INT, \
             is_browser_default INT, \
@@ -147,14 +147,14 @@ module.exports = {
 
         // Create breakpoint capabilities per component.
         db.run("CREATE TABLE component_capability_breakpoint ( \
-            id INT PRIMARY KEY, \
+            id INTEGER PRIMARY KEY AUTOINCREMENT, \
             component_capability_id INT, \
             breakpoint_id INT \
         )");
 
         // Create browser regression threshold.
         db.run("CREATE TABLE browser_threshold ( \
-            id INT PRIMARY KEY, \
+            id INTEGER PRIMARY KEY AUTOINCREMENT, \
             component_id INT, \
             capabilities_id_from INT, \
             capabilities_id_to INT, \
@@ -164,7 +164,7 @@ module.exports = {
 
         // Create notifications table
         db.run("CREATE TABLE notification_setup ( \
-            id INT PRIMARY KEY, \
+            id INTEGER PRIMARY KEY AUTOINCREMENT, \
             notification_handler VARCHAR(255), \
             setup TEXT \
         )");

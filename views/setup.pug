@@ -1,0 +1,24 @@
+extends page 
+
+block content
+    form(action='/setup', method='POST' class='text-center border border-light p-5')
+        label(for="username")
+            | Username
+            input(type='text', name='username', value='' placeholder="Username" required)
+        label(for="email")
+            | E-mail
+            input(type='email', name='email', value='' placeholder="E-mail" required)
+        div(class="grid")
+            label(for="firstname")
+                | First Name
+                input(type='text', name='firstname', value='' placeholder="First Name")
+            label(for="lastname")
+                | Last Name
+                input(type='text', name='lastname', value='' placeholder="Last Name")
+        label(for="password")
+            | Password
+            input(type='password', name='password', value='' placeholder="Password" required)
+        label(for="password2")
+            | Repeat Password
+            input(type='password', name='password2', value='' placeholder="Repeat Password" required)
+        input(type='submit', value='Start using glitch-hawk')
