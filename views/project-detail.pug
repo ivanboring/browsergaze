@@ -1,0 +1,56 @@
+extends page
+
+block content
+    div(class="header bg-primary pb-6")
+        div(class="container")
+            div(class="header-body")
+                div(class="row align-items-center py-4")
+                    div(class="col-lg-6 col-7")
+                        div(class="media align-items-center")
+                            span(class="avatar avatar-sm rounded-circle")
+                                img(src="/" + project.dataname + "/icon.png")
+                            div(class="media-body ml-2 d-none d-lg-block")
+                                h2(class="h1 text-white mb-0")=pageTitle
+                    div(class="col-lg-6 col-5 text-right")
+                        div(class="dropdown")
+                            button(class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+                                | Project Menu
+                            div(class="dropdown-menu" aria-labelledby="dropdownMenuButton")
+                                a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
+                                    i(class="fas fa-poll")
+                                    | All results
+                                a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
+                                    i(class="fas fa-play")
+                                    | Run all pages
+                                if isAdmin
+                                    a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
+                                        i(class="fas fa-plus")
+                                        | Create page
+                                    a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
+                                        i(class="fas fa-edit")
+                                        | Edit project
+    div(class="container mt--6")
+        if pages.length
+            div(class="row")
+                each val, key in pages
+                    div(class="col-sm-6 col-md-6 col-12 col-lg-4 col-xl-4")
+                        div(class="card")
+                            a(href="/projects/detail/" + project.dataname)
+                                img(src=project.dataname + '/init.jpg', class="card-img-top")
+                            div(class="card-body text-center")
+                                a(href="/projects/detail/" + project.dataname, class="avatar avatar-xs")
+                                    img(src=project.dataname + "/icon.png")
+                                a(href="/projects/detail/" + project.dataname)
+                                    h4(class="card-title text-center")=project.name
+        else
+            div(class="row justify-content-center")
+                div(class="col-6")
+                    div(class="card")
+                        div(class="card-header text-center")
+                            
+                        div(class="card-body text-center")
+                            a(href="/projects/" + project.dataname + "/page/create", class="btn btn-primary btn-md", type="button")
+                                span(class="btn-inner--icon")
+                                    i(class="ni ni-fat-add")
+                                span(class="btn-inner--text")
+                                    | Create your first page

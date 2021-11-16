@@ -4,7 +4,6 @@ module.exports = {
         // Create user table.
         db.run("CREATE TABLE users ( \
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
-            username VARCHAR(40), \
             password VARCHAR(40), \
             first_name VARCHAR(100), \
             last_name VARCHAR(100), \
@@ -16,7 +15,9 @@ module.exports = {
         db.run("CREATE TABLE projects ( \
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
             name VARCHAR(50), \
+            dataname VARCHAR(50), \
             fail_directly INT, \
+            run_sync INT, \
             default_host VARCHAR(255), \
             default_username VARCHAR(255), \
             default_password VARCHAR(255) \
@@ -46,18 +47,11 @@ module.exports = {
             advanced_config TEXT \
         )")
 
-        // Create job table.
-        db.run("CREATE TABLE jobs ( \
-            id INTEGER PRIMARY KEY AUTOINCREMENT, \
-            project_id INT, \
-            name VARCHAR(50), \
-            host VARCHAR(255) \
-        )");
-
         // Create page table.
         db.run("CREATE TABLE pages ( \
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
-            job_id INT, \
+            project_id INT, \
+            name VARCHAR(255), \
             path VARCHAR(255) \
         )");
 
@@ -107,10 +101,10 @@ module.exports = {
         )");
         
         // Create finished jobs table.
-        db.run("CREATE TABLE finished_jobs ( \
+        db.run("CREATE TABLE finished_pages ( \
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
             project_id INT, \
-            job_id INT, \
+            page_id INT, \
             status INT, \
             browser_failures INT, \
             browser_comparison_not_run INT, \
@@ -125,7 +119,8 @@ module.exports = {
         db.run("CREATE TABLE screenshots ( \
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
             project_id INT, \
-            job_id INT, \
+            page_id INT, \
+            component_id INT, \
             finished_job_id INT, \
             path VARCHAR(255), \
             capture_failure INT, \
@@ -149,7 +144,8 @@ module.exports = {
         db.run("CREATE TABLE component_capability_breakpoint ( \
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
             component_capability_id INT, \
-            breakpoint_id INT \
+            breakpoint_id INT, \
+            threshold FLOAT \
         )");
 
         // Create browser regression threshold.

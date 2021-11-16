@@ -1,0 +1,99 @@
+extends page
+block content
+    div(class="header bg-primary pb-6")
+        div(class="container")
+            div(class="header-body")
+                div(class="row align-items-center py-4")
+                    div(class="col-lg-6 col-7")
+                        h2(class="h1 text-white d-inline-block mb-0")=title
+    div(class="container")
+        div(class="row justify-content-center")
+            div(class="col-9 mt--6")
+                div(class="card")
+                    div(class="card-header")
+                        h2
+                            | Create project
+                    div(class="card-body")
+                        form(action="/projects/create", method="POST" role="form")
+                            div(class="form-group mb-3")
+                                div(class="input-group-merge input-group-alternative")
+                                    div(class="input-group-prepend")
+                                        span(class="input-group-text")
+                                            i(class="fas fa-signature")
+                                        input(type="text", class="form-control", name="name", value=form.name.value, placeholder="Project Name", aria-invalid=form.name.error, required)
+                                small
+                                    | This is the human readable project name. For instance "Mac's burgers"
+                                if form.name.error
+                                    ul(class="error")
+                                        each error in form.name.errors
+                                            li=error
+                            div(class="form-group mb-3")
+                                div(class="input-group-merge input-group-alternative")
+                                    div(class="input-group-prepend")
+                                        span(class="input-group-text")
+                                            i(class="fas fa-file-signature")
+                                        input(type="text", class="form-control", name="dataname", value=form.dataname.value, placeholder="Project Data Name", data-tooltip="test", aria-invalid=form.dataname.error, required)
+                                small
+                                    | This is the data readable project name user for api call. Only alphanumeric characters and underline. For instance "macs_burgers"
+                                    if form.dataname.error
+                                        ul(class="error")
+                                            each error in form.dataname.errors
+                                                li(style="color:red;")=error
+
+                            div(class="form-group mb-3")
+                                div(class="input-group-merge input-group-alternative")
+                                    div(class="input-group-prepend")
+                                        span(class="input-group-text")
+                                            i(class="fas fa-link")
+                                        input(type="text", class="form-control", name="default_host", value=form.default_host.value, placeholder="Default host", aria-invalid=form.default_host.error, required)
+                                small
+                                    | This is the host that is usually used for doing the visual tests. For instance "https://www.macsburgers.edu"
+                                    if form.default_host.error
+                                        ul(class="error")
+                                            each error in form.default_host.errors
+                                                li(style="color:red;")=error
+
+                            div(class="form-group mb-3")
+                                div(class="input-group-merge input-group-alternative")
+                                    div(class="input-group-prepend")
+                                        span(class="input-group-text")
+                                            i(class="fas fa-id-badge")
+                                        input(type="text", class="form-control", name="default_username", value=form.default_username.value, placeholder="Basic Auth Username")
+                                small
+                                    | If the site is behind basic auth, this is the username.
+                                    if form.default_username.error
+                                        ul(class="error")
+                                            each error in form.default_username.errors
+                                                li(style="color:red;")=error
+
+                            div(class="form-group mb-3")
+                                div(class="input-group-merge input-group-alternative")
+                                    div(class="input-group-prepend")
+                                        span(class="input-group-text")
+                                            i(class="fas fa-lock")
+                                        input(type="password", class="form-control", name="default_password", value=form.default_password.value, placeholder="Basic Auth Password")
+                                small
+                                    | If the site is behind basic auth, this is the password.
+                                    if form.default_password.error
+                                        ul(class="error")
+                                            each error in form.default_password.errors
+                                                li(style="color:red;")=error
+
+                            div(class="form-group mb-3")
+                                div(class="custom-control custom-control-alternative custom-checkbox")
+                                    input(type="checkbox", class="custom-control-input", name="fail_directly", id="check1")
+                                    label(class="custom-control-label", for="check1")
+                                        | Always fail tests directly
+                                small 
+                                    | If one tests fails or is over the threshold the testing stops.
+                            
+                            div(class="form-group mb-3")
+                                div(class="custom-control custom-control-alternative custom-checkbox")
+                                    input(type="checkbox", class="custom-control-input", name="run_sync", id="check2")
+                                    label(class="custom-control-label", for="check2")
+                                        | Always run tests synchrounosly 
+                                small 
+                                    |  If you have a very unoptimized site you might want to enable this. Then the test will run one browser after another until finished.
+
+                            div(class="text-center")
+                                input(type='submit', class="btn btn-primary my-4", value='Create project')

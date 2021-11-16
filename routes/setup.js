@@ -1,13 +1,22 @@
 const user = require('../services/user');
+const form = require('../services/form');
+const validate = require('../services/validate');
 
 module.exports = {
     'get': function(req, res) {
-        res.render('setup', {title: 'Setup Super Admin'})
+        res.render('setup', {
+            title: 'Setup the first user',
+            description: 'Visual testing awaits you!',
+            form: form.populateFormDefaults('user', req),
+        })
     },
-    'post': function(req, res) {
-        const superAdmin = req.body;
-        superAdmin.role = 1;
-        user.createUser(req.body)
-        res.redirect(301, '/login')
+    'post': async function(req, res) {
+        let validationErrors = await user.createUser(req.body)
+
+        if (validationErrors !== null) {
+            validate.redirect('/setup', req.body, validationErrors, req, res)
+        } else {
+            res.redirect(301, '/login')
+        }
     }
 }

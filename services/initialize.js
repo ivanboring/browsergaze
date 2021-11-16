@@ -1,7 +1,7 @@
 const fs = require('fs');
 const os = require('os');
 const yaml = require('js-yaml')
-const cleanup = require('./cleanup');
+const helper = require('./helper');
 const db = require('./db');
 const defaults = require('./defaults')
 
@@ -51,7 +51,7 @@ const initialize = {
             hawkConfig.databaseLocation = __dirname + '/' + defaults.databaseLocation;
         }
         // Make sure a slash exists and set some base file and directories.
-        hawkConfig.databaseLocation = cleanup.rtrim(hawkConfig.databaseLocation, '/') + '/';
+        hawkConfig.databaseLocation = helper.rtrim(hawkConfig.databaseLocation, '/') + '/';
         hawkConfig.databaseFile = hawkConfig.databaseLocation + 'hawk.db';
 
         // Check if folder exists and is writable.

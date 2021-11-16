@@ -2,11 +2,14 @@ const user = require('../services/user');
 
 module.exports = {
     'get': function(req, res) {
-        res.render('login', {title: 'Login'})
+        res.render('login', {
+            title: 'Login to glitch-hawk',
+            description: 'Lets find design issues!'
+        })
     },
     'post': async function(req, res) {
         const login = req.body;
-        const cookieValue = await user.login(req.body.username, req.body.password)
+        const cookieValue = await user.login(req.body.email, req.body.password)
         // Could login
         if (cookieValue) {
             res.cookie('glitch_hawk_session', cookieValue, {httpOnly: true, secure: true})
