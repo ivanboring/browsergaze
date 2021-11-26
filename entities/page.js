@@ -17,7 +17,7 @@ module.exports = {
         validate: {
             type: 'string',
             maxCharLength: 255,
-            minCharLength: 3,
+            minCharLength: 1,
             required: true,
         },
         sanitize: {

@@ -1,4 +1,5 @@
 const db = require('./db')
+const fs = require('fs')
 const validate = require('./validate')
 const path = require('path')
 const argon2 = require('argon2')
@@ -34,6 +35,9 @@ const user = {
             }
         }
     },
+    initialSessions(sessions) {
+        user.sessions = sessions;
+    },
     getUser: function(req) {
         if ('glitch_hawk_session' in req.cookies && req.cookies.glitch_hawk_session in user.sessions) {
             return user.sessions[req.cookies.glitch_hawk_session]
@@ -41,7 +45,7 @@ const user = {
         return false
     },
     isAdmin: function(req) {
-        if (user.sessions[req.cookies.glitch_hawk_session].role == 1 || user.sessions[req.cookies.glitch_hawk_session].role == 2) {
+        if ('cookies' in req && (user.sessions[req.cookies.glitch_hawk_session].role == 1 || user.sessions[req.cookies.glitch_hawk_session].role == 2)) {
             return true;
         }
         return false;
@@ -126,9 +130,14 @@ const user = {
         )
     },
     createCookie: function(user) {
-        console.log('test');
         const sessionHash = crypto.randomBytes(20).toString('hex');
         this.sessions[sessionHash] = {'id': user.id, 'role': user.role, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email}
+        let currentSessions = {};
+        if (fs.existsSync('/tmp/sessions')) {
+            currentSessions = JSON.parse(fs.readFileSync('/tmp/sessions'));
+        }
+        currentSessions[sessionHash] = {'id': user.id, 'role': user.role, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email}
+        fs.writeFileSync('/tmp/sessions', JSON.stringify(currentSessions));
         return sessionHash
     }
 }

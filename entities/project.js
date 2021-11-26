@@ -38,14 +38,13 @@ module.exports = {
             type: 'boolean'
         }
     },
-    default_host: {
+    default_host_path: {
         validate: {
             type: 'string',
-            maxCharLength: 50,
             minCharLength: 3,
             required: true,
             ascii: true,
-            fqdn: true,
+            fqdnInside: true,
             startWith: [
                 'https://',
                 'http://'
@@ -76,4 +75,19 @@ module.exports = {
             trim: ' '
         }        
     },
+    breakpoint_width: {
+        validate: {
+            type: 'object',
+        }
+    },
+    breakpoint_height: {
+        validate: {
+            type: 'object',
+        }
+    },
+    capability: {
+        validate: {
+            type: 'object',
+        }
+    }
 }

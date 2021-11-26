@@ -8,7 +8,7 @@ block content
                     div(class="input-group-prepend")
                         span(class="input-group-text")
                             i(class="fas fa-envelope")
-                        input(type='email', class="form-control", name='email', value=form.email.value, placeholder="E-mail", aria-invalid=form.email.error, required)
+                        input(type='email', class="form-control", name='email', value=form.email.value, placeholder="E-mail", aria-invalid=form.email.error, required, autofocus)
                 small
                     if form.email.error
                         ul(class="error")

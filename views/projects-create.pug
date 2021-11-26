@@ -1,5 +1,6 @@
 extends page
 block content
+    link(rel='stylesheet', href='/css/pages/project.css')
     div(class="header bg-primary pb-6")
         div(class="container")
             div(class="header-body")
@@ -20,7 +21,7 @@ block content
                                     div(class="input-group-prepend")
                                         span(class="input-group-text")
                                             i(class="fas fa-signature")
-                                        input(type="text", class="form-control", name="name", value=form.name.value, placeholder="Project Name", aria-invalid=form.name.error, required)
+                                        input(type="text", class="form-control", name="name", value=form.name.value, placeholder="Project Name", aria-invalid=form.name.error, required, autofocus)
                                 small
                                     | This is the human readable project name. For instance "Mac's burgers"
                                 if form.name.error
@@ -45,12 +46,12 @@ block content
                                     div(class="input-group-prepend")
                                         span(class="input-group-text")
                                             i(class="fas fa-link")
-                                        input(type="text", class="form-control", name="default_host", value=form.default_host.value, placeholder="Default host", aria-invalid=form.default_host.error, required)
+                                        input(type="text", class="form-control", name="default_host_path", value=form.default_host_path.value, placeholder="Default host", aria-invalid=form.default_host_path.error, required)
                                 small
                                     | This is the host that is usually used for doing the visual tests. For instance "https://www.macsburgers.edu"
-                                    if form.default_host.error
+                                    if form.default_host_path.error
                                         ul(class="error")
-                                            each error in form.default_host.errors
+                                            each error in form.default_host_path.errors
                                                 li(style="color:red;")=error
 
                             div(class="form-group mb-3")
@@ -94,6 +95,67 @@ block content
                                         | Always run tests synchrounosly 
                                 small 
                                     |  If you have a very unoptimized site you might want to enable this. Then the test will run one browser after another until finished.
+                            h2
+                                | Breakpoints/Widths/Heights
+                            small 
+                                |  Add all breakpoints/widths/height in pixels you want to test desktop browsers for. Note that this is browser viewport width and height. One is required.
+                            div(class="breakpoints")
+                                div(class="form-group mb-3")
+                                    div(class="input-group input-group-alternative", id="main-breakpoint")
+                                        input(type="number", class="form-control", name="breakpoint_width[]", value=form.breakpoint_width.value[0], placeholder="Width pixels", required)
+                                        div(class="input-group-append")
+                                            span(class="input-group-text")
+                                                | x
+                                        input(type="number", class="form-control", name="breakpoint_height[]", value=form.breakpoint_height.value[0], placeholder="Height pixels", required)
+                                        
+                                        div(class="input-group-append")
+                                            span(class="input-group-text")
+                                                | px
+                                each breakpoint, key in form.breakpoint_width.value
+                                    if key > 0 && breakpoint != ''
+                                        div(class="form-group mb-3")
+                                            div(class="input-group input-group-alternative", id="main-breakpoint")
+                                                input(type="number", class="form-control", name="breakpoint[]", value=breakpoint, placeholder="Width pixels")
+                                                div(class="input-group-append")
+                                                    span(class="input-group-text")
+                                                        | x
+                                                input(type="number", class="form-control", name="breakpoint_height[]", value=form.breakpoint_height.value[key], placeholder="Height pixels", required)
+                                        
+                                                div(class="input-group-append")
+                                                    span(class="input-group-text")
+                                                        | px
+                                                div(class="input-group-append delete-rule")
+                                                    span(class="input-group-text")
+                                                        i(class="fas fa-trash")
+                            div(class="text-center")
+                                input(type='submit', class="btn btn-warning btn-sm", id="add-breakpoint", value='Add breakpoint/width')
+                            h2 
+                                | Devices/Capabilites
+                            small 
+                                |  Check all devices that you want run tests on in this project by default. One is required.
+                            JSON.stringify(capabilities)
+                            each capability in capabilities
+                                div(class="form-group mb-3" )
+                                    div(class="input-group")
+                                        div(class="input-group-prepend")
+                                            span(class="input-group-text")
+                                                input(type="checkbox", name="capability[]", value=capability.id, checked=true)
+                                        div(class="input-group-prepend")
+                                            span(class="input-group-text")
+                                                i(class="fab fa-" + capability.os_icon)
+                                        div(class="input-group-prepend")
+                                            span(class="input-group-text")
+                                                i(class="fas fa-" + capability.browser_icon)
+                                        div(class="form-control")
+                                            | &nbsp; #{capability.platform} #{capability.platform_version}, #{capability.browser_name} #{capability.browser_version}, 
+                                            | from <strong>#{capability.server_name} generator server</strong>
+                            small
+                                if form.capability.error
+                                    ul(class="error")
+                                        each error in form.capability.errors
+                                            li(style="color:red;")=error
+
 
                             div(class="text-center")
                                 input(type='submit', class="btn btn-primary my-4", value='Create project')
+    script(src="/js/pages/project.js")

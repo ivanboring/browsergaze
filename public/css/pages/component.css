@@ -1,0 +1,24 @@
+@font-face {
+    font-family: 'Ubuntu Mono';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/fonts/UbuntuMono.woff2") format('woff2');
+}
+
+ul.draggable {
+    padding-inline-start: 0px;
+}
+
+ul.draggable li {
+    list-style-type: none;
+}
+
+ul.draggable li input {
+    font-family: 'Ubuntu Mono';
+    font-weight: bolder;
+}
+
+.capabilities-table .capability, .capabilities-table .breakpoint {
+    cursor: pointer;
+}

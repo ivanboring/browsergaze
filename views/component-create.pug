@@ -1,0 +1,182 @@
+extends page
+block content
+    script 
+        | let component = {csrf: "#{form.csrf}", projectName: "#{project.dataname}", domain: "#{project.default_host_path}", path: "#{page.path}"};
+    link(rel='stylesheet', href='/css/pages/component.css')
+    script(src="/js/sortable.min.js")
+    div(class="header bg-primary pb-6")
+        div(class="container")
+            div(class="header-body")
+                div(class="row align-items-center py-4")
+                    div(class="col-lg-6 col-7")
+                       div(class="media align-items-center")
+                            span(class="avatar avatar-sm rounded-circle")
+                                img(src="/" + project.dataname + "/icon.png")
+                            div(class="media-body ml-2 d-none d-lg-block")
+                                h2(class="h1 text-white mb-0")=title
+    div(class="container")
+        div(class="row")
+            div(class="col-lg-12 mt--6")
+                div(class="card")
+                    div(class="card-header")
+                        h2
+                            | Create Component for #{project.name}
+                    div(class="card-body")
+                        form(action="/projects/" + project.dataname + "/page/" + page.uuid + '/component/create', method="POST" role="form")
+                            div(class="form-group mb-3")
+                                div(class="input-group-merge input-group-alternative")
+                                    div(class="input-group-prepend")
+                                        span(class="input-group-text")
+                                            i(class="fas fa-signature")
+                                        input(type="text", class="form-control", name="name", value=form.name.value, placeholder="Component Name", aria-invalid=form.name.error, required)
+                                small
+                                    | This is the human readable component name. For instance "Headline 2"
+                                    if form.name.error
+                                        ul(class="error")
+                                            each error in form.name.errors
+                                                li(style="color:red;")=error
+                            div(class="form-group mb-3")
+                                div(class="input-group input-group-alternative")
+                                    input(type="text", class="form-control", name="default_visual_regression_threshold", value=form.default_visual_regression_threshold.value, placeholder="Regression percent", aria-invalid=form.default_visual_regression_threshold.error, required)
+                                    div(class="input-group-append")
+                                        span(class="input-group-text")
+                                            i(class="fas fa-percent")
+                                small
+                                    | This is the amount of pixles in percent the component can diff before the system marks the last run as a change/regression.
+                                    if form.default_visual_regression_threshold.error
+                                        ul(class="error")
+                                            each error in form.default_visual_regression_threshold.errors
+                                                li(style="color:red;")=error
+                            div(class="form-group mb-3", data-toogle="tooltip", data-placement="top", title="This is the amount of pixles in percent the component can diff between two browsers before the system marks it as a failure.")
+                                div(class="input-group input-group-alternative")
+                                    input(type="text", class="form-control", name="default_browser_regression_threshold", value=form.default_browser_regression_threshold.value, placeholder="Browser diff percent", aria-invalid=form.default_browser_regression_threshold.error, required)
+                                    div(class="input-group-append")
+                                        span(class="input-group-text")
+                                            i(class="fas fa-percent")
+                                small
+                                    if form.default_browser_regression_threshold.error
+                                        ul(class="error")
+                                            each error in form.default_browser_regression_threshold.errors
+                                                li(style="color:red;")=error
+                            h2
+                                | Devices / Breakpoints
+                                table(class="table align-items-center capabilities-table")
+                                    thead 
+                                        tr 
+                                            th(scope="col")
+                                                | Device
+                                            each breakpoint in breakpoints
+                                                th(scope="col", class="breakpoint", data-breakpoint=breakpoint.id) 
+                                                    | #{breakpoint.width}x#{breakpoint.height}
+                                    each capability in capabilities 
+                                        tr 
+                                            td(class="capability", data-capability=capability.id)
+                                                i(class="fab fa-" + capability.os_icon)
+                                                | &nbsp; |  
+                                                i(class="fas fa-" + capability.browser_icon)
+                                                | &nbsp; #{capability.browser_version} (#{capability.server_name})
+                                            each breakpoint in breakpoints
+                                                td 
+                                                    input(type="checkbox", checked=true, name="device_breakpoint", value=capability.id + "--" + breakpoint.id, data-breakpoint=breakpoint.id, data-capability=capability.id)
+                            h2 
+                                | Rules
+                            ul(id="rules" class="draggable")                                
+                                if "1" in form.selector.value
+                                    // If we have values
+                                    each formComponent, weight in form.selector.value
+                                        each formValues, key in formComponent 
+                                            li(class="form-group mb-3")
+                                                div(class="input-group")
+                                                    div(class="input-group-prepend drag-hook")
+                                                        span(class="input-group-text")
+                                                            i(class="fas fa-bars")
+                                                    if "prependText" in rules[key]
+                                                        div(class="input-group-prepend")
+                                                            span(class="input-group-text")
+                                                                | #{rules[key].prependText}
+                                                    each input in rules[key].inputs
+                                                        if !input.mainElement
+                                                            div(class="input-group-prepend")
+                                                                case input.type
+                                                                    when "select"
+                                                                        select(class="form-control", name="selector[" + weight + "][" + key + "][" + input.identifier + "]", data-weight=weight, data-group=key, data-id=input.identifier, id=key + "__" + input.identifier + "__" + weight)
+                                                                            each optionValue, optionKey in input.options
+                                                                                option(value=optionKey, selected = optionKey===formValues[input.identifier])
+                                                                                    | #{optionValue}
+                                                                    when "text"
+                                                                        input(type="text", class="form-control", name="selector[" + weight + "][" + key + "][" + input.identifier + "]", data-weight=weight, data-group=key, data-id=input.identifier, id=key + "__" + input.identifier + "__" + weight, value=formValues[input.identifier])
+                                                                    when "number"
+                                                                        input(type="number", class="form-control", name="selector[" + weight + "][" + key + "][" + input.identifier + "]", data-weight=weight, data-group=key, data-id=input.identifier, id=key + "__" + input.identifier + "__" + weight, value=formValues[input.identifier])
+                                                                    when "hidden"
+                                                                        input(type="hidden", name="selector[" + weight + "][" + key + "][" + input.identifier + "]", data-weight=weight, data-group=key, data-id=input.identifier, id=key + "__" + input.identifier + "__" + weight, value=formValues[input.identifier])
+                                                        else 
+                                                            case input.type
+                                                                when "select"
+                                                                    select(class="form-control", name="selector[" + weight + "][" + key + "][" + input.identifier + "]", data-weight=weight, data-group=key, data-id=input.identifier, id=key + "__" + input.identifier + "__" + weight)
+                                                                        each optionValue, optionKey in input.options
+                                                                            option(value=optionKey, selected = optionKey===formValues[input.identifier])
+                                                                                | #{optionValue}
+                                                                when "text"
+                                                                    input(type="text", class="form-control", name="selector[" + weight + "][" + key + "][" + input.identifier + "]", data-weight=weight, data-group=key, data-id=input.identifier, id=key + "__" + input.identifier + "__" + weight, value=formValues[input.identifier])
+                                                                when "number"
+                                                                    input(type="number", class="form-control", name="selector[" + weight + "][" + key + "][" + input.identifier + "]", data-weight=weight, data-group=key, data-id=input.identifier, id=key + "__" + input.identifier + "__" + weight, value=formValues[input.identifier])
+                                                                when "hidden"
+                                                                    input(type="hidden", name="selector[" + weight + "][" + key + "][" + input.identifier + "]", data-weight=weight, data-group=key, data-id=input.identifier, id=key + "__" + input.identifier + "__" + weight, value=formValues[input.identifier])
+                                                    if "appendText" in rules[key]
+                                                        div(class="input-group-append")
+                                                            span(class="input-group-text")
+                                                                | #{rules[key].appendText}
+                                             
+                                else
+                                    li(class="form-group mb-3" id="the-screenshot")
+                                        div(class="input-group")
+                                            div(class="input-group-prepend drag-hook")
+                                                span(class="input-group-text")
+                                                    i(class="fas fa-bars")
+                                            div(class="input-group-prepend")
+                                                select(class="form-control", name="selector[0][screenshotElement][selector]", data-weight="0", data-group="screenshotElement", data-id="selector", id="screenshotElement__selector__0")
+                                                    option(value="js-path")
+                                                        | I Screenshot JS Path:
+                                                    option(value="css-selector")
+                                                        | I Screenshot CSS Selector:
+                                                    option(value="xpath")
+                                                        | I Screenshot XPath:
+                                            input(type="text", name="selector[0][screenshotElement][element]", data-weight="0", data-group="screenshotElement", data-id="element", class="form-control", id="screenshotElement__element__0")
+                                            input(type="hidden", name="selector[0][screenshotElement][value]", data-weight="0", data-group="screenshotElement", data-id="value", id="screenshotElement__value__0", value="images/" + project.dataname + "/tmp/preview.png")
+                            div(id="add-more")
+                                div(class="input-group mb-3")
+                                    select(id="listed-rules", class="form-control")
+                                    div(class="input-group-append")
+                                        button(class="btn btn-icon btn-default btn-sm", id="add-rule")
+                                            span(class="btn-inner--icon")
+                                                i(class="fas fa-plus")
+                                            span(class="btn-inner--text")
+                                                | Add this rule
+                            div(class="text-center")
+                                input(type="hidden", name="tested", id="tested", value=form.tested.value)
+                                button(id="test-component", class="btn btn-secondary my-4")
+                                    | Test component
+                                input(type='submit', class="btn btn-primary my-4", id="submit", value='Create component', disabled)
+
+    div(class="hidden", name="csrf", value=form.csrf)
+    div(class="modal fade", id="loadingTest", tabindex="-1", role="dialog", aria-labelledby="loadingTestLabel", aria-hidden="true")
+        div(class="modal-dialog modal-dialog-centered" role="document")
+            div(class="modal-content")
+                div(class="modal-header")
+                    h5(class="modal-title", id="loadingTestLabel")
+                        | Testing to fetch your component
+                div(class="modal-body text-center")
+                    div(style="margin-bottom: 15px; height: 200px;")
+                        img(id="preview", style="width: 100%; max-height: 200px;")
+                    div(class="progress")
+                        div(class="progress-bar bg-info", id="progressbar", role="progressbar", aria-valuenow="60", aria-valuemin="0", aria-valuemax="100", style="width: 0%;")
+                    div(id="message", class="alert alert-primary", role="alert")
+                        | Warming Up
+                div(class="modal-footer")
+                    button(type="button", id="cancel", class="btn btn-danger", data-dismiss="modal")
+                        | Cancel
+                    button(type="button", id="accept", class="btn btn-success", data-dismiss="modal", style="display: none;")
+                        | Look good
+                    button(type="button", id="again", class="btn btn-warning", data-dismiss="modal", style="display: none;")
+                        | Try again
+    script(src="/js/pages/component.js")

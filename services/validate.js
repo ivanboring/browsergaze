@@ -59,10 +59,10 @@ const validate = {
                             validationErrors.push({id: key, error: `Only alphanumeric characters are allowed here.`});
                         }
                         break;
-                    case 'fqdn':
-                        let fqdn = value.replace('https://', '').replace('http://', '')
-                        if (!validator.isFQDN(fqdn)) {
-                            validationErrors.push({id: key, error: `${fqdn} is not a valid FQDN.`});
+                    case 'fqdnInside':
+                        let fqdn = value.replace('https://', '').replace('http://', '').split('/')
+                        if (!validator.isFQDN(fqdn[0])) {
+                            validationErrors.push({id: key, error: `${fqdn[0]} is not a valid FQDN.`});
                         }
                         break;
                     case 'email':

@@ -1,4 +1,3 @@
-
 module.exports = {
     up: function(db) {
         // Create user table.
@@ -18,14 +17,30 @@ module.exports = {
             dataname VARCHAR(50), \
             fail_directly INT, \
             run_sync INT, \
-            default_host VARCHAR(255), \
+            default_host_path TEXT, \
             default_username VARCHAR(255), \
             default_password VARCHAR(255) \
+        )");
+
+        // Create project breakpoints table.
+        db.run("CREATE TABLE project_breakpoints ( \
+            id INTEGER PRIMARY KEY AUTOINCREMENT, \
+            project_id INT, \
+            width INT, \
+            height INT \
+        )");
+
+        // Create project capabilities table.
+        db.run("CREATE TABLE project_capabilities ( \
+            id INTEGER PRIMARY KEY AUTOINCREMENT, \
+            project_id INT, \
+            capability_id INT \
         )");
 
         // Create generator server.
         db.run("CREATE TABLE generator_servers (\
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
+            name VARCHAR(255), \
             hostname VARCHAR(255), \
             path VARCHAR(255), \
             port INT, \
@@ -33,15 +48,15 @@ module.exports = {
         )")
 
         // Create capability.
-        db.run("CREATE TABLE capbilities (\
+        db.run("CREATE TABLE capabilities (\
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
             generator_server_id INT, \
             browser_name VARCHAR(100), \
+            browser_version VARCHAR(100), \
             platform VARCHAR(100), \
-            version VARCHAR(100), \
+            platform_version VARCHAR(100), \
             device_name VARCHAR(100), \
-            selenium_version VARCHAR(100), \
-            driver_version VARCHAR(100), \
+            processor VARCHAR(100), \
             is_browser_default INT, \
             is_mobile INT, \
             advanced_config TEXT \
@@ -50,19 +65,21 @@ module.exports = {
         // Create page table.
         db.run("CREATE TABLE pages ( \
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
+            uuid VARCHAR(32), \
             project_id INT, \
             name VARCHAR(255), \
-            path VARCHAR(255) \
+            path TEXT \
         )");
 
         // Create components table.
         db.run("CREATE TABLE components ( \
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
             page_id INT, \
+            project_id INT, \
+            uuid VARCHAR(32), \
             name VARCHAR(255), \
             default_visual_regression_threshold FLOAT, \
-            default_browser_regression_threshold FLOAT, \
-            selector VARCHAR(255) \
+            default_browser_regression_threshold FLOAT \
         )");
 
         // Create rules table.
@@ -70,8 +87,8 @@ module.exports = {
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
             component_id INT, \
             key VARCHAR(255), \
-            value TEXT, \
-            description VARCHAR(255) \
+            weight INT, \
+            ruleset TEXT \
         )");
 
         // Create project user table.
@@ -91,13 +108,6 @@ module.exports = {
             capability_id INT, \
             created INT, \
             path VARCHAR(255) \
-        )");
-
-        // Create breakpoints table
-        db.run("CREATE TABLE breakpoints ( \
-            id INTEGER PRIMARY KEY AUTOINCREMENT, \
-            width INT, \
-            name VARCHAR(255) \
         )");
         
         // Create finished jobs table.
@@ -129,21 +139,11 @@ module.exports = {
             created INT \
         )");
 
-        // Create capabilities per component.
-        db.run("CREATE TABLE component_capability ( \
-            id INTEGER PRIMARY KEY AUTOINCREMENT, \
-            component_id INT, \
-            capabilities_id INT, \
-            is_browser_default INT, \
-            is_mobile_default INT, \
-            browser_compare INT, \
-            mobile_compare INT \
-        )");
-
         // Create breakpoint capabilities per component.
         db.run("CREATE TABLE component_capability_breakpoint ( \
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
-            component_capability_id INT, \
+            component_id INT, \
+            capability_id INT, \
             breakpoint_id INT, \
             threshold FLOAT \
         )");
@@ -170,5 +170,14 @@ module.exports = {
             key VARCHAR(255), \
             value VARCHAR(255) \
         )");
+
+        // Create puppeteer generator server
+        db.run("INSERT INTO generator_servers (name, hostname, path, port, server_type) VALUES (?, ?, ?, ?, ?);", 
+            'Built-in',
+            'localhost',
+            '',
+            '',
+            'puppeteer'
+        );
     }
 }

@@ -10,6 +10,10 @@ const helper = {
             download(fileUrl).pipe(fs.createWriteStream(destPath));
             resolve(true)
         });
+    },
+    getDomainFromUrl: function (url) {
+        let parts = url.split('/');
+        return parts[0] + '//' + parts[2];
     }
 }
 

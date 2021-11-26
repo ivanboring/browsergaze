@@ -16,26 +16,26 @@ block content
                 div(class="card")
                     div(class="card-header")
                         h2
-                            | Create project for #{project.name}
+                            | Create Page for #{project.name}
                     div(class="card-body")
-                        form(action="/projects/create", method="POST" role="form")
+                        form(action="/projects/" + project.dataname + "/page/create", method="POST" role="form")
                             div(class="form-group mb-3")
                                 div(class="input-group-merge input-group-alternative")
                                     div(class="input-group-prepend")
                                         span(class="input-group-text")
                                             i(class="fas fa-signature")
-                                        input(type="text", class="form-control", name="name", value=form.name.value, placeholder="Page Name", aria-invalid=form.name.error, required)
-                                small
-                                    | This is the human readable page name. For instance "About Us Information Page"
+                                        input(type="text", class="form-control", name="name", value=form.name.value, placeholder="Page Name", aria-invalid=form.name.error, required, autofocus)
+                            small
+                                | This is the human readable page name. For instance "About Us Information Page"
                                 if form.name.error
                                     ul(class="error")
                                         each error in form.name.errors
-                                            li=error
+                                            li(style="color:red;")=error
                             div(class="form-group mb-3")
                                 div(class="input-group")
                                     div(class="input-group-prepend")
                                         span(class="input-group-text" id="path-to")
-                                            | #{project.default_host}
+                                            | #{project.default_host_path}
                                     input(type="text", class="form-control", id="path-here", aria-describedby="path-to", name="path", value=form.path.value, placeholder="Path", aria-invalid=form.path.error, required)
                                 small
                                     | This is the path where the screenshots will be taken. For instance "/information/about-us"

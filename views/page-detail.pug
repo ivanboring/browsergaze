@@ -1,0 +1,91 @@
+extends page
+
+block content
+    div(class="header bg-primary pb-2")
+        div(class="container")
+            div(class="header-body")
+                div(class="row align-items-center py-4")
+                    div(class="col-lg-6 col-7")
+                        div(class="media align-items-center")
+                            span(class="avatar avatar-sm rounded-circle")
+                                img(src="/" + project.dataname + "/icon.png")
+                            div(class="media-body ml-2 d-none d-lg-block")
+                                h2(class="h1 text-white mb-0")=pageTitle
+                    div(class="col-lg-6 col-5 text-right")
+                        div(class="dropdown")
+                            button(class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+                                | Page Menu
+                            div(class="dropdown-menu" aria-labelledby="dropdownMenuButton")
+                                a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
+                                    i(class="fas fa-poll")
+                                    | All results
+                                a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
+                                    i(class="fas fa-play")
+                                    | Run all Components
+                                if isAdmin
+                                    a(href="/projects/" + project.dataname + "/page/" + page.uuid + "/component/create", class="dropdown-item", disabled)
+                                        i(class="fas fa-plus")
+                                        | Create Component
+                                    a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
+                                        i(class="fas fa-edit")
+                                        | Edit Page
+    div(class="container mt-3")
+        if components.length
+            h1
+                | Components
+            div(class="table-responsive")
+                div 
+                    table(class="table align-items-center")
+                        thead(class="thead-light")
+                            tr
+                                th(scope="col")
+                                    | Image
+                                th(scope="col", class="sort", data-sort="name")
+                                    | Name
+                                th(scope="col", class="sort", data-sort="testrun")
+                                    | Last Test Run
+                                th(scope="col")
+                                    | Actions
+                        tbody 
+                            each val, key in components
+                                tr
+                                    th(scope="row")
+                                        img(src='/' + project.dataname + "/" + page.uuid + '/' + val.uuid + '/default.png', style="max-width: 200px; max-height:100px;")
+                                    th(scope="row")
+                                        | #{val.name}
+                                    th(scope="row")
+                                        | 2021-12-01 14:00:00
+                                    th(scope="row")
+                                        div(class="dropdown")
+                                            button(class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+                                                | Actions
+                                            div(class="dropdown-menu" aria-labelledby="dropdownMenuButton")
+                                                a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
+                                                    i(class="fas fa-poll")
+                                                    | Edit component
+                                                a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
+                                                    i(class="fas fa-poll")
+                                                    | Upload baseline image
+                                                a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
+                                                    i(class="fas fa-poll")
+                                                    | Run test on component
+                                                a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
+                                                    i(class="fas fa-poll")
+                                                    | View results of test runs
+                                        //a(href="/projects/" + project.dataname + '/page/' + val.uuid)
+                                        //    img(src='/' + project.dataname + "/" + page.uuid + '/' + val.uuid + '/default.png', class="card-img-top")
+                                        //div(class="card-body text-center")
+                                        //    a(href="projects/" + project.dataname + '/page/' + val.uuid)
+                                        //        h4(class="card-title text-center")=val.name
+        else
+            div(class="row justify-content-center")
+                div(class="col-6")
+                    div(class="card")
+                        div(class="card-header text-center")
+                            
+                        div(class="card-body text-center")
+                            a(href="/projects/" + project.dataname + "/page/" + page.uuid + "/component/create", class="btn btn-primary btn-md", type="button")
+                                span(class="btn-inner--icon")
+                                    i(class="ni ni-fat-add")
+                                span(class="btn-inner--text")
+                                    | Create your first component

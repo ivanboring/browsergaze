@@ -1,7 +1,7 @@
 extends page
 
 block content
-    div(class="header bg-primary pb-6")
+    div(class="header bg-primary pb-2")
         div(class="container")
             div(class="header-body")
                 div(class="row align-items-center py-4")
@@ -29,19 +29,19 @@ block content
                                     a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
                                         i(class="fas fa-edit")
                                         | Edit project
-    div(class="container mt--6")
+    div(class="container mt-3")
         if pages.length
+            h1
+                | Pages
             div(class="row")
                 each val, key in pages
                     div(class="col-sm-6 col-md-6 col-12 col-lg-4 col-xl-4")
                         div(class="card")
-                            a(href="/projects/detail/" + project.dataname)
-                                img(src=project.dataname + '/init.jpg', class="card-img-top")
+                            a(href="/projects/" + project.dataname + '/page/' + val.uuid)
+                                img(src='/' + project.dataname + "/" + val.uuid + '/init.jpg', class="card-img-top")
                             div(class="card-body text-center")
-                                a(href="/projects/detail/" + project.dataname, class="avatar avatar-xs")
-                                    img(src=project.dataname + "/icon.png")
-                                a(href="/projects/detail/" + project.dataname)
-                                    h4(class="card-title text-center")=project.name
+                                a(href="projects/" + project.dataname + '/page/' + val.uuid)
+                                    h4(class="card-title text-center")=val.name
         else
             div(class="row justify-content-center")
                 div(class="col-6")
