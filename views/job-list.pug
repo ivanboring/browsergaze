@@ -1,0 +1,185 @@
+extends page
+
+block content
+    script
+        | const screenshot_ids = "#{screenshotIds}";
+        | const project_name = "#{project.dataname}";
+    link(rel='stylesheet', href='/css/pages/job-list.css')
+    div(class="header bg-primary pb-2")
+        div(class="container-fluid")
+            div(class="header-body")
+                div(class="row align-items-center py-4")
+                    div(class="col-lg-6 col-7")
+                        div(class="media align-items-center")
+                            span(class="avatar avatar-sm rounded-circle")
+                                img(src="/" + project.dataname +"/icon.png")
+                            div(class="media-body ml-2 d-none d-lg-block")
+                                h2(class="h1 text-white mb-0")=pageTitle
+                    div(class="col-lg-6 col-5 text-right")
+                        div(class="dropdown")
+                            button(class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+                                | Page Menu
+                            div(class="dropdown-menu" aria-labelledby="dropdownMenuButton")
+                                a(href="/projects/run/all/", class="dropdown-item", disabled)
+                                    i(class="fas fa-poll")
+                                    | All results
+    div(class="container-fluid mt-3")
+        nav(aria-label="breadcrumb")
+            ol(class="breadcrumb")
+                li(class="breadcrumb-item")
+                    a(href="/projects")
+                        | Projects 
+                li(class="breadcrumb-item")
+                    a(href="/projects/detail/" + project.dataname)
+                        | #{project.name}
+                li(class="breadcrumb-item active" aria-current="page")
+                        | Jobs
+
+        h1
+            | Visual Test Results
+        form(action="/projects/fastdesign/results?", method="GET")
+            div(class="row")
+                div(class="col-md-2")
+                    div(class="form-group")
+                        label(for="page")
+                            | Page 
+                        select(class="form-control", name="page_id", id="page")
+                            each val, key in pageOptions
+                                option(value=val.id, selected=val.selected)
+                                    | #{val.value}
+                div(class="col-md-2")
+                    div(class="form-group")
+                        label(for="job")
+                            | Job 
+                        select(class="form-control", name="job_id", id="job")
+                            each val, key in jobOptions
+                                option(value=val.id, selected=val.selected)
+                                    | #{val.value}
+                div(class="col-md-2")
+                    div(class="form-group")
+                        label(for="component")
+                            | Component
+                        select(class="form-control", name="component_id", id="component")
+                            each val, key in componentOptions
+                                option(value=val.id, selected=val.selected)
+                                    | #{val.value}
+                div(class="col-md-2")
+                    div(class="form-group")
+                        label(for="device")
+                            | Device
+                        select(class="form-control", name="capability_id", id="device")
+                            each val, key in capabilityOptions
+                                option(value=val.id, selected=val.selected)
+                                    | #{val.value}
+                div(class="col-md-2")
+                    div(class="form-group")
+                        label(for="breakpoint")
+                            | Breakpoints
+                        select(class="form-control", name="breakpoint_id", id="breakpoint")
+                            each val, key in breakpointOptions
+                                option(value=val.id, selected=val.selected)
+                                    | #{val.value}
+            div(class="row")
+                div(class="col-md-2")
+                    input(class="btn btn-primary", type="submit", value="Filter")
+        div(class="table-responsive")
+            div 
+                table(style="width: 100%;")
+                    thead(class="thead-light")
+                        tr
+                            th
+                                | Image
+                            th
+                                | Baseline
+                            th
+                                | Diff
+                            th
+                                | Page
+                            th
+                                | Component
+                            th
+                                | Last Update
+                            th
+                                | Status
+                            th
+                                | Device
+                            th
+                                | Width
+                            th
+                                | Height
+                            th
+                                | Regression
+                            th
+                                | Is Baseline
+                            th
+                                | Actions
+                    tbody 
+                        each val, key in screenshots
+                            tr
+                                td(class="screenshot", id="screenshot-" + val.id)
+                                    if (val.status > 1)
+                                        img(src=val.path.substr(8), style="max-width: 200px; max-height:100px;")
+                                    else
+                                        img(src='/pics/loading.gif', style="max-width: 200px; max-height:100px;")
+                                td(scope="row", class="baseline", id="baseline-" + val.id)
+                                    if key in baseline && "path" in baseline[key]
+                                        img(src=baseline[key].path.substr(8), style="max-width: 200px; max-height:100px;")
+                                td(scope="row", class="diff", id="diff-" + val.id)
+                                    if (val.status > 1)
+                                        img(src=val.path.replace('.png', '_diff.png').substr(8), style="max-width: 200px; max-height:100px;")
+                                    else
+                                        img(src='/pics/loading.gif', style="max-width: 200px; max-height:100px;")
+                                td(scope="row")
+                                    | #{val.page_name}
+                                td(scope="row")
+                                    | #{val.component_name}
+                                td(scope="row")
+                                    | #{val.created_time_formatted}
+                                td(scope="row", class="status", id="status-" + val.id, data-status=val.status)
+                                    case val.status
+                                        when 0
+                                            | No shot yet
+                                        when 1
+                                            | Grabbing shot
+                                        when 2
+                                            | Waiting test
+                                        when 3
+                                            | Testing
+                                        when 4
+                                            | Finished
+                                td(scope="row")
+                                    i(class="fab fa-" + val.os_icon)
+                                    | &nbsp; #{val.platform_version}
+                                    | &nbsp; |  
+                                    i(class="fas fa-" + val.browser_icon)
+                                    | &nbsp; #{val.browser_version} #{val.server_type}
+                                td(scope="row")
+                                    | #{val.width}
+                                td(scope="row")
+                                    | #{val.height}
+                                td(scope="row", class="visual-regression", id="visual-regression-" + val.id)
+                                    | #{val.visual_regression}%
+                                td(scope="row")
+                                    if val.is_baseline
+                                        strong
+                                        | Baseline
+                                    else
+                                        |
+                                td(scope="row")
+                                    div(class="dropdown")
+                                        button(class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+                                            | Actions
+                                        div(class="dropdown-menu" aria-labelledby="dropdownMenuButton")
+                                            a(href="/projects/" + project.dataname + "/results/diff/" + val.id, class="dropdown-item", disabled)
+                                                i(class="fas fa-poll")
+                                                | View Regression Diff
+                                            a(href="/projects/run/all" class="dropdown-item", disabled)
+                                                i(class="fas fa-poll")
+                                                | View Browser Diffs
+                                            a(href="/projects/run/all" class="dropdown-item", disabled)
+                                                i(class="fas fa-poll")
+                                                | Set as Baseline
+                                            a(href="/projects/run/all" class="dropdown-item", disabled)
+                                                i(class="fas fa-poll")
+                                                | Delete Result
+    script(src="/js/pages/job-list.js")

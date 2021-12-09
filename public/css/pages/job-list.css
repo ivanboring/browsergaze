@@ -1,0 +1,22 @@
+table {
+    font-size: 0.75em;
+    color: black;
+}
+table tr {
+    border-bottom: 2px solid #fff;
+}
+
+table tr:nth-child(even) {
+    background-color: #f2f2fe;
+}
+
+table tr th {
+    padding: 5px 3px;
+    border-right: 2px solid #fff;
+}
+
+table tr td {
+    padding: 5px 3px;
+    border-right: 2px solid #f2f2fe;
+    border-left: 2px solid #f2f2fe;
+}

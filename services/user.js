@@ -50,6 +50,12 @@ const user = {
         }
         return false;
     },
+    isCreator: function(req) {
+        if ('cookies' in req && (user.sessions[req.cookies.glitch_hawk_session].role >= 1 && user.sessions[req.cookies.glitch_hawk_session].role <= 3)) {
+            return true;
+        }
+        return false;
+    },
     createUser: async function(userData) {
         const password2 = userData.password2;
         delete userData.password2;

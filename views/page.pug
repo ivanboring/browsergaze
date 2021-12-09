@@ -11,7 +11,7 @@ html
   body
     div(class="main-content")
       nav(class="navbar navbar-top navbar-expand navbar-dark bg-primary border-bottom")
-        div(class="container")
+        div(class="container-fluid")
           div(class="collapse navbar-collapse", id="navbarSupportedContent")
             ul(class="navbar-nav align-items-center ml-md-auto")
               li(class="nav-item dropdown")
@@ -34,7 +34,7 @@ html
                       small
                         | Results
                     if isAdmin
-                      a(class="col-4 shortcut-item", href="#4")
+                      a(class="col-4 shortcut-item", href="/projects/results")
                         span(class="shortcut-media avatar rounded-circle bg-gradient-red")
                           i(class="fas fa-desktop")
                         small

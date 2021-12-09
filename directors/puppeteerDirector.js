@@ -16,7 +16,7 @@ const puppeteerDirector = {
     },
     resizeWindow: async function(width, height, jobId) {
         const session = await this.page[jobId].target().createCDPSession();
-        await this.page[jobId].setViewport({height, width});
+        await this.page[jobId].setViewport({width: width, height: height});
         const {windowId} = await session.send('Browser.getWindowForTarget');
         await session.send('Browser.setWindowBounds', {
             bounds: {height, width},
@@ -28,6 +28,9 @@ const puppeteerDirector = {
             path = path.substr(1);
         }
         await this.page[jobId].goto(this.domain + path);
+    },
+    reload: async function(jobId) {
+        await this.page[jobId].reload();
     },
     screenshot: async function(filePath, jobId) {
         await this.page[jobId].screenshot({ path: filePath });
@@ -80,39 +83,13 @@ const puppeteerDirector = {
         if (parameters.element == '') {
             throw 'No element/xpath given';
         }
+        let file = parameters.value;
         try {
             let element = await this.getElement(jobId, parameters.selector, parameters.element);
-            await element.screenshot({path: parameters.value});
+            await element.screenshot({path: file});
         } catch(e) {
             throw `Could not write the file for the screenshot of: ${selector}.`;
         }
-
-        /*    const rect = await this.page[jobId].evaluate(selector => {
-                const element = document.querySelector(selector);
-                if (!element)
-                    return null;
-                const {x, y, width, height} = element.getBoundingClientRect();
-                return {left: x, top: y, width, height, id: element.id};
-            }, selector);
-        }
-
-        if (!rect) {
-            throw `Could not find element that matches selector: ${selector}.`;
-        }
-
-        try {
-            await this.page[jobId].screenshot({
-                path: parameters.value,
-                clip: {
-                    x: rect.left,
-                    y: rect.top,
-                    width: rect.width * 2,
-                    height: rect.height * 2
-                }
-            });
-        } catch(e) {
-            throw 'Screenshotting went wrong'
-        }*/
         return parameters.value;
     },
     // Wait ms.
@@ -134,6 +111,19 @@ const puppeteerDirector = {
                 throw `Button with title ${parameter.title} not found`;
             }
             if (button) {
+                await button.click();
+            }
+        } catch (e) {
+            throw e
+        }
+    },
+    clickButtonTitledExists: async function(parameter, jobId) {
+        if (parameter.title == '') {
+            throw 'No button title given';
+        }
+        try {
+            const [button] = await this.page[jobId].$x("//button[contains(., '" + parameter.title + "')]");
+            if (typeof button !== 'undefined') {
                 await button.click();
             }
         } catch (e) {

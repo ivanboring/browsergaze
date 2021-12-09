@@ -4,7 +4,10 @@ const {
 
 const form = {
     tokens: {},
-    populateFormDefaults(entityName, req) {
+    populateFormDefaults(entityName, req, valueObject) {
+        if (typeof valueObject == 'undefined') {
+            valueObject = {};
+        }
         const passedVariable = 'session' in req && 'validation' in req.session ? req.session.validation : {};
         const formValues = passedVariable !== null && 'values' in passedVariable ? passedVariable.values : {};
         const formValidation = passedVariable !== null &&'validationErrors' in passedVariable ? passedVariable.validationErrors : [];
@@ -30,6 +33,8 @@ const form = {
             }
             if (formField in formValues) {
                 formObject[formField]['value'] = formValues[formField];
+            } else if (formField in valueObject) {
+                formObject[formField]['value'] = valueObject[formField];
             } else if ('default' in entityRules[formField]) {
                 formObject[formField]['value'] = entityRules[formField]['default'];
             } else {

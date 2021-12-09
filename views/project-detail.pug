@@ -1,6 +1,8 @@
 extends page
 
 block content
+    script
+        | project_name="#{project.dataname}";
     div(class="header bg-primary pb-2")
         div(class="container")
             div(class="header-body")
@@ -16,12 +18,12 @@ block content
                             button(class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
                                 | Project Menu
                             div(class="dropdown-menu" aria-labelledby="dropdownMenuButton")
-                                a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
+                                a(href="/projects/" + project.dataname + "/results", class="dropdown-item", disabled)
                                     i(class="fas fa-poll")
                                     | All results
-                                a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
+                                a(href="", id="run-project", class="dropdown-item", disabled)
                                     i(class="fas fa-play")
-                                    | Run all pages
+                                    | Run everything
                                 if isAdmin
                                     a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
                                         i(class="fas fa-plus")
@@ -54,3 +56,4 @@ block content
                                     i(class="ni ni-fat-add")
                                 span(class="btn-inner--text")
                                     | Create your first page
+    script(src="/js/pages/project-detail.js")

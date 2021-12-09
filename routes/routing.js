@@ -13,9 +13,21 @@ const routing = {
         app.get('/setup', require('./setup').get);
         app.post('/setup', require('./setup').post);
 
+        app.post('/api/component/start/:uuid', require('./jobs').startComponent)
+        app.post('/api/project/start/:project_name', require('./jobs').startProject)
+        // Status for specific screenshots
+        app.get('/api/job/status/:project_name', require('./jobs').getStatusPerId);
+        // Status for one job.
+        app.get('/api/job/:uuid/status', require('./jobs').getStatus);
+
         app.post('/runner/component/start', require('./components').startRunner)
         app.get('/runner/component/status/:jobId', require('./components').statusRunner)
         app.get('/projects/:projectName/page/create', require('./pages').createForm);
+        app.get('/projects/:projectName/results', require('./jobs').getJobs);
+        app.get('/projects/:projectName/results/diff/:screenshot_id', require('./screenshots').diff);
+
+        app.get('/projects/:projectName/component/:componentUuid/edit', require('./components').editForm);
+
         app.post('/projects/:projectName/page/create', require('./pages').post);
         app.get('/projects/:projectName/page/:pageUuid', require('./pages').detail);
         app.get('/projects/:projectName/page/:pageUuid/component/create', require('./components').createForm);

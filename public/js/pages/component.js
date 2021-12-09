@@ -1,5 +1,4 @@
 let globalRules = {}
-let globalRulesCounter = 1;
 let globalComponentInterval = null;
 let globalTotalJobs = 0;
 
@@ -46,6 +45,16 @@ $(document).ready(function() {
             $('#again').hide();
             $('#cancel').show();
         })
+
+        $('.delete-rule').off('click').on('click', function() {
+            $(this).parents('li').remove();
+        })
+
+        Sortable.create(document.getElementById('rules'), {
+            handle: '.drag-hook',
+            animation: 150,
+            onEnd: restructureComponents
+        });
     })
 });
 
@@ -108,8 +117,8 @@ function addRule() {
     $('.delete-rule').off('click').on('click', function() {
         $(this).parents('li').remove();
     })
-    
-    globalRulesCounter++;
+    console.log(globalRulesCounter);
+
     Sortable.create(document.getElementById('rules'), {
         handle: '.drag-hook',
         animation: 150,

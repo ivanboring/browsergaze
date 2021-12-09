@@ -27,6 +27,24 @@ const page = {
             }
         )
     },
+    getPageById: async function(req, id) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    if (user.isAdmin(req)) {
+                        query.get("SELECT pg.* FROM pages pg WHERE pg.id=?;", id, function(err, rows) {
+                            resolve(rows)
+                        });
+                    } else {
+                        query.get("SELECT pg.* FROM pages pg LEFT JOIN projects p ON p.id=pg.project_id LEFT JOIN project_user pu ON pu.page_id=p.id WHERE pu.user_id=? AND p.ids=?;", user.getUser(req).id, id, function(err, rows) {
+                            resolve(rows)
+                        });
+                    }
+                });
+            }
+        )
+    },
     getPageByUuid: async function(req, uuid) {
         let query = db.getDb();
         return new Promise(

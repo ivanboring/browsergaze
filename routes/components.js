@@ -27,6 +27,49 @@ const components = {
                 form: form.populateFormDefaults('component', req),
                 rules: yaml.load(fs.readFileSync('./directors/rules.yaml')),
                 user: user.getUser(req),
+                buttonText: 'Create component',
+                capabilities: capabilities.getCapabilitiesForStyling(projectCapabilites),
+                breakpoints: projectBreakpoints,
+            })
+        } else {
+            res.redirect(301, '/projects')
+        }
+    },
+    editForm: async function(req, res) {
+        const projectObject = await project.getProjectByName(req, req.params.projectName);
+        const componentObject = await component.getComponentByUuid(req, req.params.componentUuid);
+        const fullComponent = await component.getFullComponent(componentObject);
+        // Fix full component.
+        fullComponent.device_breakpoint = [];
+        for (let t in fullComponent.capabilities_and_breakpoints) {
+            let mix = fullComponent.capabilities_and_breakpoints[t];
+            fullComponent.device_breakpoint.push(mix.capability_id + '--' + mix.breakpoint_id);
+        }
+        fullComponent.selector = [];
+        for (let t in fullComponent.rules) {
+            let mix = fullComponent.rules[t];
+            let rule = {};
+            rule[mix.key] = JSON.parse(mix.ruleset);
+            fullComponent.selector.push(rule)
+        }
+        fullComponent.tested = 1;
+        const pageObject = await page.getPageById(req, componentObject.page_id);
+        const projectBreakpoints = await project.getProjectBreakpoints(req, projectObject.id);
+        const projectCapabilites = await project.getProjectCapabilities(req, projectObject.id);
+        if (!projectObject || !pageObject) {
+            res.redirect(301, '/projects')
+            return
+        }
+        if (user.isAdmin(req)) {
+            res.render('component-create', {
+                title: 'Edit Component ' + componentObject.name + ' for ' + projectObject.name,
+                project: projectObject,
+                page: pageObject,
+                id: componentObject.id,
+                form: form.populateFormDefaults('component', req, componentObject),
+                rules: yaml.load(fs.readFileSync('./directors/rules.yaml')),
+                user: user.getUser(req),
+                buttonText: 'Edit component',
                 capabilities: capabilities.getCapabilitiesForStyling(projectCapabilites),
                 breakpoints: projectBreakpoints,
             })
@@ -38,9 +81,14 @@ const components = {
         if (user.isAdmin(req)) {
             const projectObject = await project.getProjectByName(req, req.params.projectName)
             const pageObject = await page.getPageByUuid(req, req.params.pageUuid)
-            let validationErrors = await component.createComponent(req.body, pageObject, projectObject)
+            let validationErrors = "id" in req.body ? await component.editComponent(req.body, pageObject, projectObject) : await component.createComponent(req.body, pageObject, projectObject)
             if (validationErrors !== null) {
-                validate.redirect('/projects/' + projectObject.dataname + '/page/' + pageObject.uuid + '/component/create', req.body, validationErrors, req, res)
+                if ("id" in req.body) {
+                    const componentObject = await component.getComponentById(req, req.body.id);
+                    validate.redirect('/projects/' + projectObject.dataname + '/component/' + componentObject.uuid + '/edit', req.body, validationErrors, req, res)
+                } else {
+                    validate.redirect('/projects/' + projectObject.dataname + '/page/' + pageObject.uuid + '/component/create', req.body, validationErrors, req, res)
+                }
             } else {
                 res.redirect(301, '/projects/' + projectObject.dataname + '/page/' + pageObject.uuid )
             }

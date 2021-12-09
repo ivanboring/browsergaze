@@ -5,6 +5,8 @@ const helper = require('./helper');
 const db = require('./db');
 const defaults = require('./defaults');
 const puppeteer = require('puppeteer');
+const runner = require('../directors/runner');
+const differ = require('../directors/differ');
 
 const configPath = '../config.yaml';
 
@@ -17,6 +19,8 @@ const initialize = {
             throw Error('No config set, please run "npm run install" or read documentation.');
         }
         this.checkRequirements();
+        runner.startGenerators();
+        differ.startDiffer();
     },
     checkRequirements: function() {
         this.checkImageMagickBinary();
@@ -26,16 +30,16 @@ const initialize = {
         // Try to check if exe file exists in path or in config path.
         hawkConfig.usedBinaryCommand = null;
         if ('imageMagicBinary' in hawkConfig) {
-            const testBinary = os.platform() == 'win32' ? hawkConfig.imageMagicBinary.replace('.exe') : hawkConfig.imageMagicBinary;
-            if (require('hasbin').sync(testBinary)) {
-                hawkConfig.usedBinaryCommand = testBinary + ' convert';
-            }
+            const testBinary = os.platform() == 'win32' ? hawkConfig.imageMagicBinary.replace('.exe', '') : hawkConfig.imageMagicBinary;
+            //if (require('hasbin').sync(testBinary)) {
+                hawkConfig.usedBinaryCommand = testBinary + ' compare';
+            //}
         }
-        if (!hawkConfig.usedBinaryCommand && require('hasbin').sync('convert')) {
-            hawkConfig.usedBinaryCommand = 'convert';
+        if (!hawkConfig.usedBinaryCommand && require('hasbin').sync('compare')) {
+            hawkConfig.usedBinaryCommand = 'compare';
         }
         if (!hawkConfig.usedBinaryCommand && require('hasbin').sync('magick')) {
-            hawkConfig.usedBinaryCommand = 'magick convert';
+            hawkConfig.usedBinaryCommand = 'magick compare';
         }
         if (!hawkConfig.usedBinaryCommand) {
             throw Error('Could not find ImageMagick, please run "npm run install" or read documentation.');

@@ -1,6 +1,8 @@
 extends page
 
 block content
+    script
+        | project_name="#{project.dataname}";
     div(class="header bg-primary pb-2")
         div(class="container")
             div(class="header-body")
@@ -16,7 +18,7 @@ block content
                             button(class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
                                 | Page Menu
                             div(class="dropdown-menu" aria-labelledby="dropdownMenuButton")
-                                a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
+                                a(href="/projects/" + project.dataname + "/results", class="dropdown-item", disabled)
                                     i(class="fas fa-poll")
                                     | All results
                                 a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
@@ -60,23 +62,18 @@ block content
                                             button(class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
                                                 | Actions
                                             div(class="dropdown-menu" aria-labelledby="dropdownMenuButton")
-                                                a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
+                                                a(href="/projects/" + project.dataname + "/component/" + val.uuid + "/edit", class="dropdown-item", disabled)
                                                     i(class="fas fa-poll")
                                                     | Edit component
                                                 a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
                                                     i(class="fas fa-poll")
                                                     | Upload baseline image
-                                                a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
+                                                div(class="dropdown-item start-job-component", data-uuid=val.uuid, style="cursor: pointer;")
                                                     i(class="fas fa-poll")
                                                     | Run test on component
-                                                a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
+                                                a(href="/projects/" + project.dataname + '/results?component_id=' + val.id, class="dropdown-item", disabled)
                                                     i(class="fas fa-poll")
                                                     | View results of test runs
-                                        //a(href="/projects/" + project.dataname + '/page/' + val.uuid)
-                                        //    img(src='/' + project.dataname + "/" + page.uuid + '/' + val.uuid + '/default.png', class="card-img-top")
-                                        //div(class="card-body text-center")
-                                        //    a(href="projects/" + project.dataname + '/page/' + val.uuid)
-                                        //        h4(class="card-title text-center")=val.name
         else
             div(class="row justify-content-center")
                 div(class="col-6")
@@ -89,3 +86,4 @@ block content
                                     i(class="ni ni-fat-add")
                                 span(class="btn-inner--text")
                                     | Create your first component
+    script(src="/js/pages/component-list.js")

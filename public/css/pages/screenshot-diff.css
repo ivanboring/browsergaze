@@ -1,0 +1,33 @@
+.tabs {
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tabs li.active {
+    background: #172b4d;
+}
+
+.tabs li {
+    cursor: pointer;
+    padding:10px 20px;
+    margin:0px 2px;
+    background:#0a48b3;
+    display:inline-block;
+    color:#fff;
+    border-radius:3px 3px 0px 0px;
+    box-shadow: 0 0.5rem 0.8rem #00000080;
+}
+
+.tabs li a {
+    color: #fff;
+}
+
+.panel{
+    background:#fffffff6;
+    box-shadow: 0 2rem 2rem #00000080;
+    min-height:50px;
+    max-width:100%;
+    border-radius:3px;
+    overflow:hidden;
+}

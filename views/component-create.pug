@@ -2,6 +2,7 @@ extends page
 block content
     script 
         | let component = {csrf: "#{form.csrf}", projectName: "#{project.dataname}", domain: "#{project.default_host_path}", path: "#{page.path}"};
+        | var globalRulesCounter=#{"1" in form.selector.value ? form.selector.value.length : 1};
     link(rel='stylesheet', href='/css/pages/component.css')
     script(src="/js/sortable.min.js")
     div(class="header bg-primary pb-6")
@@ -20,9 +21,11 @@ block content
                 div(class="card")
                     div(class="card-header")
                         h2
-                            | Create Component for #{project.name}
+                            | #{title}
                     div(class="card-body")
                         form(action="/projects/" + project.dataname + "/page/" + page.uuid + '/component/create', method="POST" role="form")
+                            if id
+                                input(type="hidden", id="id", name="id", value=id)
                             div(class="form-group mb-3")
                                 div(class="input-group-merge input-group-alternative")
                                     div(class="input-group-prepend")
@@ -77,7 +80,7 @@ block content
                                                 | &nbsp; #{capability.browser_version} (#{capability.server_name})
                                             each breakpoint in breakpoints
                                                 td 
-                                                    input(type="checkbox", checked=true, name="device_breakpoint", value=capability.id + "--" + breakpoint.id, data-breakpoint=breakpoint.id, data-capability=capability.id)
+                                                    input(type="checkbox", checked=form.device_breakpoint.value.includes(capability.id + "--" + breakpoint.id), name="device_breakpoint", value=capability.id + "--" + breakpoint.id, data-breakpoint=breakpoint.id, data-capability=capability.id)
                             h2 
                                 | Rules
                             ul(id="rules" class="draggable")                                
@@ -85,7 +88,7 @@ block content
                                     // If we have values
                                     each formComponent, weight in form.selector.value
                                         each formValues, key in formComponent 
-                                            li(class="form-group mb-3")
+                                            li(class="form-group mb-3" id=key == "screenshotElement" ? "the-screenshot" : "")
                                                 div(class="input-group")
                                                     div(class="input-group-prepend drag-hook")
                                                         span(class="input-group-text")
@@ -126,6 +129,10 @@ block content
                                                         div(class="input-group-append")
                                                             span(class="input-group-text")
                                                                 | #{rules[key].appendText}
+                                                    if key != 'screenshotElement'
+                                                        div(class="input-group-append delete-rule")
+                                                            span(class="input-group-text")
+                                                                i(class="fas fa-trash")
                                              
                                 else
                                     li(class="form-group mb-3" id="the-screenshot")
@@ -156,7 +163,7 @@ block content
                                 input(type="hidden", name="tested", id="tested", value=form.tested.value)
                                 button(id="test-component", class="btn btn-secondary my-4")
                                     | Test component
-                                input(type='submit', class="btn btn-primary my-4", id="submit", value='Create component', disabled)
+                                input(type='submit', class="btn btn-primary my-4", id="submit", value=buttonText, disabled)
 
     div(class="hidden", name="csrf", value=form.csrf)
     div(class="modal fade", id="loadingTest", tabindex="-1", role="dialog", aria-labelledby="loadingTestLabel", aria-hidden="true")

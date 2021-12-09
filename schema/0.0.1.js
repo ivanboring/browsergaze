@@ -6,7 +6,7 @@ module.exports = {
             password VARCHAR(40), \
             first_name VARCHAR(100), \
             last_name VARCHAR(100), \
-            role INT, \
+            role INTEGER, \
             email VARCHAR(255) \
         )");
 
@@ -15,8 +15,8 @@ module.exports = {
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
             name VARCHAR(50), \
             dataname VARCHAR(50), \
-            fail_directly INT, \
-            run_sync INT, \
+            fail_directly INTEGER, \
+            run_sync INTEGER, \
             default_host_path TEXT, \
             default_username VARCHAR(255), \
             default_password VARCHAR(255) \
@@ -25,16 +25,16 @@ module.exports = {
         // Create project breakpoints table.
         db.run("CREATE TABLE project_breakpoints ( \
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
-            project_id INT, \
-            width INT, \
-            height INT \
+            project_id INTEGER, \
+            width INTEGER, \
+            height INTEGER \
         )");
 
         // Create project capabilities table.
         db.run("CREATE TABLE project_capabilities ( \
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
-            project_id INT, \
-            capability_id INT \
+            project_id INTEGER, \
+            capability_id INTEGER \
         )");
 
         // Create generator server.
@@ -43,22 +43,23 @@ module.exports = {
             name VARCHAR(255), \
             hostname VARCHAR(255), \
             path VARCHAR(255), \
-            port INT, \
-            server_type INT \
+            port INTEGER, \
+            concurreny INTEGER, \
+            server_type INTEGER \
         )")
 
         // Create capability.
         db.run("CREATE TABLE capabilities (\
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
-            generator_server_id INT, \
+            generator_server_id INTEGER, \
             browser_name VARCHAR(100), \
             browser_version VARCHAR(100), \
             platform VARCHAR(100), \
             platform_version VARCHAR(100), \
             device_name VARCHAR(100), \
             processor VARCHAR(100), \
-            is_browser_default INT, \
-            is_mobile INT, \
+            is_browser_default INTEGER, \
+            is_mobile INTEGER, \
             advanced_config TEXT \
         )")
 
@@ -66,7 +67,7 @@ module.exports = {
         db.run("CREATE TABLE pages ( \
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
             uuid VARCHAR(32), \
-            project_id INT, \
+            project_id INTEGER, \
             name VARCHAR(255), \
             path TEXT \
         )");
@@ -74,8 +75,8 @@ module.exports = {
         // Create components table.
         db.run("CREATE TABLE components ( \
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
-            page_id INT, \
-            project_id INT, \
+            page_id INTEGER, \
+            project_id INTEGER, \
             uuid VARCHAR(32), \
             name VARCHAR(255), \
             default_visual_regression_threshold FLOAT, \
@@ -85,16 +86,16 @@ module.exports = {
         // Create rules table.
         db.run("CREATE TABLE rules ( \
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
-            component_id INT, \
+            component_id INTEGER, \
             key VARCHAR(255), \
-            weight INT, \
+            weight INTEGER, \
             ruleset TEXT \
         )");
 
         // Create project user table.
         db.run("CREATE TABLE project_user ( \
-            user_id INT, \
-            page_id INT \
+            user_id INTEGER, \
+            page_id INTEGER \
         )");
 
         // Set index.
@@ -104,58 +105,79 @@ module.exports = {
         // Create baselines table
         db.run("CREATE TABLE baseline ( \
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
-            component_id INT, \
-            capability_id INT, \
-            created INT, \
+            project_id INTEGER, \
+            component_id INTEGER, \
+            capability_id INTEGER, \
+            screenshot_id INTEGER, \
+            breakpoint_id INTEGER, \
+            created INTEGER, \
             path VARCHAR(255) \
         )");
         
         // Create finished jobs table.
         db.run("CREATE TABLE finished_pages ( \
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
-            project_id INT, \
-            page_id INT, \
-            status INT, \
-            browser_failures INT, \
-            browser_comparison_not_run INT, \
-            regression_failures INT, \
-            regressions INT, \
-            missing_components INT, \
-            added_components INT, \
-            created INT \
+            project_id INTEGER, \
+            page_id INTEGER, \
+            status INTEGER, \
+            browser_failures INTEGER, \
+            browser_comparison_not_run INTEGER, \
+            regression_failures INTEGER, \
+            regressions INTEGER, \
+            missing_components INTEGER, \
+            added_components INTEGER, \
+            created INTEGER \
+        )");
+
+        // Create jobs table.
+        db.run("CREATE TABLE jobs ( \
+           id INTEGER PRIMARY KEY AUTOINCREMENT, \
+           uuid VARCHAR(32), \
+           project_id INTEGER, \
+           max_regression FLOAT, \
+           max_browser_failure FLOAT, \
+           status INTEGER \
         )");
 
         // Create screenshots table.
         db.run("CREATE TABLE screenshots ( \
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
-            project_id INT, \
-            page_id INT, \
-            component_id INT, \
-            finished_job_id INT, \
+            project_id INTEGER, \
+            page_id INTEGER, \
+            component_id INTEGER, \
+            job_id INTEGER, \
+            capability_id INTEGER, \
+            breakpoint_id INTEGER, \
             path VARCHAR(255), \
-            capture_failure INT, \
-            width INT, \
-            height INT, \
-            created INT \
+            capture_failure INTEGER, \
+            width INTEGER, \
+            height INTEGER, \
+            created_time INTEGER, \
+            screenshot_time INTEGER, \
+            is_baseline INTEGER, \
+            status INTEGER, \
+            visual_regression FLOAT, \
+            browser_regression FLOAT, \
+            error TEXT \
         )");
 
         // Create breakpoint capabilities per component.
         db.run("CREATE TABLE component_capability_breakpoint ( \
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
-            component_id INT, \
-            capability_id INT, \
-            breakpoint_id INT, \
+            component_id INTEGER, \
+            capability_id INTEGER, \
+            breakpoint_id INTEGER, \
             threshold FLOAT \
         )");
 
         // Create browser regression threshold.
         db.run("CREATE TABLE browser_threshold ( \
             id INTEGER PRIMARY KEY AUTOINCREMENT, \
-            component_id INT, \
-            capabilities_id_from INT, \
-            capabilities_id_to INT, \
-            breakpoint_id INT, \
-            browser_threshold INT \
+            component_id INTEGER, \
+            capabilities_id_from INTEGER, \
+            capabilities_id_to INTEGER, \
+            breakpoint_id INTEGER, \
+            browser_threshold INTEGER \
         )");
 
         // Create notifications table
@@ -172,12 +194,13 @@ module.exports = {
         )");
 
         // Create puppeteer generator server
-        db.run("INSERT INTO generator_servers (name, hostname, path, port, server_type) VALUES (?, ?, ?, ?, ?);", 
+        db.run("INSERT INTO generator_servers (name, hostname, path, port, server_type, concurrency) VALUES (?, ?, ?, ?, ?, ?);", 
             'Built-in',
             'localhost',
             '',
             '',
-            'puppeteer'
+            'puppeteer',
+            1
         );
     }
 }

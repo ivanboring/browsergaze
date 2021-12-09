@@ -13,6 +13,40 @@ const capabilities = {
             }
         )
     },
+    getCapabilitiesAndBreakpointsForComponent: async function (component_id) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.all("SELECT pb.*, pb.id as breakpoint_id, c.*, pc.id as capability_id, gs.name as server_name \
+                        FROM component_capability_breakpoint ccb \
+                        LEFT JOIN project_capabilities pc ON pc.id=ccb.capability_id \
+                        LEFT JOIN capabilities c ON c.id=pc.capability_id \
+                        LEFT JOIN generator_servers gs ON gs.id=c.generator_server_id \
+                        LEFT JOIN project_breakpoints pb ON pb.id=ccb.breakpoint_id \
+                        WHERE ccb.component_id=? ;", component_id, function(err, rows) {
+                        resolve(rows)
+                    });
+                });
+            }
+        )
+    },
+    getCapabilitiesForProject: async function(project_id) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.all("SELECT c.*, gs.name as server_name \
+                        FROM project_capabilities pc \
+                        LEFT JOIN capabilities c ON c.id=pc.capability_id \
+                        LEFT JOIN generator_servers gs ON gs.id=c.generator_server_id \
+                        WHERE pc.project_id=? ;", project_id, function(err, rows) {
+                        resolve(rows)
+                    });
+                });
+            }
+        )
+    },
     getCapabilitiesForStyling: function(rows) {
         for (let x in rows) {
             switch (rows[x].browser_name) {
