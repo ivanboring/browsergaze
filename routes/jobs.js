@@ -33,6 +33,7 @@ const jobs = {
             {type: 'space', value: ')'},
         ];
         const capabilityOptions = helper.createSelectOptions(await capabilities.getCapabilitiesForProject(projectObject.id), 'id', capRender, 'Any', req.query.capability_id);
+
         const bpRender = [
             {type: 'value', value: 'width'},
             {type: 'space', value: 'x'},
@@ -111,10 +112,12 @@ const jobs = {
             }
             
             const jobStarted = await component.getBreakpointCapabilityForComponent(componentObject);
+
             for (let capability_id in jobStarted) {
                 let startJobs = jobStarted[capability_id];
                 for(let i in startJobs) {
                     let startJob = startJobs[i];
+                    console.log(startJob);
                     screenshot.createQueuedScreenshot({
                         project_id: projectObject.id,
                         page_id: pageObject.id,
@@ -123,8 +126,9 @@ const jobs = {
                         path: `${newDir}/${componentObject.id}_${startJob['capability_id']}_${startJob['width']}_${startJob['height']}.png`,
                         created_time: Date.now(),
                         status: 0,
-                        capability_id: capability_id,
+                        capability_id: startJob.project_capabilities_id,
                         breakpoint_id: startJob.breakpoint_id,
+                        generator_server: startJob.generator_server_id,
                     })
                 }
             }

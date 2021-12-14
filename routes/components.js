@@ -54,7 +54,7 @@ const components = {
         }
         fullComponent.tested = 1;
         const pageObject = await page.getPageById(req, componentObject.page_id);
-        const projectBreakpoints = await project.getProjectBreakpoints(req, projectObject.id);
+        const projectBreakpoints = await project.getProjectBreakpoints(projectObject.id);
         const projectCapabilites = await project.getProjectCapabilities(req, projectObject.id);
         if (!projectObject || !pageObject) {
             res.redirect(301, '/projects')

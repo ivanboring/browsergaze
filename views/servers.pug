@@ -1,0 +1,39 @@
+extends page
+
+block content
+    div(class="header bg-primary pb-6")
+        div(class="container")
+            div(class="header-body")
+                div(class="row align-items-center py-4")
+                    div(class="col-lg-6 col-7")
+                        h2(class="h1 text-white d-inline-block mb-0")=title
+                    div(class="col-lg-6 col-5 text-right")
+                        if isAdmin
+                            a(href="/servers/create", class="btn btn-neutral btn-md", type="button")
+                                span(class="btn-inner--icon")
+                                    i(class="ni ni-fat-add")
+                                span(class="btn-inner--text")
+                                    | Add server
+    div(class="container mt--6")
+        div(class="row")
+            each val, key in servers
+                div(class="col-sm-6 col-md-6 col-12 col-lg-4 col-xl-4")
+                    div(class="card")
+                        img(src='/pics/' + val.server_type + '.png', class="card-img-top")
+                        div(class="card-body text-center")
+                            h4(class="card-title text-center")
+                                | #{val.name} (#{val.server_type})
+                            div(class="dropdown")
+                                button(class="btn btn-primary btn-sm dropdown-toggle" type="button", disabled=val.server_type == 'puppeteer', id="dropdownMenuButton" + val.id data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+                                    | Actions
+                                div(class="dropdown-menu" aria-labelledby="dropdownMenuButton" + val.id)
+                                    a(href="/server/" + val.id + "/edit", class="dropdown-item", disabled)
+                                        i(class="fas fa-poll")
+                                        | Edit
+                                    a(href="/servers/" + val.id + "/devices" class="dropdown-item", disabled)
+                                        i(class="fas fa-poll")
+                                        | Select Devices
+                                    a(href="/server/" + val.id + "/devices" class="dropdown-item", disabled)
+                                        i(class="fas fa-poll")
+                                        | Delete
+

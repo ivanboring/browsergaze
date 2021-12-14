@@ -28,10 +28,17 @@ block content
                                     a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
                                         i(class="fas fa-plus")
                                         | Create page
-                                    a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
+                                    a(href="/projects/" + project.dataname + "/edit", class="dropdown-item", disabled)
                                         i(class="fas fa-edit")
                                         | Edit project
     div(class="container mt-3")
+        nav(aria-label="breadcrumb")
+            ol(class="breadcrumb")
+                li(class="breadcrumb-item")
+                    a(href="/projects")
+                        | Projects 
+                li(class="breadcrumb-item active" aria-current="page")
+                        | #{project.name}
         if pages.length
             h1
                 | Pages

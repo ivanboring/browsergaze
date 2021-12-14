@@ -154,6 +154,7 @@ module.exports = {
             height INTEGER, \
             created_time INTEGER, \
             screenshot_time INTEGER, \
+            generator_server INTEGER, \
             is_baseline INTEGER, \
             status INTEGER, \
             visual_regression FLOAT, \

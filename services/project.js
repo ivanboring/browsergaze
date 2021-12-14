@@ -6,6 +6,7 @@ const defaults = require('./defaults');
 const helper = require('./helper');
 const puppeteerDirector = require('../directors/puppeteerDirector');
 const svgexport = require('svgexport');
+const capabilities = require('./capabilities');
 
 const project = {
     getProjects: async function(req) {
@@ -62,17 +63,33 @@ const project = {
             }
         )
     },
+    getEditableProjectByName: async function(req, name) {
+        let projectObject = await this.getProjectByName(req, name);
+        let capabilitiesList = await capabilities.getCapabilitiesForProject(projectObject.id);
+        projectObject.capability = [];
+        for (let x in capabilitiesList) {
+            projectObject.capability.push(capabilitiesList[x].id)
+        }
+        projectObject.breakpoint_height = [];
+        projectObject.breakpoint_width = [];
+        let breakpoints = await this.getProjectBreakpoints(projectObject.id);
+        for (let x in breakpoints) {
+            projectObject.breakpoint_width.push(breakpoints[x].width);
+            projectObject.breakpoint_height.push(breakpoints[x].height);
+        }
+        return projectObject;
+    },
     getProjectCapabilities: async function(req, project_id) {
         let query = db.getDb();
         return new Promise(
             (resolve, reject) => {
                 query.serialize(function() {
                     if (user.isAdmin(req)) {
-                        query.all("SELECT c.*, gs.name as server_name FROM capabilities c LEFT JOIN generator_servers gs ON gs.id=c.generator_server_id LEFT JOIN project_capabilities pc ON c.id=pc.capability_id LEFT JOIN projects p ON p.id=pc.project_id WHERE p.id=?;", project_id, function(err, rows) {
+                        query.all("SELECT DISTINCT c.*, gs.name as server_name, pc.id as id FROM capabilities c LEFT JOIN generator_servers gs ON gs.id=c.generator_server_id LEFT JOIN project_capabilities pc ON c.id=pc.capability_id LEFT JOIN projects p ON p.id=pc.project_id WHERE p.id=?;", project_id, function(err, rows) {
                             resolve(rows)
                         });
                     } else {
-                        query.all("SELECT c.*, gs.name as server_name FROM capabilities c LEFT JOIN generator_servers gs ON gs.id=c.generator_server_id LEFT JOIN project_capabilities pc ON c.id=pc.capability_id LEFT JOIN FROM projects p ON p.id=pc.project_id LEFT JOIN project_user pu ON pu.page_id=p.id WHERE pu.user_id=? AND p.project_id=?;", user.getUser(req).id, project_id, function(err, rows) {
+                        query.all("SELECT c.*, gs.name as server_name, pc.id as id FROM capabilities c LEFT JOIN generator_servers gs ON gs.id=c.generator_server_id LEFT JOIN project_capabilities pc ON c.id=pc.capability_id LEFT JOIN FROM projects p ON p.id=pc.project_id LEFT JOIN project_user pu ON pu.page_id=p.id WHERE pu.user_id=? AND p.project_id=?;", user.getUser(req).id, project_id, function(err, rows) {
                             resolve(rows)
                         });
                     }
@@ -100,28 +117,8 @@ const project = {
     },
     createProject: async function(project) {
         // Validate normal values.
-        let validationErrors = validate.validateEntity(project, 'project');
-        // Validate so we can take screenshots
-        await puppeteerDirector.init(project.default_host_path, 'test');
-        try {
-            await puppeteerDirector.goto('/', 'test');
-        }
-        catch (err) {
-            validationErrors.push({id: 'default_host_path', error: 'We could not reach that domain.'});
-        }
-
-        // Validate that the dataname is unique.
-        let oldProject = await this.findDataName(project.dataname);
-
-        if (typeof oldProject == 'object') {
-            validationErrors.push({id: 'dataname', error: 'That dataname already exists for a project.'});
-        }
-
-        // Validate that one capability is chosen.
-        if (this.validateCapabilities(project)) {
-            validationErrors.push({id: 'capability', error: 'You have to check at least one capability.'});
-        }
-
+        let formErrors = validate.validateEntity(project, 'project');
+        let validationErrors = formErrors.concat(await this.extraProjectValidation(project, true));
         if (validationErrors.length) {
             return validationErrors
         }
@@ -145,13 +142,116 @@ const project = {
         await puppeteerDirector.screenshot(imageDir + 'init.jpg', 'test');
         await puppeteerDirector.close('test');
         // Store in db.
-        let projectId = await this.createDb(project);
+        let projectId = await this.createProjectDb(project);
         // Store capabilities and breakpoints.
         await this.createProjectCapabilities(projectId, project.capability);
         await this.createProjectBreakpoints(projectId, project.breakpoint_width, project.breakpoint_height);
         return null;
     },
-    createDb(project) {
+    updateProject: async function(project) {
+        let formErrors = validate.validateEntity(project, 'project');
+        let validationErrors = formErrors.concat(await this.extraProjectValidation(project, false));
+        if (validationErrors.length) {
+            return validationErrors
+        }
+        await this.updateProjectDb(project);
+        await this.updateProjectCapabilities(project.id, project.capability);
+        //TODO: update breakpoints
+        return null;
+    },
+    extraProjectValidation: async function(project, checkDataname) {
+        let validationErrors = [];
+        // Validate so we can take screenshots
+        await puppeteerDirector.init(project.default_host_path, 'test');
+        try {
+            await puppeteerDirector.goto('/', 'test');
+        }
+        catch (err) {
+            validationErrors.push({id: 'default_host_path', error: 'We could not reach that domain.'});
+        }
+
+        // Validate that the dataname is unique.
+        if (checkDataname) {
+            let oldProject = await this.findDataName(project.dataname);
+
+            if (typeof oldProject == 'object') {
+                validationErrors.push({id: 'dataname', error: 'That dataname already exists for a project.'});
+            }
+        }
+
+        // Validate that one capability is chosen.
+        if (this.validateCapabilities(project)) {
+            validationErrors.push({id: 'capability', error: 'You have to check at least one capability.'});
+        }
+        return validationErrors;
+    },
+    updateProjectDb(project) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.run("UPDATE projects SET name=?, dataname=?, fail_directly=?, run_sync=?, default_host_path=?, default_username=?, default_password=? WHERE id=?;", 
+                        project.name,
+                        project.dataname,
+                        project.fail_directly,
+                        project.run_sync,
+                        project.default_host_path,
+                        project.default_username,
+                        project.default_password,
+                        project.id,
+                    function(err) {
+                        resolve(this.lastID)
+                    });
+                });
+            }
+        );
+    },
+    updateProjectCapabilities(projectId, capabilities) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    let currentCapabilities = [];
+                    let newCapabilities = [];
+                    query.all('SELECT * FROM project_capabilities WHERE project_id=?', projectId, (err, rows) => {
+                        if (typeof rows !== 'undefined') {
+                            for (let x in rows) {
+                                currentCapabilities.push(rows[x].id.toString());
+                            }
+                        }
+
+                        for (let x in capabilities) {
+                            if (!currentCapabilities.includes(capabilities[x])) {
+                                newCapabilities.push(capabilities[x]);
+                            } else {
+                                const index = currentCapabilities.indexOf(capabilities[x]);
+                                if (index > -1) {
+                                    currentCapabilities.splice(index, 1);
+                                }
+                            }
+                        }
+
+                        for (let capability of newCapabilities) {
+                            query.run("INSERT INTO project_capabilities (project_id, capability_id) VALUES (?, ?);", 
+                                projectId,
+                                capability,
+                            );
+                        }
+
+                        for (let capability of currentCapabilities) {
+                            query.run("DELETE FROM project_capabilities WHERE project_id=? AND capability_id=?;", 
+                                projectId,
+                                capability,
+                            );
+                        }
+
+                        resolve(true)
+                    });
+                });
+            }
+        );
+    },
+    createProjectDb(project) {
         let query = db.getDb();
         return new Promise(
             (resolve, reject) => {
@@ -200,6 +300,18 @@ const project = {
                         );
                     }
                     resolve(true)
+                });
+            }
+        );
+    },
+    getProjectBreakpoints: async function(projectId) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                        query.all("SELECT * FROM project_breakpoints WHERE project_id=?;", projectId, function(err, rows) {
+                            resolve(rows)
+                        });
                 });
             }
         );

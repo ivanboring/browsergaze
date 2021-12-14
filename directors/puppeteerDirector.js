@@ -7,7 +7,7 @@ const puppeteerDirector = {
     domain: null,
     username: null,
     password: null,
-    init: async function(domain, jobId) {
+    init: async function(domain, jobId, capabilityObject) {
         if (!this.browser) {
             this.browser = await puppeteer.launch();
         }
@@ -75,7 +75,6 @@ const puppeteerDirector = {
                 } catch(e) {
                     throw `Could not find element that matches CSS selector: ${value}. If the path included a shadow dom, only JS path works.`;
                 }
-                break;
         }
     },
     // Screenshot element.

@@ -1,0 +1,75 @@
+extends page
+block content
+    div(class="header bg-primary pb-6")
+        div(class="container")
+            div(class="header-body")
+                div(class="row align-items-center py-4")
+                    div(class="col-lg-6 col-7")
+                        h2(class="h1 text-white d-inline-block mb-0")=title
+    div(class="container")
+        div(class="row justify-content-center")
+            div(class="col-9 mt--6")
+                div(class="card")
+                    div(class="card-header")
+                        h2
+                            | Create server
+                    div(class="card-body")
+                        form(action="/servers/create", method="POST" role="form")
+                            div(class="form-group mb-3")
+                                div(class="input-group-merge input-group-alternative")
+                                    div(class="input-group-prepend")
+                                        span(class="input-group-text")
+                                            i(class="fas fa-signature")
+                                        input(type="text", class="form-control", name="name", value=form.name.value, placeholder="Server Name", aria-invalid=form.name.error, required, autofocus)
+                                small
+                                    | This is the human readable servername
+                                    if form.name.error
+                                        ul(class="error")
+                                            each error in form.name.errors
+                                                li(style="color:red;")=error
+
+                            div(class="form-group mb-3")
+                                div(class="input-group-merge input-group-alternative")
+                                    div(class="input-group-prepend")
+                                        span(class="input-group-text")
+                                            i(class="fas fa-link")
+                                        input(type="text", class="form-control", name="hostname", value=form.hostname.value, placeholder="Default host", aria-invalid=form.hostname.error, required)
+                                small
+                                    | This is the host of the server. For instance "http://1.2.3.4"
+                                    if form.hostname.error
+                                        ul(class="error")
+                                            each error in form.hostname.errors
+                                                li(style="color:red;")=error
+
+                            div(class="form-group mb-3")
+                                div(class="input-group-merge input-group-alternative")
+                                    div(class="input-group-prepend")
+                                        span(class="input-group-text")
+                                            i(class="fas fa-link")
+                                        input(type="number", class="form-control", name="port", value=form.port.value, placeholder="Default port", aria-invalid=form.port.error, required)
+                                small
+                                    | This is the port of the server. For instance "4444"
+                                    if form.port.error
+                                        ul(class="error")
+                                            each error in form.port.errors
+                                                li(style="color:red;")=error
+
+                            div(class="form-group mb-3")
+                                div(class="input-group-merge input-group-alternative")
+                                    div(class="input-group-prepend")
+                                        span(class="input-group-text")
+                                            i(class="fas fa-link")
+                                        select(class="form-control", name="server_type", id="server_type")
+                                            option(value='selenium')
+                                                | Selenium Grid 4
+
+                                small
+                                    | This is the type of server to connect
+                                    if form.server_type.error
+                                        ul(class="error")
+                                            each error in form.server_type.errors
+                                                li(style="color:red;")=error
+
+
+                            div(class="text-center")
+                                input(type='submit', class="btn btn-primary my-4", value='Create server')

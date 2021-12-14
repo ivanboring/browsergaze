@@ -194,8 +194,8 @@ const screenshot = {
         return new Promise(
             (resolve, reject) => {
                 query.serialize(function() {
-                    query.run("INSERT INTO screenshots (project_id, page_id, component_id, job_id, path, created_time, status, capability_id, breakpoint_id) \
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", 
+                    query.run("INSERT INTO screenshots (project_id, page_id, component_id, job_id, path, created_time, status, capability_id, breakpoint_id, generator_server) \
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", 
                         queue_data.project_id,
                         queue_data.page_id,
                         queue_data.component_id,
@@ -205,6 +205,7 @@ const screenshot = {
                         queue_data.status,
                         queue_data.capability_id,
                         queue_data.breakpoint_id,
+                        queue_data.generator_server,
                     function(err) {
                         resolve(this.lastID)
                     });

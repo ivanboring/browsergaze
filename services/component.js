@@ -53,7 +53,7 @@ const component = {
         return new Promise(
             (resolve, reject) => {
                 query.serialize(function() {
-                    query.all("SELECT ccb.threshold, pb.width, pb.height, pc.capability_id, c.*, pb.id as breakpoint_id, gs.*, co.uuid as component_uuid \
+                    query.all("SELECT ccb.threshold, pb.width, pb.height, pc.capability_id, c.*, pb.id as breakpoint_id, gs.*, co.uuid as component_uuid, pc.id as project_capabilities_id \
                         FROM component_capability_breakpoint ccb \
                         LEFT JOIN components co ON co.id=ccb.component_id \
                         LEFT JOIN project_breakpoints pb ON pb.id=ccb.breakpoint_id \

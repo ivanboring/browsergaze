@@ -122,10 +122,14 @@ block content
                                     else
                                         img(src='/pics/loading.gif', style="max-width: 200px; max-height:100px;")
                                 td(scope="row", class="baseline", id="baseline-" + val.id)
-                                    if key in baseline && "path" in baseline[key]
+                                    if (val.is_baseline)
+                                        img(src=val.path.substr(8), style="max-width: 200px; max-height:100px;")
+                                    else if key in baseline && "path" in baseline[key]
                                         img(src=baseline[key].path.substr(8), style="max-width: 200px; max-height:100px;")
                                 td(scope="row", class="diff", id="diff-" + val.id)
-                                    if (val.status > 1)
+                                    if (val.is_baseline)
+                                        img(src=val.path.substr(8), style="max-width: 200px; max-height:100px;")
+                                    else if (val.status > 1)
                                         img(src=val.path.replace('.png', '_diff.png').substr(8), style="max-width: 200px; max-height:100px;")
                                     else
                                         img(src='/pics/loading.gif', style="max-width: 200px; max-height:100px;")
@@ -151,7 +155,7 @@ block content
                                     i(class="fab fa-" + val.os_icon)
                                     | &nbsp; #{val.platform_version}
                                     | &nbsp; |  
-                                    i(class="fas fa-" + val.browser_icon)
+                                    i(class="fab fa-" + val.browser_icon)
                                     | &nbsp; #{val.browser_version} #{val.server_type}
                                 td(scope="row")
                                     | #{val.width}
@@ -159,7 +163,7 @@ block content
                                     | #{val.height}
                                 td(scope="row", class="visual-regression", id="visual-regression-" + val.id)
                                     | #{val.visual_regression}%
-                                td(scope="row")
+                                td(scope="row", class="is-baseline", id="is-baseline-" + val.id)
                                     if val.is_baseline
                                         strong
                                         | Baseline
@@ -176,7 +180,7 @@ block content
                                             a(href="/projects/run/all" class="dropdown-item", disabled)
                                                 i(class="fas fa-poll")
                                                 | View Browser Diffs
-                                            a(href="/projects/run/all" class="dropdown-item", disabled)
+                                            a(href="/api/baseline/set/" + val.id, data-id=val.id, class="dropdown-item set-baseline", disabled)
                                                 i(class="fas fa-poll")
                                                 | Set as Baseline
                                             a(href="/projects/run/all" class="dropdown-item", disabled)

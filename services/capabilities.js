@@ -31,6 +31,22 @@ const capabilities = {
             }
         )
     },
+    getCapabilityForProjectCapabilityId: async function (capability_id) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.get("SELECT c.*, gs.* \
+                        FROM project_capabilities pc \
+                        LEFT JOIN capabilities c ON c.id=pc.capability_id \
+                        LEFT JOIN generator_servers gs ON gs.id=c.generator_server_id \
+                        WHERE pc.id=? ;", capability_id, function(err, row) {
+                        resolve(row)
+                    });
+                });
+            }
+        )
+    },
     getCapabilitiesForProject: async function(project_id) {
         let query = db.getDb();
         return new Promise(
@@ -47,15 +63,56 @@ const capabilities = {
             }
         )
     },
+    getDataFromSelPlatform: function(platform) {
+        switch (platform) {
+            case 'WIN11':
+                return {platform: 'Windows', version: '11'};
+            case 'WIN10':
+                return {platform: 'Windows', version: '10'};
+        }
+    },
+    getHumanReadableFromSelPlatform: function(platform) {
+        switch (platform) {
+            case 'WIN11':
+                return 'Windows 11';
+            case 'WIN10':
+                return 'Windows 10';
+        }
+    },
+    getHumanReadableFromSelBrowser: function(browserName) {
+        switch (browserName) {
+            case 'opera':
+                return 'Opera';
+            case 'firefox':
+                return 'Firefox';
+            case 'MicrosoftEdge':
+                return 'Microsoft Edge';
+            case 'chrome':
+                return 'Chrome';
+        }
+    },
+    getDataFromHumanBrowserName: function(browserName) {
+        switch (browserName) {
+            case 'Opera':
+                return 'opera';
+            case 'Firefox':
+                return 'firefox';
+            case 'Microsoft Edge':
+                return 'MicrosoftEdge';
+            case 'Chrome':
+                return 'chrome';
+        }
+    },
     getCapabilitiesForStyling: function(rows) {
         for (let x in rows) {
             switch (rows[x].browser_name) {
                 case 'Chromium':
-                    rows[x].browser_icon = 'robot';
+                    rows[x].browser_icon = 'google';
                     break;
                 case 'Chrome':
                     rows[x].browser_icon = 'chrome';
                     break;
+                case 'Microsoft Edge':
                 case 'Edge':
                     rows[x].browser_icon = 'edge';
                     break;

@@ -12,10 +12,10 @@ block content
             div(class="col-9 mt--6")
                 div(class="card")
                     div(class="card-header")
-                        h2
-                            | Create project
+                        h2=title
                     div(class="card-body")
-                        form(action="/projects/create", method="POST" role="form")
+                        form(action=action, method="POST" role="form")
+                            input(type="hidden", value=id, name="id")
                             div(class="form-group mb-3")
                                 div(class="input-group-merge input-group-alternative")
                                     div(class="input-group-prepend")
@@ -28,18 +28,21 @@ block content
                                     ul(class="error")
                                         each error in form.name.errors
                                             li=error
-                            div(class="form-group mb-3")
-                                div(class="input-group-merge input-group-alternative")
-                                    div(class="input-group-prepend")
-                                        span(class="input-group-text")
-                                            i(class="fas fa-file-signature")
-                                        input(type="text", class="form-control", name="dataname", value=form.dataname.value, placeholder="Project Data Name", data-tooltip="test", aria-invalid=form.dataname.error, required)
-                                small
-                                    | This is the data readable project name user for api call. Only alphanumeric characters and underline. For instance "macs_burgers"
-                                    if form.dataname.error
-                                        ul(class="error")
-                                            each error in form.dataname.errors
-                                                li(style="color:red;")=error
+                            if id 
+                                input(type="hidden", name="dataname", value=form.dataname.value)
+                            else
+                                div(class="form-group mb-3")
+                                    div(class="input-group-merge input-group-alternative")
+                                        div(class="input-group-prepend")
+                                            span(class="input-group-text")
+                                                i(class="fas fa-file-signature")
+                                            input(type="text", class="form-control", name="dataname", value=form.dataname.value, placeholder="Project Data Name", data-tooltip="test", aria-invalid=form.dataname.error, required)
+                                    small
+                                        | This is the data readable project name user for api call. Only alphanumeric characters and underline. For instance "macs_burgers"
+                                        if form.dataname.error
+                                            ul(class="error")
+                                                each error in form.dataname.errors
+                                                    li(style="color:red;")=error
 
                             div(class="form-group mb-3")
                                 div(class="input-group-merge input-group-alternative")
@@ -115,7 +118,7 @@ block content
                                     if key > 0 && breakpoint != ''
                                         div(class="form-group mb-3")
                                             div(class="input-group input-group-alternative", id="main-breakpoint")
-                                                input(type="number", class="form-control", name="breakpoint[]", value=breakpoint, placeholder="Width pixels")
+                                                input(type="number", class="form-control", name="breakpoint_width[]", value=breakpoint, placeholder="Width pixels")
                                                 div(class="input-group-append")
                                                     span(class="input-group-text")
                                                         | x
@@ -134,21 +137,21 @@ block content
                             small 
                                 |  Check all devices that you want run tests on in this project by default. One is required.
                             JSON.stringify(capabilities)
+                            div(class="form-group mb-3" )
                             each capability in capabilities
-                                div(class="form-group mb-3" )
                                     div(class="input-group")
                                         div(class="input-group-prepend")
                                             span(class="input-group-text")
-                                                input(type="checkbox", name="capability[]", value=capability.id, checked=true)
+                                                input(type="checkbox", name="capability[]", value=capability.id, checked=form.capability.value.includes(capability.id))
                                         div(class="input-group-prepend")
                                             span(class="input-group-text")
                                                 i(class="fab fa-" + capability.os_icon)
                                         div(class="input-group-prepend")
                                             span(class="input-group-text")
-                                                i(class="fas fa-" + capability.browser_icon)
+                                                i(class="fab fa-" + capability.browser_icon)
                                         div(class="form-control")
-                                            | &nbsp; #{capability.platform} #{capability.platform_version}, #{capability.browser_name} #{capability.browser_version}, 
-                                            | from <strong>#{capability.server_name} generator server</strong>
+                                            | &nbsp; #{capability.platform} <em>#{capability.platform_version}</em>, #{capability.browser_name} <em>#{capability.browser_version}</em>, 
+                                            | from <strong>#{capability.server_name} server</strong>
                             small
                                 if form.capability.error
                                     ul(class="error")
@@ -157,5 +160,5 @@ block content
 
 
                             div(class="text-center")
-                                input(type='submit', class="btn btn-primary my-4", value='Create project')
+                                input(type='submit', class="btn btn-primary my-4", value=title)
     script(src="/js/pages/project.js")

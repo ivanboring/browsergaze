@@ -41,12 +41,39 @@ module.exports = {
             }
         }
     },
+    update: async function(req, res) {
+        if (user.isAdmin(req)) {
+            let validationErrors = await project.updateProject(req.body)
+            if (validationErrors !== null) {
+                validate.redirect('/projects/' + req.params.projectName + '/edit', req.body, validationErrors, req, res)
+            } else {
+                res.redirect(301, '/projects/detail/' + req.params.projectName);
+            }
+        }
+    },
     createForm: async function(req, res) {
         if (user.isAdmin(req)) {
             let capabiltyRows = await capabilities.getCapabilities()
             res.render('projects-create', {
                 title: 'Create Project',
+                action: '/projects/create',
                 form: form.populateFormDefaults('project', req),
+                user: user.getUser(req),
+                capabilities: capabilities.getCapabilitiesForStyling(capabiltyRows)
+            })
+        } else {
+            res.redirect(301, '/projects')
+        }
+    },
+    editForm: async function(req, res) {
+        if (user.isAdmin(req)) {
+            let capabiltyRows = await capabilities.getCapabilities()
+            const projectObject = await project.getEditableProjectByName(req, req.params.projectName);
+            res.render('projects-create', {
+                title: 'Edit Project',
+                form: form.populateFormDefaults('project', req, projectObject),
+                id: projectObject.id,
+                action: '/projects/' + projectObject.dataname + '/edit',
                 user: user.getUser(req),
                 capabilities: capabilities.getCapabilitiesForStyling(capabiltyRows)
             })

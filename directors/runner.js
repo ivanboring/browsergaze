@@ -3,8 +3,8 @@ const {
 } = require('uuid');
 const fs = require('fs')
 const db = require('../services/db');
-const generator = require('./generator');
 const screenshot = require('../services/screenshot');
+const { Generator } = require('./generator');
 
 const runner = {
     runningJobs: {},
@@ -34,6 +34,8 @@ const runner = {
         switch (processor) {
             case 'puppeteer':
                 return require('./puppeteerDirector')
+            case 'selenium':
+                return require('./seleniumDirector')
         }
     },
     process: async function(rules, capabilities, jobId) {
@@ -75,12 +77,10 @@ const runner = {
     },
     startGenerators: async function() {
         let generators = await this.getGenerators();
-        for (let i in generators) {
-            setTimeout(() => {
-                runner.generators[generators[i].id] = generator;
-                runner.generators[generators[i].id].startGenerator(generators[i]);
-            }, 0);
+        for (let i in generators) { 
+            runner.generators[generators[i].id] = new Generator(generators[i]);
         }
+        
         setTimeout(runner.checkForJobs, 1000);
     },
     getGenerators: async function() {
@@ -102,25 +102,30 @@ const runner = {
         let jobGroups = {}
         for (let i in jobsList) {
             let a = jobsList[i];
-            if (!(a.capability_id in jobGroups)) {
-                jobGroups[a.capability_id] = {}
+            if (!(a.generator_server in jobGroups)) {
+                jobGroups[a.generator_server] = {}
             }
-            if (!(a.page_id in jobGroups[a.capability_id])) {
-                jobGroups[a.capability_id][a.page_id] = {}
+            if (!(a.capability_id in jobGroups[a.generator_server])) {
+                jobGroups[a.generator_server][a.capability_id] = {}
             }
-            if (!(a.component_id in jobGroups[a.capability_id][a.page_id])) {
-                jobGroups[a.capability_id][a.page_id][a.component_id] = {jobs: []};
+            if (!(a.page_id in jobGroups[a.generator_server][a.capability_id])) {
+                jobGroups[a.generator_server][a.capability_id][a.page_id] = {}
             }
-            jobGroups[a.capability_id][a.page_id][a.component_id]["jobs"].push(a);
+            if (!(a.component_id in jobGroups[a.generator_server][a.capability_id][a.page_id])) {
+                jobGroups[a.generator_server][a.capability_id][a.page_id][a.component_id] = {jobs: []};
+            }
+            jobGroups[a.generator_server][a.capability_id][a.page_id][a.component_id]["jobs"].push(a);
         }
 
         for (let b in jobGroups) {
             // Itterate to get the last job id.
             for(let t in jobGroups[b]) {
                 for(let i in jobGroups[b][t]) {
-                    for (let s in jobGroups[b][t][i].jobs) {
-                        let job = jobGroups[b][t][i].jobs[s];
-                        runner.lastJobId = job.id;
+                    for (let s in jobGroups[b][t][i]) {
+                        for (let p in jobGroups[b][t][i][s].jobs) {
+                            let job = jobGroups[b][t][i][s].jobs[p]; 
+                            runner.lastJobId = job.id;
+                        }
                     }
                 }
             }
@@ -146,6 +151,7 @@ const runner = {
                 try {
                     await director[step.key](step.parameters, jobId);
                 } catch (e) {
+                    console.log('super error', e);
                     director.close(jobId);
                     return;
                 }

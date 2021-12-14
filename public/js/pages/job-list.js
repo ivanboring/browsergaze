@@ -1,6 +1,22 @@
 $(document).ready(function() {
     statusUpdate();
+
+    $('.set-baseline').click(baseline);
 })
+
+function baseline() {
+    $.getJSON('/api/baseline/set/' + $(this).attr('data-id'), function(result) {
+        if ("status" in result && result.status) {
+            let img = $("#screenshot-" + result.id + " img").attr('src');
+            $("#baseline-" + result.id + " img").attr('src', img);
+            $("#diff-" + result.id + " img").attr('src', img);
+            $("#is-baseline-" + result.id).html('Baseline');
+            $("#visual-regression-" + result.id).html('0%');
+        }
+    });
+    console.log($(this).attr('data-id'));
+    return false;
+}
 
 function statusUpdate() {
     $.getJSON('/api/job/status/' + project_name + '?ids=' + screenshot_ids, function(result) {

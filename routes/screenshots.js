@@ -11,15 +11,12 @@ const runner = require('../directors/runner.js');
 const fs = require('fs');
 const yaml = require('js-yaml');
 const screenshot = require('../services/screenshot');
-const helper = require('../services/helper');
 const baseline = require('../services/baseline');
 
 const screenshots = {
     diff: async function(req, res) {
         const projectObject = await project.getProjectByName(req, req.params.projectName)
-        const screenshotObject = await screenshot.getScreenshot(req.params.screenshot_id);
-        console.log(projectObject);
-        console.log(screenshotObject);
+        const screenshotObject = await screenshot.getScreenshot(req.params.screenshotId);
         if (!projectObject || projectObject.id != screenshotObject.project_id) {
             res.redirect(301, '/projects')
             return
@@ -35,6 +32,15 @@ const screenshots = {
             user: user.getUser(req),
         });
     },
+    setBaseline: async function(req, res) {
+        if (user.isCreator(req)) {
+            const screenshotObject = await screenshot.getScreenshot(req.params.screenshotId);
+            baseline.newBaseline(screenshotObject);
+            res.json({status: true, id: screenshotObject.id});
+        } else {
+            res.status(401).send('No access')
+        }        
+    }
 }
 
 module.exports=screenshots
