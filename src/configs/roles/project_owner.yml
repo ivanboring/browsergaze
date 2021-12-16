@@ -1,0 +1,27 @@
+id: 3
+permissions:
+  create-project: false
+  edit-all-projects: false
+  edit-own-projects: true
+  delete-project: false
+  view-all-projects: false
+  view-own-projects: true
+  manage-users: false
+  add-devices: false
+  remove-devices: false
+  create-page: true
+  edit-page: true
+  delete-page: true
+  view-page: true
+  create-component: true
+  edit-component: true
+  delete-component: true
+  view-component: true
+  start-test: true
+  view-results: true
+  delete-results: true
+  approve-results: true
+  set-thresholds: true
+  set-new-baseline: true
+  upload-baseline: true
+  create-api-key: false

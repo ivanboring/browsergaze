@@ -1,0 +1,27 @@
+id: 4
+permissions:
+  create-project: false
+  edit-all-projects: false
+  edit-own-projects: false
+  delete-project: false
+  view-all-projects: false
+  view-own-projects: true
+  manage-users: false
+  add-devices: false
+  remove-devices: false
+  create-page: false
+  edit-page: false
+  delete-page: false
+  view-page: true
+  create-component: false
+  edit-component: false
+  delete-component: false
+  view-component: true
+  start-test: true
+  view-results: true
+  delete-results: true
+  approve-results: true
+  set-thresholds: true
+  set-new-baseline: true
+  upload-baseline: true
+  create-api-key: false
