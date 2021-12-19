@@ -1,4 +1,6 @@
 fields:
+  password_old:
+    validate: 'string'
   password:
     validate:
       type: 'string'
@@ -6,7 +8,6 @@ fields:
       minCharLength: 8
       required: true
       ascii: true
-      validRegex: /^[0-9A-Za-z!@#$%&*()_\-+={[}\]|\:;"'<>.?\/\\~`]+[0-9A-Za-z!@#$%&*()_\-+={[}\]|\:;"'<>.?\/\\~`]*$/g
     sanitize:
       escape: ''
       blacklist: ''
@@ -48,5 +49,8 @@ fields:
     validate:
       type: 'number'
       min: 0
-      max: 3
+      max: 6
       required: true
+  projects:
+    validate:
+      type: 'object'

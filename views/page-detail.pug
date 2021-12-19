@@ -31,7 +31,7 @@ block content
                                     a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
                                         i(class="fas fa-edit")
                                         | Edit Page
-    div(class="container mt-3")
+    div(class="container-fluid mt-3")
         if components.length
             h1
                 | Components
@@ -74,6 +74,9 @@ block content
                                                 a(href="/projects/" + project.dataname + '/results?component_id=' + val.id, class="dropdown-item", disabled)
                                                     i(class="fas fa-poll")
                                                     | View results of test runs
+                                                a(href="/projects/" + project.dataname + "/component/" + val.uuid + "/delete", class="dropdown-item", disabled)
+                                                    i(class="fas fa-poll")
+                                                    | Delete component
         else
             div(class="row justify-content-center")
                 div(class="col-6")

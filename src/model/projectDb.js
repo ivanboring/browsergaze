@@ -8,11 +8,11 @@ const projectDb = {
             (resolve, reject) => {
                 query.serialize(function() {
                     if (user.isAdmin(req)) {
-                        query.all("SELECT * FROM projects;", function(err, rows) {
+                        query.all("SELECT * FROM projects ORDER BY name ASC;", function(err, rows) {
                             resolve(rows)
                         });
                     } else {
-                        query.all("SELECT p.* FROM projects p LEFT JOIN project_user pu ON pu.page_id=p.id WHERE pu.user_id=?;", user.getUser(req).id, function(err, rows) {
+                        query.all("SELECT p.* FROM projects p LEFT JOIN project_user pu ON pu.project_id=p.id WHERE pu.user_id=? ORDER BY name ASC;", user.getUser(req).id, function(err, rows) {
                             resolve(rows)
                         });
                     }
@@ -30,7 +30,7 @@ const projectDb = {
                             resolve(rows)
                         });
                     } else {
-                        query.get("SELECT p.* FROM projects p LEFT JOIN project_user pu ON pu.page_id=p.id WHERE pu.user_id=? AND p.id=?;", user.getUser(req).id, id, function(err, rows) {
+                        query.get("SELECT p.* FROM projects p LEFT JOIN project_user pu ON pu.project_id=p.id WHERE pu.user_id=? AND p.id=?;", user.getUser(req).id, id, function(err, rows) {
                             resolve(rows)
                         });
                     }
@@ -48,7 +48,7 @@ const projectDb = {
                             resolve(rows)
                         });
                     } else {
-                        query.get("SELECT p.* FROM projects p LEFT JOIN project_user pu ON pu.page_id=p.id WHERE pu.user_id=? AND p.dataname=?;", user.getUser(req).id, name, function(err, rows) {
+                        query.get("SELECT p.* FROM projects p LEFT JOIN project_user pu ON pu.project_id=p.id WHERE pu.user_id=? AND p.dataname=?;", user.getUser(req).id, name, function(err, rows) {
                             resolve(rows)
                         });
                     }
@@ -66,7 +66,7 @@ const projectDb = {
                             resolve(rows)
                         });
                     } else {
-                        query.all("SELECT c.*, gs.name as server_name, pc.id as id FROM capabilities c LEFT JOIN generator_servers gs ON gs.id=c.generator_server_id LEFT JOIN project_capabilities pc ON c.id=pc.capability_id LEFT JOIN FROM projects p ON p.id=pc.project_id LEFT JOIN project_user pu ON pu.page_id=p.id WHERE pu.user_id=? AND p.project_id=?;", user.getUser(req).id, projectId, function(err, rows) {
+                        query.all("SELECT c.*, gs.name as server_name, pc.id as id FROM capabilities c LEFT JOIN generator_servers gs ON gs.id=c.generator_server_id LEFT JOIN project_capabilities pc ON c.id=pc.capability_id LEFT JOIN FROM projects p ON p.id=pc.project_id LEFT JOIN project_user pu ON pu.project_id=p.id WHERE pu.user_id=? AND p.project_id=?;", user.getUser(req).id, projectId, function(err, rows) {
                             resolve(rows)
                         });
                     }
@@ -84,7 +84,7 @@ const projectDb = {
                             resolve(rows)
                         });
                     } else {
-                        query.all("SELECT pb.* FROM project_breakpoints pb LEFT JOIN projects p ON p.id=pb.project_id LEFT JOIN project_user pu ON pu.page_id=p.id WHERE pu.user_id=? AND p.project_id=?;", user.getUser(req).id, projectId, function(err, rows) {
+                        query.all("SELECT pb.* FROM project_breakpoints pb LEFT JOIN projects p ON p.id=pb.project_id LEFT JOIN project_user pu ON pu.project_id=p.id WHERE pu.user_id=? AND p.project_id=?;", user.getUser(req).id, projectId, function(err, rows) {
                             resolve(rows)
                         });
                     }

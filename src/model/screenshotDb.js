@@ -21,6 +21,26 @@ const screenshotDb = {
             }
         )
     },
+    getScreenshotsFromComponentId: async function (component_id) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.all("SELECT s.*, c.name as component_name, p.name as page_name, pb.width, pb.height, cb.browser_name, cb.browser_version, \
+                        cb.platform, cb.platform_version, gs.server_type \
+                        FROM screenshots s LEFT JOIN pages p ON p.id=s.page_id \
+                        LEFT JOIN components c ON c.id=s.component_id \
+                        LEFT JOIN project_capabilities pc ON pc.id=s.capability_id \
+                        LEFT JOIN capabilities cb ON pc.capability_id=cb.id \
+                        LEFT JOIN generator_servers gs ON gs.id=cb.generator_server_id \
+                        LEFT JOIN project_breakpoints pb ON pb.id=s.breakpoint_id \
+                        WHERE s.component_id=? ORDER BY s.created_time ASC;", component_id, function(err, rows) {
+                        resolve(rows)
+                    });
+                });
+            }
+        )
+    },
     getScreenshots: async function (projectId, conditions, sortKey, sortOrder, limit, page) {
         if (typeof conditions == 'undefined') {
             conditions = {};
@@ -242,6 +262,32 @@ const screenshotDb = {
                             resolve(this.lastID)
                         }
                     );
+                });
+            }
+        );
+    },
+    deleteScreenshotForComponent: async function (componentObject) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.run("DELETE FROM screenshots WHERE component_id=?;", 
+                    componentObject.component_id, function(err) {
+                        resolve(true);
+                    });
+                });
+            }
+        );
+    },
+    deleteScreenshot: async function (screenshotObject) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.run("DELETE FROM screenshots WHERE id=?;", 
+                    screenshotObject.id, function(err) {
+                        resolve(true);
+                    });
                 });
             }
         );

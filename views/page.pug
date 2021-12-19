@@ -41,7 +41,7 @@ html
                           | Devices
                   if isAdmin
                     div(class="row shortcuts px-4")
-                      a(class="col-4 shortcut-item", href="/projects")
+                      a(class="col-4 shortcut-item", href="/users")
                         span(class="shortcut-media avatar rounded-circle bg-gradient-red")
                           i(class="fas fa-user-friends")
                         small
@@ -58,7 +58,7 @@ html
                   div(class="dropdown-header noti-title")
                     h6
                       | Hello!
-                  a(href="#" class="dropdown-item")
+                  a(href="/users/" + user.id + "/edit" class="dropdown-item")
                     | My Profile
                   div(class="dropdown-divider")
                   a(href="/logout" class="dropdown-item")

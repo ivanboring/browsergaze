@@ -1,15 +1,11 @@
-const validate = require('../services/validate');
 const project = require('../services/project');
 const component = require('../services/component');
 const user = require('../services/user');
-const form = require('../services/form');
 const page = require('../services/page');
 const job = require('../services/job');
 const defaults = require('../services/defaults');
 const capabilities = require('../services/capabilities');
-const runner = require('../directors/runner.js');
 const fs = require('fs');
-const yaml = require('js-yaml');
 const screenshot = require('../services/screenshot');
 const helper = require('../services/helper');
 const baseline = require('../services/baseline');
@@ -56,6 +52,11 @@ const jobs = {
 
         const baselines = await baseline.getBaselineForScreenshots(screenshots, projectObject.id);
 
+        let queryString = [];
+        for (let o in req.query) {
+            queryString.push(o + '=' + req.query[o]);
+        }
+
         res.render('job-list', {
             title: 'glitch-hawk: Results for ' + projectObject.name,
             pageTitle: 'Visual Test Results for ' + projectObject.name + ' Project',
@@ -66,6 +67,7 @@ const jobs = {
             capabilityOptions: capabilityOptions,
             breakpointOptions: breakpointOptions,
             screenshotIds: screenshotIds,
+            queryString: encodeURIComponent("/projects/" + projectObject.dataname + "/results?" + queryString.join("&")),
             baseline: baselines,
             project: projectObject,
             screenshots: screenshots,

@@ -7,7 +7,8 @@ const page = require('../services/page');
 
 module.exports = {
     get: async function(req, res) {
-        const projects = await project.getProjects(req)
+        const projects = await project.getProjects(req);
+        console.log(projects);
         res.render('projects', {
             title: 'Your projects',
             isAdmin: user.isAdmin(req),

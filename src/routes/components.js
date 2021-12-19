@@ -77,6 +77,33 @@ const components = {
             res.redirect(301, '/projects')
         }
     },
+    deleteForm: async function(req, res) {
+        const projectObject = await project.getProjectByName(req, req.params.projectName);
+        const componentObject = await component.getComponentByUuid(req, req.params.componentUuid);
+        const pageObject = await page.getPageById(req, componentObject.page_id);
+        if (user.hasPermission(req, 'delete-component')) {
+            res.render('component-delete', {
+                title: 'Delete Component ' + componentObject.name + ' for ' + projectObject.name,
+                project: projectObject,
+                page: pageObject,
+                id: componentObject.id,
+                user: user.getUser(req),
+            })
+        } else {
+            res.redirect(301, '/projects')
+        }
+    },
+    deleteComponent: async function(req, res) {
+        const projectObject = await project.getProjectByName(req, req.params.projectName);
+        const componentObject = await component.getComponentById(req, req.body.component_id);
+        const pageObject = await page.getPageById(req, componentObject.page_id);
+        if (user.hasPermission(req, 'delete-component')) {
+            component.deleteComponent(req, componentObject);
+            res.redirect(301, '/projects/' + projectObject.dataname + '/page/' + pageObject.uuid);
+        } else {
+            res.redirect(301, '/projects');
+        }
+    },
     post: async function(req, res) {
         if (user.isAdmin(req)) {
             const projectObject = await project.getProjectByName(req, req.params.projectName)

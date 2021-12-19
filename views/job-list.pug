@@ -174,7 +174,7 @@ block content
                                         button(class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
                                             | Actions
                                         div(class="dropdown-menu" aria-labelledby="dropdownMenuButton")
-                                            a(href="/projects/" + project.dataname + "/results/diff/" + val.id, class="dropdown-item", disabled)
+                                            a(href="/projects/" + project.dataname + "/results/" + val.id + '/diff', class="dropdown-item", disabled)
                                                 i(class="fas fa-poll")
                                                 | View Regression Diff
                                             a(href="/projects/run/all" class="dropdown-item", disabled)
@@ -183,7 +183,7 @@ block content
                                             a(href="/api/baseline/set/" + val.id, data-id=val.id, class="dropdown-item set-baseline", disabled)
                                                 i(class="fas fa-poll")
                                                 | Set as Baseline
-                                            a(href="/projects/run/all" class="dropdown-item", disabled)
+                                            a(href="/projects/" + project.dataname + "/results/" + val.id + '/delete?redirect=' + queryString, class="dropdown-item", disabled)
                                                 i(class="fas fa-poll")
                                                 | Delete Result
     script(src="/js/pages/job-list.js")

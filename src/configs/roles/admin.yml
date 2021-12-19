@@ -1,4 +1,5 @@
 id: 2
+name: Administrator
 permissions:
   create-project: true
   edit-all-projects: true

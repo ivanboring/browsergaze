@@ -95,12 +95,12 @@ module.exports = {
         // Create project user table.
         db.run("CREATE TABLE project_user ( \
             user_id INTEGER, \
-            page_id INTEGER \
+            project_id INTEGER \
         )");
 
         // Set index.
         db.run("CREATE UNIQUE INDEX idx_project_user \
-            ON project_user (user_id, page_id);");
+            ON project_user (user_id, project_id);");
 
         // Create baselines table
         db.run("CREATE TABLE baseline ( \

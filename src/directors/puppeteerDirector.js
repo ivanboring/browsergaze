@@ -91,6 +91,20 @@ const puppeteerDirector = {
         }
         return parameters.value;
     },
+    // Hide element.
+    hideElement: async function(parameters, jobId) {
+        if (parameters.element == '') {
+            throw 'No element/xpath given';
+        }
+        let file = parameters.value;
+        try {
+            let element = await this.getElement(jobId, parameters.selector, parameters.element);
+            await element.evaluate((el) => el.style.display = 'none');
+        } catch(e) {
+            throw `Could not hide the selector: ${selector}.`;
+        }
+        return parameters.value;
+    },
     // Wait ms.
     waitTime: async function(parameters, jobId) {
         return new Promise(function(resolve) { 

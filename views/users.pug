@@ -1,0 +1,64 @@
+extends page
+
+block content
+    div(class="header bg-primary pb-2")
+        div(class="container-fluid")
+            div(class="header-body")
+                div(class="row align-items-center py-4")
+                    div(class="col-lg-6 col-7")
+                        div(class="media align-items-center")
+                            div(class="media-body ml-2 d-none d-lg-block")
+                                h2(class="h1 text-white mb-0")=pageTitle
+                    div(class="col-lg-6 col-5 text-right")
+                        div(class="dropdown")
+                            button(class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+                                | User Menu
+                            div(class="dropdown-menu" aria-labelledby="dropdownMenuButton")
+                                a(href="/users/create", class="dropdown-item", disabled)
+                                    i(class="fas fa-poll")
+                                    | Add user
+    div(class="container-fluid mt-3")
+        if users.length
+            h1=title
+            div(class="table-responsive")
+                div 
+                    table(class="table align-items-center")
+                        thead(class="thead-light")
+                            tr
+                                th(scope="col")
+                                    | Id
+                                th(scope="col")
+                                    | First Name
+                                th(scope="col")
+                                    | Last Name
+                                th(scope="col")
+                                    | E-mail
+                                th(scope="col")
+                                    | Role
+                                th(scope="col")
+                                    | Actions
+                        tbody 
+                            each val in users
+                                tr
+                                    th(scope="row")
+                                        | #{val.id}
+                                    th(scope="row")
+                                        | #{val.first_name}
+                                    th(scope="row")
+                                        | #{val.last_name}
+                                    th(scope="row")
+                                        | #{val.email}
+                                    th(scope="row")
+                                        | #{roles[val.role]}
+                                    th(scope="row")
+                                        div(class="dropdown")
+                                            button(class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+                                                | Actions
+                                            div(class="dropdown-menu" aria-labelledby="dropdownMenuButton")
+                                                a(href="/users/" + val.id + "/edit", class="dropdown-item")
+                                                    i(class="fas fa-poll")
+                                                    | Edit user
+                                                if (val.id != "1")
+                                                    a(href="/users/" + val.id + "/delete", class="dropdown-item")
+                                                        i(class="fas fa-poll")
+                                                        | Delete user

@@ -1,6 +1,9 @@
 const { 
     v1: uuidv1,
 } = require('uuid');
+const helper = require('./helper');
+const fs = require('fs');
+const yaml = require('js-yaml');
 
 const form = {
     tokens: {},
@@ -8,10 +11,11 @@ const form = {
         if (typeof valueObject == 'undefined') {
             valueObject = {};
         }
+        const confdir = helper.getConfigDirecory('entities');
         const passedVariable = 'session' in req && 'validation' in req.session ? req.session.validation : {};
         const formValues = passedVariable !== null && 'values' in passedVariable ? passedVariable.values : {};
         const formValidation = passedVariable !== null &&'validationErrors' in passedVariable ? passedVariable.validationErrors : [];
-        const entityRules = require('../entities/' + entityName);
+        const entityRules = yaml.load(fs.readFileSync(confdir + entityName + '.yml')).fields;
         const formObject = {}
         // Reset session variable
         req.session.validation = null;

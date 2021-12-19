@@ -1,15 +1,12 @@
 const componentDb = require('../model/componentDb');
 const fs = require('fs');
-const user = require('./user');
 const validate = require('./validate');
 const defaults = require('./defaults')
-const { 
-    v1: uuidv1,
-} = require('uuid');
-const puppeteerDirector = require('../directors/puppeteerDirector');
-const { resolve } = require('path');
-const { query } = require('express');
 const capabilities = require('./capabilities');
+const project = require('./project');
+const page = require('./page');
+const screenshot = require('./screenshot');
+const baseline = require('./baseline');
 
 const component = {
     getComponentsForProject: async function(req, projectId) {
@@ -75,6 +72,18 @@ const component = {
         await componentDb.saveCapabilityBreakpoint(componentObject, true)
         return null;
     },
+    deleteComponent: async function(req, componentObject) {
+        console.log(componentObject);
+        const pageObject = await page.getPageById(req, componentObject.page_id);
+        const projectObject = await project.getProjectById(req, componentObject.project_id);
+        await componentDb.deleteComponentById(componentObject.id);
+        await this.deleteDefaultImage(componentObject, pageObject, projectObject);
+        await componentDb.deleteCapabilityBreakpointFromComponent(componentObject);
+        await componentDb.deleteRulesFromComponent(componentObject);
+        await screenshot.deleteScreenshotForComponent(componentObject);
+        await baseline.deleteBaselineForComponent(componentObject);
+
+    },
     getRulesForComponent: async function(componentId) {
         return await componentDb.getRulesForComponent(componentId);
     },
@@ -90,6 +99,12 @@ const component = {
         fs.copyFileSync(defaults.imageLocation + projectObject.dataname + '/tmp/preview.png', newDir + '/default.png')
 
         return true;
+    },
+    deleteDefaultImage(componentObject, pageObject, projectObject) {
+        let file = defaults.imageLocation + projectObject.dataname + '/' + pageObject.uuid + '/' + componentObject.uuid + '/default.png';
+        if (fs.existsSync(file)) {
+            fs.unlinkSync(file);
+        }
     }
 }
 

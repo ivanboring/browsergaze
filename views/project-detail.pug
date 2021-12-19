@@ -25,7 +25,7 @@ block content
                                     i(class="fas fa-play")
                                     | Run everything
                                 if isAdmin
-                                    a(href="/projects/run/all/" + project.dataname, class="dropdown-item", disabled)
+                                    a(href="/projects/" + project.dataname + "/page/create", class="dropdown-item", disabled)
                                         i(class="fas fa-plus")
                                         | Create page
                                     a(href="/projects/" + project.dataname + "/edit", class="dropdown-item", disabled)
@@ -39,7 +39,7 @@ block content
                         | Projects 
                 li(class="breadcrumb-item active" aria-current="page")
                         | #{project.name}
-        if pages.length
+        if pages && pages.length
             h1
                 | Pages
             div(class="row")

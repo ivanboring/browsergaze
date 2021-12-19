@@ -21,13 +21,25 @@ const routing = {
         app.get('/api/job/:uuid/status', require('./jobs').getStatus);
         app.get('/api/baseline/set/:screenshotId', require('./screenshots').setBaseline);
 
+        app.get('/users', require('./users').listUsers);
+        app.get('/users/create', require('./users').createUser);
+        app.post('/users/create', require('./users').postCreateUser);
+        app.get('/users/:userId/edit', require('./users').editUser);
+        app.post('/users/:userId/edit', require('./users').postEditUser);
+        app.get('/users/:userId/delete', require('./users').deleteUser);
+        app.post('/users/:userId/delete', require('./users').postDeleteUser);
+
         app.post('/runner/component/start', require('./components').startRunner)
         app.get('/runner/component/status/:jobId', require('./components').statusRunner)
         app.get('/projects/:projectName/page/create', require('./pages').createForm);
         app.get('/projects/:projectName/results', require('./jobs').getJobs);
-        app.get('/projects/:projectName/results/diff/:screenshotId', require('./screenshots').diff);
+        app.get('/projects/:projectName/results/:screenshotId/diff', require('./screenshots').diff);
+        app.get('/projects/:projectName/results/:screenshotId/delete', require('./screenshots').deleteForm);
+        app.post('/projects/:projectName/screenshot/delete', require('./screenshots').deleteScreenshot);
 
         app.get('/projects/:projectName/component/:componentUuid/edit', require('./components').editForm);
+        app.get('/projects/:projectName/component/:componentUuid/delete', require('./components').deleteForm);
+        app.post('/projects/:projectName/component/delete', require('./components').deleteComponent);
 
         app.post('/projects/:projectName/page/create', require('./pages').post);
         app.get('/projects/:projectName/page/:pageUuid', require('./pages').detail);

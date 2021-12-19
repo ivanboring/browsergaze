@@ -1,15 +1,7 @@
-const validate = require('../services/validate');
 const project = require('../services/project');
 const component = require('../services/component');
 const user = require('../services/user');
-const form = require('../services/form');
 const page = require('../services/page');
-const job = require('../services/job');
-const defaults = require('../services/defaults');
-const capabilities = require('../services/capabilities');
-const runner = require('../directors/runner.js');
-const fs = require('fs');
-const yaml = require('js-yaml');
 const screenshot = require('../services/screenshot');
 const baseline = require('../services/baseline');
 
@@ -31,6 +23,32 @@ const screenshots = {
             baseline: baselineObject,
             user: user.getUser(req),
         });
+    },
+    deleteForm: async function(req, res) {
+        const screenshotObject = await screenshot.getScreenshot(req.params.screenshotId);
+        const pageObject = await page.getPageById(req, screenshotObject.page_id);
+        const projectObject = await project.getProjectById(req, screenshotObject.project_id);
+        if (user.hasPermission(req, 'delete-results')) {
+            res.render('screenshot-delete', {
+                title: 'Delete Screenshot id: ' + screenshotObject.id,
+                project: projectObject,
+                page: pageObject,
+                id: screenshotObject.id,
+                redirect: req.query.redirect,
+                user: user.getUser(req),
+            })
+        } else {
+            res.redirect(301, '/projects')
+        }
+    },
+    deleteScreenshot: async function(req, res) {
+        const screenshotObject = await screenshot.getScreenshot(req.body.screenshot_id);
+        if (user.hasPermission(req, 'delete-results')) {
+            screenshot.deleteScreenshot(screenshotObject)
+            res.redirect(301, decodeURIComponent(req.body.redirect));
+        } else {
+            res.redirect(301, '/projects');
+        }
     },
     setBaseline: async function(req, res) {
         if (user.isCreator(req)) {

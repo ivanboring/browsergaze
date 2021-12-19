@@ -33,6 +33,19 @@ const baseline = {
             }
         )
     },
+    deleteBaselineForComponent: async function (componentObject) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.run("DELETE FROM baselines WHERE component_id=?;", 
+                    componentObject.component_id, function(err) {
+                        resolve(true);
+                    });
+                });
+            }
+        );
+    },
     setBaseline: async function(screenshotObject) {
         let query = db.getDb();
         await screenshot.updateBaseline(screenshotObject);

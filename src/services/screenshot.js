@@ -1,4 +1,5 @@
 
+const fs = require('fs');
 const helper = require('./helper');
 const capabilities = require('./capabilities');
 const screenshotDb = require('../model/screenshotDb');
@@ -32,6 +33,18 @@ const screenshot = {
         }
         rows = capabilities.getCapabilitiesForStyling(rows);
         return rows;
+    },
+    deleteScreenshotForComponent: async function (componentObject) {
+        let rows = await screenshotDb.getScreenshotsFromComponentId(componentObject.id);
+        for (let x in rows) {
+            await this.deleteScreenshot(rows[x]);
+        }
+    },
+    deleteScreenshot: async function (screenshotObject) {
+        if (fs.existsSync(screenshotObject.path)) {
+            fs.unlinkSync(screenshotObject.path);
+        }
+        return await screenshotDb.deleteScreenshot(screenshotObject);
     },
     getUnrunScreenshots: async function (lastId) {
         return await screenshotDb.getUnrunScreenshots(lastId);

@@ -18,7 +18,7 @@ block content
                                     else
                                         | Create first project
     div(class="container mt--6")
-        if projects.length
+        if projects && projects.length
             div(class="row")
                 each val, key in projects
                     div(class="col-sm-6 col-md-6 col-12 col-lg-4 col-xl-4")

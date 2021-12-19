@@ -30,6 +30,9 @@ const baseline = {
     getBaselineForProject: async function (project_id) {
         return await baselineDb.getBaselineForProject(project_id);
     },
+    deleteBaselineForComponent: async function (componentObject) {
+        return await baselineDb.deleteBaselineForComponent(componentObject);
+    },
     setBaseline: async function(screenshotObject) {
         return await baselineDb.setBaseline(screenshotObject);
     }

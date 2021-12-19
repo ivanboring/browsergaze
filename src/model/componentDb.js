@@ -15,7 +15,7 @@ const component = {
                             resolve(rows)
                         });
                     } else {
-                        query.all("SELECT c.* FROM components c LEFT JOIN project_user pu ON pu.page_id=c.project_id WHERE pu.user_id=? AND c.project_id=?;", user.getUser(req).id, projectId, function(err, rows) {
+                        query.all("SELECT c.* FROM components c LEFT JOIN project_user pu ON pu.project_id=c.project_id WHERE pu.user_id=? AND c.project_id=?;", user.getUser(req).id, projectId, function(err, rows) {
                             resolve(rows)
                         });
                     }
@@ -33,7 +33,7 @@ const component = {
                             resolve(rows)
                         });
                     } else {
-                        query.all("SELECT c.* FROM components c LEFT JOIN project_user pu ON pu.page_id=c.project_idid WHERE pu.user_id=? AND c.page_id=?;", user.getUser(req).id, pageObject.id, function(err, rows) {
+                        query.all("SELECT c.* FROM components c LEFT JOIN project_user pu ON pu.project_id=c.project_idid WHERE pu.user_id=? AND c.page_id=?;", user.getUser(req).id, pageObject.id, function(err, rows) {
                             resolve(rows)
                         });
                     }
@@ -70,10 +70,23 @@ const component = {
                             resolve(rows)
                         });
                     } else {
-                        query.get("SELECT c.* FROM components c LEFT JOIN project_user pu ON pu.page_id=c.project_idid WHERE pu.user_id=? AND c.id=?;", user.getUser(req).id, id, function(err, rows) {
+                        query.get("SELECT c.* FROM components c LEFT JOIN project_user pu ON pu.project_id=c.project_idid WHERE pu.user_id=? AND c.id=?;", user.getUser(req).id, id, function(err, rows) {
                             resolve(rows)
                         });
                     }
+                });
+            }
+        )
+    },
+    deleteComponentById: async function(id) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.get("DELETE FROM components WHERE id=?;", id, function(err, rows) {
+                        console.log(err);
+                        resolve(true)
+                    });
                 });
             }
         )
@@ -88,7 +101,7 @@ const component = {
                             resolve(rows)
                         });
                     } else {
-                        query.get("SELECT c.* FROM components c LEFT JOIN project_user pu ON pu.page_id=c.project_idid WHERE pu.user_id=? AND c.uuid=?;", user.getUser(req).id, uuid, function(err, rows) {
+                        query.get("SELECT c.* FROM components c LEFT JOIN project_user pu ON pu.project_id=c.project_idid WHERE pu.user_id=? AND c.uuid=?;", user.getUser(req).id, uuid, function(err, rows) {
                             resolve(rows)
                         });
                     }
@@ -172,7 +185,18 @@ const component = {
                             );
                         }
                     }
-                    resolve("true");
+                    resolve(true);
+                });
+            }
+        );
+    },
+    deleteRulesFromComponent: async function(componentObject) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.run("DELETE FROM rules WHERE component_id=?", componentObject.id);
+                    resolve(true);
                 });
             }
         );
@@ -194,10 +218,21 @@ const component = {
                             componentObject.default_visual_regression_threshold,
                         );
                     }
-                    resolve("true");
+                    resolve(true);
                 });
             }
         )
+    },
+    deleteCapabilityBreakpointFromComponent: async function(componentObject) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.run("DELETE FROM component_capability_breakpoint WHERE component_id=?", componentObject.id);
+                    resolve(true);
+                });
+            }
+        );
     },
     getUuidFromId: async function(id) {
         let query = db.getDb();

@@ -1,0 +1,103 @@
+extends page
+
+block content
+    div(class="container")
+        div(class="card-header bg-transparent pb-5")
+            h2=title
+            form(action='/users/' + id + '/edit', method='POST' role="form")
+                input(type="hidden", name="id", value=id)
+                if extended
+                    div(class="form-group mb-3")
+                        div(class="input-group-merge input-group-alternative")
+                            div(class="input-group-prepend")
+                                span(class="input-group-text")
+                                    i(class="fas fa-envelope")
+                                input(type='email', class="form-control", name='email', value=form.email.value, placeholder="E-mail", aria-invalid=form.email.error, required, autofocus)
+                        small
+                            if form.email.error
+                                ul(class="error")
+                                    each error in form.email.errors
+                                        li(style="color:red;")=error
+                else
+                    input(type="hidden", name="email", value=form.email.value)
+
+                div(class="form-group mb-3")
+                    div(class="input-group")
+                        div(class="input-group-prepend")
+                            div(class="input-group-text")
+                                | Name
+                        input(type='text', class="form-control", name='first_name', value=form.first_name.value, placeholder="First Name", aria-invalid=form.first_name.error, required)
+                        input(type='text', class="form-control", name='last_name', value=form.last_name.value, placeholder="Last Name", aria-invalid=form.last_name.error, required)
+                    small
+                        if form.first_name.error
+                            ul(class="error")
+                                each error in form.first_name.errors
+                                    li(style="color:red;")=error
+                        if form.last_name.error
+                            ul(class="error")
+                                each error in form.last_name.errors
+                                    li(style="color:red;")=error
+                            
+                if own 
+                    div(class="form-group mb-3")
+                        div(class="input-group-merge input-group-alternative")
+                            div(class="input-group-prepend")
+                                span(class="input-group-text")
+                                    i(class="fas fa-lock")
+                                input(type='password', class="form-control", name='password_old', value='', placeholder="Old Password", aria-invalid=form.password.error)
+                            small
+                                if "password_old" in form && form.password_old.error
+                                    ul(class="error")
+                                        each error in form.password_old.errors
+                                            li(style="color:red;")=error
+                        
+                div(class="form-group mb-3")
+                    div(class="input-group-merge input-group-alternative")
+                        div(class="input-group-prepend")
+                            span(class="input-group-text")
+                                i(class="fas fa-lock")
+                            input(type='password', class="form-control", name='password', value='', placeholder="New Password", aria-invalid=form.password.error)
+                        small
+                            if form.password.error
+                                ul(class="error")
+                                    each error in form.password.errors
+                                        li(style="color:red;")=error
+
+                div(class="form-group mb-3")
+                    div(class="input-group-merge input-group-alternative")
+                        div(class="input-group-prepend")
+                            span(class="input-group-text")
+                                i(class="fas fa-lock")
+                            input(type='password', class="form-control", name='password2', value='', placeholder="Repeat New Password")
+                if extended && id !== 1
+                    div(class="form-group mb-3")
+                        select(class="form-control", name="role", id="role", required)
+                            each value, key in roles
+                                option(value=key, selected=form.role.value==key)
+                                    | #{value}
+                        small
+                            if form.role.error
+                                ul(class="error")
+                                    each error in form.role.errors
+                                        li(style="color:red;")=error
+
+                    div(class="form-group mb-3", id="project-choice")
+                        h3
+                            | Choose projects
+                        each project in projects
+                            div(class="custom-control custom-checkbox")
+                                input(type="checkbox", class="custom-control-input", name="projects[]", value=project.id, id="customCheckDisabled" + project.id, checked=form.projects.value.includes(project.id) ? true : false)
+                                label(class="custom-control-label", for="customCheckDisabled" + project.id)=project.name
+                        small
+                            if form.projects.error
+                                ul(class="error")
+                                    each error in form.projects.errors
+                                        li(style="color:red;")=error
+                else 
+                    input(type="hidden", name="role", value=form.role.value)
+                    each project in form.projects.value
+                        input(type="hidden", name="projects[]", value=project)
+
+                div(class="text-center")
+                    input(type='submit', class="btn btn-primary my-4", value='Edit user')
+    script(src="/js/pages/users.js")

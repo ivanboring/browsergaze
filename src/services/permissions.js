@@ -4,6 +4,9 @@ const helper = require('./helper');
 
 const permissions = {
     permissionsPerRole: {},
+    roleNames: {
+        '1': 'Superadmin',
+    },
     roleHasPermission: function(role, permission) {
         // Load permissions into memory.
         if (Object.keys(this.permissionsPerRole).length === 0) {
@@ -14,13 +17,17 @@ const permissions = {
         if (role == 1) {
             return true;
         }
-        return permission in this.permissionsPerRole && this.permissionsPerRole[permission].indexOf(role.toString()) ? true : false;
+        return permission in this.permissionsPerRole && this.permissionsPerRole[permission].includes(role.toString()) ? true : false;
+    },
+    getRoleName(id) {
+        return id in this.roleNames ? this.roleNames[id] : 'unknown';
     },
     loadPermissions: function() {
         let confdir = helper.getConfigDirecory('roles');
         let files = fs.readdirSync(confdir);
         for (let file of files) {
             let roledata = yaml.load(fs.readFileSync(confdir + file))
+            this.roleNames[roledata.id.toString()] = roledata.name; 
             for (let x in roledata.permissions) {
                 if (roledata.permissions[x]) {
                     if (!(x in this.permissionsPerRole)) {
