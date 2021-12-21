@@ -3,6 +3,7 @@ block content
     script 
         | let component = {csrf: "#{form.csrf}", projectName: "#{project.dataname}", domain: "#{project.default_host_path}", path: "#{page.path}"};
         | var globalRulesCounter=#{"1" in form.selector.value ? form.selector.value.length : 1};
+    link(rel='stylesheet', href='/libraries/chosen/chosen.min.css')
     link(rel='stylesheet', href='/css/pages/component.css')
     script(src="/js/sortable.min.js")
     div(class="header bg-primary pb-6")
@@ -152,13 +153,18 @@ block content
                                             input(type="hidden", name="selector[0][screenshotElement][value]", data-weight="0", data-group="screenshotElement", data-id="value", id="screenshotElement__value__0", value="images/" + project.dataname + "/tmp/preview.png")
                             div(id="add-more")
                                 div(class="input-group mb-3")
-                                    select(id="listed-rules", class="form-control")
-                                    div(class="input-group-append")
-                                        button(class="btn btn-icon btn-default btn-sm", id="add-rule")
+                                    select(id="listed-rules", data-placeholder="Choose a rule...", class="form-control")
+                                div(class="input-group mb-3")
+                                        button(class="btn btn-icon btn-default btn", id="add-rule")
                                             span(class="btn-inner--icon")
                                                 i(class="fas fa-plus")
                                             span(class="btn-inner--text")
                                                 | Add this rule
+                                        button(class="btn btn-icon btn-secondary btn", id="describe-rule")
+                                            span(class="btn-inner--icon")
+                                                i(class="fas fa-question")
+                                            span(class="btn-inner--text")
+                                                | Describe this rule
                             div(class="text-center")
                                 input(type="hidden", name="tested", id="tested", value=form.tested.value)
                                 button(id="test-component", class="btn btn-secondary my-4")
@@ -186,4 +192,5 @@ block content
                         | Look good
                     button(type="button", id="again", class="btn btn-warning", data-dismiss="modal", style="display: none;")
                         | Try again
+    script(src="/libraries/chosen/chosen.jquery.min.js")
     script(src="/js/pages/component.js")

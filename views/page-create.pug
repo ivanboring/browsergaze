@@ -16,9 +16,9 @@ block content
                 div(class="card")
                     div(class="card-header")
                         h2
-                            | Create Page for #{project.name}
+                            | #{title}
                     div(class="card-body")
-                        form(action="/projects/" + project.dataname + "/page/create", method="POST" role="form")
+                        form(action=action, method="POST" role="form")
                             div(class="form-group mb-3")
                                 div(class="input-group-merge input-group-alternative")
                                     div(class="input-group-prepend")
@@ -45,4 +45,4 @@ block content
                                                 li(style="color:red;")=error
 
                             div(class="text-center")
-                                input(type='submit', class="btn btn-primary my-4", value='Create page')
+                                input(type='submit', class="btn btn-primary my-4", value=submitText)

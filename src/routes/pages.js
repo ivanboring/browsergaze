@@ -14,6 +14,40 @@ module.exports = {
                 project: projectData,
                 form: form.populateFormDefaults('page', req),
                 user: user.getUser(req),
+                action: "/projects/" + project.dataname + "/page/create",
+                submitText: "Create Page",
+            })
+        } else {
+            res.redirect(301, '/projects')
+        }
+    },
+    editForm: async function(req, res) {
+        const projectData = await project.getProjectByName(req, req.params.projectName);
+        const pageData = await page.getPageByUuid(req, req.params.pageUuid);
+        if (user.hasPermission(req, 'edit-page')) {
+            res.render('page-create', {
+                title: 'Edit Page for ' + projectData.name,
+                project: projectData,
+                form: form.populateFormDefaults('page', req, pageData),
+                id: pageData.id,
+                user: user.getUser(req),
+                action: "/projects/" + projectData.dataname + "/page/" + pageData.uuid + "/edit",
+                submitText: "Edit Page",
+            })
+        } else {
+            res.redirect(301, '/projects')
+        }
+    },
+    deleteForm: async function(req, res) {
+        const projectData = await project.getProjectByName(req, req.params.projectName);
+        const pageData = await page.getPageByUuid(req, req.params.pageUuid);
+        if (user.hasPermission(req, 'delete-page')) {
+            res.render('page-delete', {
+                title: 'Delete Page ' + pageData.name + ' for ' + projectData.name,
+                project: projectData,
+                page: pageData,
+                id: pageData.id,
+                user: user.getUser(req),
             })
         } else {
             res.redirect(301, '/projects')
@@ -33,6 +67,32 @@ module.exports = {
             } else {
                 res.redirect(301, '/projects/detail/' + projectObject.dataname)
             }
+        }
+    },
+    update: async function(req, res) {
+        const projectObject = await project.getProjectByName(req, req.params.projectName);
+        const pageData = await page.getPageByUuid(req, req.params.pageUuid);
+        if (user.hasPermission(req, 'edit-page')) {
+            if (!projectObject) {
+                res.redirect(301, '/projects')
+                return
+            }
+            let validationErrors = await page.createPage(req.body, projectObject, pageData.id, pageData.uuid)
+            if (validationErrors !== null) {
+                validate.redirect('/projects/' + projectObject.dataname + '/page/' + pageData + '/edit', req.body, validationErrors, req, res)
+            } else {
+                res.redirect(301, '/projects/detail/' + projectObject.dataname)
+            }
+        }
+    },
+    delete: async function(req, res) {
+        const projectData = await project.getProjectByName(req, req.params.projectName);
+        const pageData = await page.getPageByUuid(req, req.params.pageUuid);
+        if (user.hasPermission(req, 'delete-page')) {
+            page.deletePage(req, pageData, projectData);
+            res.redirect(301, '/projects/detail/' + projectData.dataname);
+        } else {
+            res.redirect(301, '/projects/detail/' + projectData.dataname);
         }
     },
     detail: async function(req, res) {

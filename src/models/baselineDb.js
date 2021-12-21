@@ -46,6 +46,19 @@ const baseline = {
             }
         );
     },
+    deleteBaselineForProjectId: async function (projectId) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.run("DELETE FROM baselines WHERE project_id=?;", 
+                    projectId, function(err) {
+                        resolve(true);
+                    });
+                });
+            }
+        );
+    },
     setBaseline: async function(screenshotObject) {
         let query = db.getDb();
         await screenshot.updateBaseline(screenshotObject);

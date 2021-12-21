@@ -4,7 +4,7 @@ block content
     script
         | project_name="#{project.dataname}";
     div(class="header bg-primary pb-2")
-        div(class="container")
+        div(class="container-fluid")
             div(class="header-body")
                 div(class="row align-items-center py-4")
                     div(class="col-lg-6 col-7")
@@ -32,10 +32,20 @@ block content
                                         i(class="fas fa-edit")
                                         | Edit Page
     div(class="container-fluid mt-3")
+        nav(aria-label="breadcrumb")
+            ol(class="breadcrumb")
+                li(class="breadcrumb-item")
+                    a(href="/projects")
+                        | Projects 
+                li(class="breadcrumb-item")
+                    a(href="/projects/detail/" + project.dataname)
+                        | #{project.name}
+                li(class="breadcrumb-item active" aria-current="page")
+                    | #{page.name}
         if components.length
             h1
                 | Components
-            div(class="table-responsive")
+            div(class="table-responsive", style="overflow-x: visible;")
                 div 
                     table(class="table align-items-center")
                         thead(class="thead-light")

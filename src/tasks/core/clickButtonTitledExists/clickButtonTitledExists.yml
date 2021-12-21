@@ -1,0 +1,9 @@
+id: clickButtonTitledExists
+optionsText: I click/press button with title {title} if it exists
+prependText: If it exists I click/press button with title 
+inputs:
+  - identifier: title
+    type: text
+    mainElement: true
+    validation:
+      required: true

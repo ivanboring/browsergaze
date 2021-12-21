@@ -6,7 +6,7 @@ $(document).ready(function() {
     $.getJSON('/ajax/rules.json', function(json) {
         globalRules = json;
         // Populate select.
-        let options = '';
+        let options = '<option> </option>';
         for (key in globalRules) {
             if (key !== "screenshotElement") {
                 options += `<option value="${key}">${globalRules[key].optionsText}</option>`;
@@ -17,7 +17,8 @@ $(document).ready(function() {
             $('#submit').attr('disabled', false);
         }
 
-        $('#listed-rules').html(options)
+        $('#listed-rules').html(options);
+        $("#listed-rules").chosen({disable_search_threshold: 1});
 
         $('#add-rule').click(addRule)
 

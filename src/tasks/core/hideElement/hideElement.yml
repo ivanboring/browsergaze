@@ -1,0 +1,17 @@
+id: hideElement
+optionsText: I hide {element}
+prependText: I hide the
+inputs:
+  - identifier: selector
+    type: select
+    options:
+      js-path: JS Path
+      css-selector: CSS selector
+      xpath: Xpath
+    validation:
+      required: true
+  - identifier: element
+    type: text
+    mainElement: true
+    validation:
+      required: true

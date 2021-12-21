@@ -191,6 +191,21 @@ const screenshotDb = {
             }
         );
     },
+    setScreenshotError: async function (id, error) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.run("UPDATE screenshots SET error=? WHERE id=?;", 
+                        error,
+                        id,
+                    function(err) {
+                        resolve(this.lastID)
+                    });
+                });
+            }
+        );
+    },
     createQueuedScreenshot: async function (queueData) {
         let query = db.getDb();
         return new Promise(

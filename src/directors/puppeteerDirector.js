@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const fs = require('fs');
 const helper = require('../services/helper');
 
 const puppeteerDirector = {
@@ -55,113 +56,16 @@ const puppeteerDirector = {
         }
         return url;
     },
-    getElement: async function(jobId, type, value) {
-        switch (type) {
-            case 'js-path':
-                try {
-                    return await this.page[jobId].evaluateHandle(value);
-                } catch(e) {
-                    throw `Could not find element that matches js-path: ${value}.`;
-                }
-            case 'xpath':
-                try {
-                    return (await this.page[jobId].$x(value))[0];
-                } catch(e) {
-                    throw `Could not find element that matches xpath: ${value}. If the path included a shadow dom, only JS path works.`;
-                }
-            default:
-                try {
-                    return (await this.page[jobId].$$(value))[0];
-                } catch(e) {
-                    throw `Could not find element that matches CSS selector: ${value}. If the path included a shadow dom, only JS path works.`;
-                }
-        }
-    },
-    // Screenshot element.
-    screenshotElement: async function(parameters, jobId) {
-        if (parameters.element == '') {
-            throw 'No element/xpath given';
-        }
-        let file = parameters.value;
-        try {
-            let element = await this.getElement(jobId, parameters.selector, parameters.element);
-            await element.screenshot({path: file});
-        } catch(e) {
-            throw `Could not write the file for the screenshot of: ${selector}.`;
-        }
-        return parameters.value;
-    },
-    // Hide element.
-    hideElement: async function(parameters, jobId) {
-        if (parameters.element == '') {
-            throw 'No element/xpath given';
-        }
-        let file = parameters.value;
-        try {
-            let element = await this.getElement(jobId, parameters.selector, parameters.element);
-            await element.evaluate((el) => el.style.display = 'none');
-        } catch(e) {
-            throw `Could not hide the selector: ${selector}.`;
-        }
-        return parameters.value;
-    },
-    // Wait ms.
-    waitTime: async function(parameters, jobId) {
-        return new Promise(function(resolve) { 
-            setTimeout(function() {
-                resolve(`Waited ${parameters.time} ms.`)
-            }, parameters.time)
-        });
-    },
-    // Click button titled.
-    clickButtonTitled: async function(parameter, jobId) {
-        if (parameter.title == '') {
-            throw 'No button title given';
-        }
-        try {
-            const [button] = await this.page[jobId].$x("//button[contains(., '" + parameter.title + "')]");
-            if (typeof button === 'undefined') {
-                throw `Button with title ${parameter.title} not found`;
+    runStep: async function(taskName, parameters, jobId) {
+        for (let dir of ['custom', 'core']) {
+            let requirement = `./src/tasks/${dir}/${taskName}/src/puppeteer`;
+            if (fs.existsSync(requirement + '.js')) {
+                let base = require(requirement.replace('./src/', '../'));
+                // Run the task.
+                return base[taskName](parameters, this.page[jobId]);
             }
-            if (button) {
-                await button.click();
-            }
-        } catch (e) {
-            throw e
         }
-    },
-    clickButtonTitledExists: async function(parameter, jobId) {
-        if (parameter.title == '') {
-            throw 'No button title given';
-        }
-        try {
-            const [button] = await this.page[jobId].$x("//button[contains(., '" + parameter.title + "')]");
-            if (typeof button !== 'undefined') {
-                await button.click();
-            }
-        } catch (e) {
-            throw e
-        }
-    },
-    //hover
-    hover: async function(parameters, jobId) {
-        if (parameters.element == '') {
-            throw 'No element/xpath given';
-        }
-        let element = await this.getElement(jobId, parameters.selector, parameters.element);
-        try {
-            const rect = await this.page[jobId].evaluate((element) => {
-                const {top, left, bottom, right} = element.getBoundingClientRect();
-                return {top, left, bottom, right};
-            }, element);
-            await this.page[jobId].evaluate((rect) => {
-                window.scrollBy(0, rect.top)
-            }, rect);
-            await this.waitTime({time: 800})
-            await element.hover();
-        } catch(e) {
-            throw `Could not hover over: ${selector}.`;
-        }
+        throw ' Coult not find the task ' + taskName;
     },
     close: async function(jobId) {
         if (Object.keys(this.page).length > 1) {

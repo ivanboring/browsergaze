@@ -5,7 +5,11 @@ const helper = require('./helper');
 const puppeteerDirector = require('../directors/puppeteerDirector');
 const svgexport = require('svgexport');
 const capabilities = require('./capabilities');
-const projectDb = require('../model/projectDb');
+const projectDb = require('../models/projectDb');
+const component = require('./component');
+const job = require('./job');
+const page = require('./page');
+const user = require('./user');
 
 const project = {
     getProjects: async function(req) {
@@ -123,7 +127,23 @@ const project = {
     },
     validateCapabilities(project) {
         return 'capability' in project ? false : true;
-    }
+    },
+    deleteProject: async function(req, project) {
+        const componentsList = await component.getComponentsForProject(req, project.id);
+        for (let x in componentsList) {
+            await component.deleteComponentForProject(req, componentsList[x], project);
+        }
+        await job.deleteJobFromProjectId(project.id);
+        await page.deletePageFromProjectId(project.id);
+        await capabilities.deleteBreakpointForProjectId(project.id);
+        await capabilities.deleteCapabilitiesForProjectId(project.id);
+        await user.deleteUserFromProjectId(project.id);
+        await projectDb.deleteProject(project);
+        console.log('ffff');
+        if (fs.existsSync(defaults.imageLocation + project.dataname)) {
+            fs.rmSync(defaults.imageLocation + project.dataname, { recursive: true });
+        }
+    },
 }
 
 module.exports = project;

@@ -54,6 +54,17 @@ const userDb = {
             }
         );
     },
+    deleteUserFromProjectId: async function(projectId) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.run("DELETE FROM project_user WHERE project_id=?;", projectId);
+                    resolve(true);
+                });
+            }
+        );
+    },
     getUserProjects: async function(userId) {
         let query = db.getDb();
         return new Promise(

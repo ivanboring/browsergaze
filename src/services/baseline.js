@@ -1,4 +1,4 @@
-const baselineDb = require('../model/baselineDb');
+const baselineDb = require('../models/baselineDb');
 
 const baseline = {
     getBaseline: async function (project_id, component_id, capability_id, breakpoint_id) {

@@ -2,7 +2,7 @@ extends page
 
 block content
     div(class="header bg-primary pb-6")
-        div(class="container")
+        div(class="container-fluid")
             div(class="header-body")
                 div(class="row align-items-center py-4")
                     div(class="col-lg-6 col-7")
@@ -17,11 +17,11 @@ block content
                                         | Create another project
                                     else
                                         | Create first project
-    div(class="container mt--6")
+    div(class="container-fluid mt--6")
         if projects && projects.length
             div(class="row")
                 each val, key in projects
-                    div(class="col-sm-6 col-md-6 col-12 col-lg-4 col-xl-4")
+                    div(class="col-sm-6 col-md-6 col-12 col-lg-4 col-xl-3")
                         div(class="card")
                             a(href="/projects/detail/" + val.dataname)
                                 img(src='/' + val.dataname + '/init.jpg', class="card-img-top")
@@ -30,6 +30,22 @@ block content
                                     img(src='/' + val.dataname + "/icon.png")
                                 a(href="/projects/detail/" + val.dataname)
                                     h4(class="card-title text-center")=val.name
+                                div(class="dropdown")
+                                    button(class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+                                        | Actions
+                                    div(class="dropdown-menu" aria-labelledby="dropdownMenuButton")
+                                        a(href="/projects/detail/" + val.dataname, class="dropdown-item")
+                                            i(class="fas fa-file")
+                                            | View pages
+                                        a(href="/projects/" + val.dataname + '/results', class="dropdown-item")
+                                            i(class="fas fa-poll")
+                                            | View results
+                                        a(href="/projects/" + val.dataname + "/edit", class="dropdown-item")
+                                            i(class="fas fa-edit")
+                                            | Edit project
+                                        a(href="/projects/" + val.dataname + "/delete", class="dropdown-item")
+                                            i(class="fas fa-minus-circle")
+                                            | Delete project
         else
             div(class="row justify-content-center")
                 div(class="col-6")

@@ -2,7 +2,7 @@
 const fs = require('fs');
 const helper = require('./helper');
 const capabilities = require('./capabilities');
-const screenshotDb = require('../model/screenshotDb');
+const screenshotDb = require('../models/screenshotDb');
 
 const screenshot = {
     getScreenshot: async function (screenshotId) {
@@ -54,6 +54,9 @@ const screenshot = {
     },
     setScreenshotStatus: async function (id, status) {
         return await screenshotDb.setScreenshotStatus(id, status);
+    },
+    setScreenshotError: async function (id, error) {
+        return await screenshotDb.setScreenshotError(id, error);
     },
     createQueuedScreenshot: async function (queueData) {
         return await screenshotDb.createQueuedScreenshot(queueData);

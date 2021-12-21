@@ -1,10 +1,9 @@
-const componentDb = require('../model/componentDb');
+const componentDb = require('../models/componentDb');
 const fs = require('fs');
 const validate = require('./validate');
 const defaults = require('./defaults')
 const capabilities = require('./capabilities');
 const project = require('./project');
-const page = require('./page');
 const screenshot = require('./screenshot');
 const baseline = require('./baseline');
 
@@ -72,17 +71,17 @@ const component = {
         await componentDb.saveCapabilityBreakpoint(componentObject, true)
         return null;
     },
-    deleteComponent: async function(req, componentObject) {
-        console.log(componentObject);
-        const pageObject = await page.getPageById(req, componentObject.page_id);
+    deleteComponent: async function(req, componentObject, pageObject) {
         const projectObject = await project.getProjectById(req, componentObject.project_id);
+        this.deleteComponentForProject(req, componentObject, projectObject, pageObject);
+    },
+    deleteComponentForProject: async function(req, componentObject, projectObject, pageObject) {
         await componentDb.deleteComponentById(componentObject.id);
         await this.deleteDefaultImage(componentObject, pageObject, projectObject);
         await componentDb.deleteCapabilityBreakpointFromComponent(componentObject);
         await componentDb.deleteRulesFromComponent(componentObject);
         await screenshot.deleteScreenshotForComponent(componentObject);
         await baseline.deleteBaselineForComponent(componentObject);
-
     },
     getRulesForComponent: async function(componentId) {
         return await componentDb.getRulesForComponent(componentId);

@@ -43,6 +43,20 @@ const jobDb = {
             }
         )
     },
+    deleteJobFromProjectId: async function(projectId) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.run("DELETE FROM jobs WHERE project_id=?", 
+                    projectId,
+                    function(err) {
+                        resolve(this.lastID)
+                    });
+                });
+            }
+        );
+    },
     createJob: async function(projectId) {
         let query = db.getDb();
         return new Promise(

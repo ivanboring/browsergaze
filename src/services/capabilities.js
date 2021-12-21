@@ -1,4 +1,4 @@
-const capabilitiesDb = require('../model/capabilitiesDb');
+const capabilitiesDb = require('../models/capabilitiesDb');
 
 const capabilities = {
     getCapabilities: async function() {
@@ -11,7 +11,10 @@ const capabilities = {
         return await capabilitiesDb.getCapabilityForProjectCapabilityId(capabilityId);
     },
     getCapabilitiesForProject: async function(projectId) {
-        return await capabilitiesDb.getCapabilityForProjectCapabilityId(projectId);
+        return await capabilitiesDb.getCapabilitiesForProject(projectId);
+    },
+    getCapabilitiesForServer: async function(serverId) {
+        return await capabilitiesDb.getCapabilitiesForServer(serverId);
     },
     getDataFromSelPlatform: function(platform) {
         switch (platform) {
@@ -99,7 +102,13 @@ const capabilities = {
             }
         }
         return rows;
-    }
+    },
+    deleteBreakpointForProjectId: async function (projectId) {
+        return await capabilitiesDb.deleteBreakpointForProjectId(projectId);
+    },
+    deleteCapabilitiesForProjectId: async function (capabilityId) {
+        return await capabilitiesDb.deleteCapabilitiesForProjectId(capabilityId);
+    },
 }
 
 module.exports=capabilities

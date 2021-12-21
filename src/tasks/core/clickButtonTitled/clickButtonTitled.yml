@@ -1,0 +1,9 @@
+id: clickButtonTitled
+optionsText: I click/press button with title {title}
+prependText: I click/press button with title 
+inputs:
+  - identifier: title
+    type: text
+    mainElement: true
+    validation:
+      required: true

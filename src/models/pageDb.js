@@ -70,7 +70,54 @@ const pageDb = {
                 });
             }
         );
-    }
+    },
+    updatePage(pageObject) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.run("UPDATE pages set uuid=?, name=?, path=?, project_id=? WHERE id=?;", 
+                        pageObject.uuid,
+                        pageObject.name,
+                        pageObject.path,
+                        pageObject.project_id,
+                        pageObject.id, function(err, row) {
+                            console.log(err);
+                            console.log(pageObject);
+                            resolve(true)
+                        }
+                    );
+                    
+                });
+            }
+        );
+    },
+    deletePage: async function(page) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.run("DELETE FROM pages WHERE id=?", 
+                        page.id
+                    );
+                    resolve(true)
+                });
+            }
+        );
+    },
+    deletePageFromProjectId: async function(projectId) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.run("DELETE FROM pages WHERE project_id=?", 
+                        projectId
+                    );
+                    resolve(true)
+                });
+            }
+        );
+    },
 }
 
 module.exports = pageDb;

@@ -86,7 +86,6 @@ module.exports = {
     },
     postCreateUser: async function(req, res) {
         if (user.hasPermission(req, 'manage-users')) {
-            console.log(req.body);
             let validationErrors = await user.createUser(req.body);
             if (validationErrors !== null) {
                 validate.redirect('/users/create', req.body, validationErrors, req, res)

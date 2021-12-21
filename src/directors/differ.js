@@ -2,7 +2,7 @@ const {
     v1: uuidv1,
 } = require('uuid');
 const fs = require('fs')
-const db = require('../model/db');
+const db = require('../models/db');
 const generator = require('./generator');
 const job = require('../services/job');
 const screenshot = require('../services/screenshot');

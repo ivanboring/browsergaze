@@ -20,8 +20,8 @@ block content
                                 div(class="form-group mb-3")
                                     each subVal, subKey in val.browsers 
                                         div(class="custom-control custom-control-alternative custom-checkbox")
-                                            input(type="checkbox", class="custom-control-input", name="device_breakpoint[]", value=key + '--' + subKey, id=key + '--' + subKey)
+                                            input(type="checkbox", class="custom-control-input", name="devices[]", value=key + '--' + subKey + '--' + subVal.uniqueId, id=key + '--' + subKey, checked=chosen.includes(subVal.uniqueId))
                                             label(class="custom-control-label", for=key + '--' + subKey)
-                                                | #{subVal.browserName} - #{subVal.version}
+                                                | #{subVal.browserName} - #{subVal.version} (uid: #{subVal.uniqueId})
                             div(class="text-center")
                                 input(type='submit', class="btn btn-primary my-4", id="submit", value="Save")

@@ -1,0 +1,10 @@
+id: waitTime
+optionsText: I wait for {ms}
+prependText: I wait for
+appendText: ms
+inputs:
+  - identifier: time
+    type: number
+    mainElement: true
+    validation:
+      required: true

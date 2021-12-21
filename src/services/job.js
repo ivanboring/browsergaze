@@ -1,4 +1,4 @@
-const jobDb = require('../model/jobDb');
+const jobDb = require('../models/jobDb');
 
 const job = {
     getJobFromUuid: async function (uuid) {
@@ -18,6 +18,9 @@ const job = {
     },
     getUuidFromId: async function(id) {
         return await jobDb.createJob(id);
+    },
+    deleteJobFromProjectId: async function(id) {
+        return await jobDb.deleteJobFromProjectId(id);
     },
 }
 

@@ -2,7 +2,7 @@ const {
     v1: uuidv1,
 } = require('uuid');
 const fs = require('fs')
-const db = require('../model/db');
+const db = require('../models/db');
 const screenshot = require('../services/screenshot');
 const { Generator } = require('./generator');
 
@@ -58,10 +58,10 @@ const runner = {
             for (let s in rules.steps) {
                 let step = rules.steps[s];
                 try {
-                    let rmessage = await director[step.key](step.parameters, jobId);
+                    let rmessage = await director.runStep(step.key, step.parameters, jobId);
                     this.resultJobs[jobId].push({process: step.key, success: true, message: rmessage})
                 } catch (e) {
-                    this.resultJobs[jobId].push({process: step.key, success: false, message: e})
+                    this.resultJobs[jobId].push({process: step.key, success: false, message: e.toString()})
                     director.close(jobId);
                     return;
                 }
@@ -149,9 +149,10 @@ const runner = {
                     step.parameters.value = `${newDir}/${caps['component_uuid']}_${caps['capability_id']}_${caps['width']}_${caps['height']}.png`
                 }
                 try {
-                    await director[step.key](step.parameters, jobId);
+                    await director.runStep(step.keystep.parameters, jobId);
                 } catch (e) {
-                    console.log('super error', e);
+                    screenshot.setScreenshotStatus(runJob.id, 5);
+                    screenshot.setScreenshotError(runJob.id, e.toString());
                     director.close(jobId);
                     return;
                 }

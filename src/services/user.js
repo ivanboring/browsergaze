@@ -4,7 +4,7 @@ const path = require('path')
 const argon2 = require('argon2')
 const crypto = require("crypto")
 const permissions = require('./permissions')
-const userDb = require('../model/userDb')
+const userDb = require('../models/userDb')
 
 const user = {
     sessions: {},
@@ -123,7 +123,6 @@ const user = {
             }
         }
 
-        console.log(userData.password_old, oldUserObject.password)
         if (userData.password_old) {
             let passwordMatch = await argon2.verify(oldUserObject.password, userData.password_old);
             if (!passwordMatch) {
@@ -139,7 +138,6 @@ const user = {
         if (validationErrors.length == 1 && validationErrors[0]['id'] == 'password' && validationErrors[0]['error'] == "This fields can't be empty.") {
             validationErrors = [];
         }
-        console.log(validationErrors);
 
         if (validationErrors.length) {
             return validationErrors
@@ -199,6 +197,9 @@ const user = {
             returnProjects.push(projects[x].project_id);
         }
         return returnProjects;
+    },
+    deleteUserFromProjectId: async function(projectId) {
+        return await userDb.deleteUserFromProjectId(projectId);
     },
     createCookie: function(user) {
         const sessionHash = crypto.randomBytes(20).toString('hex');

@@ -1,7 +1,7 @@
 const validate = require('./validate');
 const got = require('got');
 const helper = require('./helper');
-const serverDb = require('../model/serverDb');
+const serverDb = require('../models/serverDb');
 
 const servers = {
     getServers: async function() {

@@ -29,6 +29,11 @@ const routing = {
         app.get('/users/:userId/delete', require('./users').deleteUser);
         app.post('/users/:userId/delete', require('./users').postDeleteUser);
 
+        app.get('/projects/:projectName/page/:pageUuid/edit', require('./pages').editForm);
+        app.post('/projects/:projectName/page/:pageUuid/edit', require('./pages').update);
+        app.get('/projects/:projectName/page/:pageUuid/delete', require('./pages').deleteForm);
+        app.post('/projects/:projectName/page/:pageUuid/delete', require('./pages').delete);
+
         app.post('/runner/component/start', require('./components').startRunner)
         app.get('/runner/component/status/:jobId', require('./components').statusRunner)
         app.get('/projects/:projectName/page/create', require('./pages').createForm);
@@ -50,6 +55,8 @@ const routing = {
         app.get('/projects', require('./projects').get);
         app.get('/projects/:projectName/edit', require('./projects').editForm);
         app.post('/projects/:projectName/edit', require('./projects').update);
+        app.get('/projects/:projectName/delete', require('./projects').deleteForm);
+        app.post('/projects/:projectName/delete', require('./projects').delete);
         app.post('/projects/create', require('./projects').post);
 
         app.get('/servers', require('./devices').getServers);

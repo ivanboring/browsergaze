@@ -1,11 +1,12 @@
 const fs = require('fs');
 const validate = require('./validate');
-const defaults = require('./defaults')
+const defaults = require('./defaults');
+const component = require('./component');
 const { 
     v1: uuidv1,
 } = require('uuid');
 const puppeteerDirector = require('../directors/puppeteerDirector');
-const pageDb = require('../model/pageDb');
+const pageDb = require('../models/pageDb');
 
 const page = {
     getPagesByProjectId: async function(req, projectId) {
@@ -17,7 +18,17 @@ const page = {
     getPageByUuid: async function(req, uuid) {
         return await pageDb.getPageByUuid(req, uuid);
     },
-    createPage: async function(pageObject, projectObject) {
+    deletePage: async function (req, pageObject, projectObject) {
+        const componentsList = await component.getComponentsForPage(req, pageObject, projectObject, pageObject);
+        for (let x in componentsList) {
+            await component.deleteComponent(req, componentsList[x], pageObject);
+        }
+        return await pageDb.deletePage(pageObject);
+    },
+    deletePageFromProjectId: async function(id) {
+        return await pageDb.deletePageFromProjectId(id);
+    },
+    createPage: async function(pageObject, projectObject, updateId, uuid) {
         // Validate normal values.
         let validationErrors = validate.validateEntity(pageObject, 'page');
         // Validate so we can take screenshots
@@ -33,7 +44,12 @@ const page = {
             return validationErrors
         }
 
-        pageObject.uuid = uuidv1();
+        if (updateId) {
+            pageObject.id = updateId;
+            pageObject.uuid = uuid;
+        } else {
+            pageObject.uuid = uuidv1();
+        }
         pageObject.project_id = projectObject.id;
 
         let imagedir = this.createPageDir(projectObject.dataname, pageObject.uuid);
@@ -42,8 +58,12 @@ const page = {
         await puppeteerDirector.resizeWindow(1280, 720);
         await puppeteerDirector.screenshot(imagedir + 'init.jpg');
         await puppeteerDirector.close();
-        // Store in db   
-        await pageDb.createPage(pageObject);
+        // Store in db
+        if (updateId) {
+            await pageDb.updatePage(pageObject);
+        } else {
+            await pageDb.createPage(pageObject);
+        }
         return null;
     },
     createPageDir(projectName, pageUuid) {

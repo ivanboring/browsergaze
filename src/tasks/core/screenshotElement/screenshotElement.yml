@@ -1,0 +1,18 @@
+id: screenshotElement
+optionsText: I screenshot {element}
+inputs:
+  - identifier: selector
+    type: select
+    options:
+      js-path: "I screenshot JS Path:"
+      css-selector: "I screenshot CSS selector:"
+      xpath: "I screenshot Xpath:"
+    validation:
+      required: true
+  - identifier: element
+    type: text
+    mainElement: true
+    validation:
+      required: true
+  - identifier: value
+    type: hidden

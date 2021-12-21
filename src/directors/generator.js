@@ -36,7 +36,6 @@ const generator = function(generatorObject) {
                         let rules = await job.getRunschemaForComponentId(component_id);
                         for (let t in runs.jobs) {
                             runJob = runs.jobs[t];
-                            console.log(runJob);
                             await screenshot.setScreenshotStatus(runJob.id, 1);
                             // Start the director if it's closed.
                             if (!this.director) {
@@ -62,9 +61,10 @@ const generator = function(generatorObject) {
                                     parameters.value = runJob.path;
                                 }
                                 try {
-                                    await this.director[rule.key](parameters, this.currentJobId);
+                                    await this.director.runStep(rule.key, parameters, this.currentJobId);
                                 } catch (e) {
-                                    console.log('super error', e);
+                                    screenshot.setScreenshotStatus(runJob.id, 5);
+                                    screenshot.setScreenshotError(runJob.id, e.toString());
                                     await this.director.close(this.currentJobId);
                                     return;
                                 }

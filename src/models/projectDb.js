@@ -178,6 +178,20 @@ const projectDb = {
             }
         );
     },
+    deleteProject: async function(project) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.run("DELETE FROM projects WHERE id=?;", 
+                        project.id,
+                    function(err) {
+                        resolve(this.lastID)
+                    });
+                });
+            }
+        );
+    },
     createProjectCapabilities(projectId, capabilities) {
         let query = db.getDb();
         return new Promise(

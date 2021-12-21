@@ -117,7 +117,9 @@ block content
                         each val, key in screenshots
                             tr
                                 td(class="screenshot", id="screenshot-" + val.id)
-                                    if (val.status > 1)
+                                    if (val.status == 5)
+                                        img(src='/pics/failed.png', style="max-width: 100px; max-height:50px;")
+                                    else if (val.status > 1)
                                         img(src=val.path.substr(8), style="max-width: 200px; max-height:100px;")
                                     else
                                         img(src='/pics/loading.gif', style="max-width: 200px; max-height:100px;")
@@ -129,6 +131,8 @@ block content
                                 td(scope="row", class="diff", id="diff-" + val.id)
                                     if (val.is_baseline)
                                         img(src=val.path.substr(8), style="max-width: 200px; max-height:100px;")
+                                    else if (val.status == 5)
+                                        img(src='/pics/failed.png', style="max-width: 100px; max-height:50px;")
                                     else if (val.status > 1)
                                         img(src=val.path.replace('.png', '_diff.png').substr(8), style="max-width: 200px; max-height:100px;")
                                     else
@@ -151,6 +155,8 @@ block content
                                             | Testing
                                         when 4
                                             | Finished
+                                        when 5
+                                            | Failed
                                 td(scope="row")
                                     i(class="fab fa-" + val.os_icon)
                                     | &nbsp; #{val.platform_version}

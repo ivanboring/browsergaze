@@ -60,6 +60,7 @@ module.exports = {
             processor VARCHAR(100), \
             is_browser_default INTEGER, \
             is_mobile INTEGER, \
+            unique_id VARCHAR(32), \
             advanced_config TEXT \
         )")
 

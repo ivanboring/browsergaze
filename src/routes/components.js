@@ -6,8 +6,7 @@ const form = require('../services/form');
 const page = require('../services/page');
 const capabilities = require('../services/capabilities');
 const runner = require('../directors/runner.js');
-const fs = require('fs');
-const yaml = require('js-yaml');
+const rules = require('../services/rules');
 
 const components = {
     createForm: async function(req, res) {
@@ -19,13 +18,14 @@ const components = {
             res.redirect(301, '/projects')
             return
         }
+        let rulesObject = await rules.collectRules();
         if (user.isAdmin(req)) {
             res.render('component-create', {
                 title: 'Create Component for ' + projectObject.name,
                 project: projectObject,
                 page: pageObject,
                 form: form.populateFormDefaults('component', req),
-                rules: yaml.load(fs.readFileSync('./src/directors/rules.yml')),
+                rules: rulesObject,
                 user: user.getUser(req),
                 buttonText: 'Create component',
                 capabilities: capabilities.getCapabilitiesForStyling(projectCapabilites),
@@ -60,6 +60,7 @@ const components = {
             res.redirect(301, '/projects')
             return
         }
+        let rulesObject = await rules.collectRules();
         if (user.isAdmin(req)) {
             res.render('component-create', {
                 title: 'Edit Component ' + componentObject.name + ' for ' + projectObject.name,
@@ -67,7 +68,7 @@ const components = {
                 page: pageObject,
                 id: componentObject.id,
                 form: form.populateFormDefaults('component', req, componentObject),
-                rules: yaml.load(fs.readFileSync('./src/directors/rules.yml')),
+                rules: rulesObject,
                 user: user.getUser(req),
                 buttonText: 'Edit component',
                 capabilities: capabilities.getCapabilitiesForStyling(projectCapabilites),
@@ -123,10 +124,10 @@ const components = {
     },
     startRunner: async function(req, res) {
         if (('csrf' in req.body) && (req.body.csrf in form.tokens)) {
-            const rules = components.buildRules(req.body);
+            const rulesSet = components.buildRules(req.body);
             const capabilities = await components.buildCapabilities(req.body);
             if (await user.isAdmin(req)) {
-                if (runner.startJob(rules, capabilities, req.body.csrf)) {
+                if (runner.startJob(rulesSet, capabilities, req.body.csrf)) {
                     res.json({'status': true})
                     return;
                 }

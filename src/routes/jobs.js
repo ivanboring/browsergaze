@@ -119,7 +119,6 @@ const jobs = {
                 let startJobs = jobStarted[capability_id];
                 for(let i in startJobs) {
                     let startJob = startJobs[i];
-                    console.log(startJob);
                     screenshot.createQueuedScreenshot({
                         project_id: projectObject.id,
                         page_id: pageObject.id,

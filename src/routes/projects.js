@@ -8,7 +8,6 @@ const page = require('../services/page');
 module.exports = {
     get: async function(req, res) {
         const projects = await project.getProjects(req);
-        console.log(projects);
         res.render('projects', {
             title: 'Your projects',
             isAdmin: user.isAdmin(req),
@@ -81,5 +80,25 @@ module.exports = {
         } else {
             res.redirect(301, '/projects')
         }
-    } 
+    },
+    deleteForm: async function(req, res) {
+        if (user.hasPermission(req, "delete-project")) {
+            const projectObject = await project.getEditableProjectByName(req, req.params.projectName);
+            res.render('project-delete', {
+                title: 'Delete Project ' + projectObject.name,
+                id: projectObject.id,
+                project: projectObject,
+                user: user.getUser(req)
+            })
+        } else {
+            res.redirect(301, '/projects')
+        }
+    },
+    delete: async function(req, res) {
+        if (user.hasPermission(req, "delete-project")) {
+            const projectObject = await project.getProjectByName(req, req.params.projectName)
+            await project.deleteProject(req, projectObject);
+        }
+        res.redirect(301, '/projects');
+    }
 }

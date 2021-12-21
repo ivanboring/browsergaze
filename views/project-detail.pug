@@ -4,7 +4,7 @@ block content
     script
         | project_name="#{project.dataname}";
     div(class="header bg-primary pb-2")
-        div(class="container")
+        div(class="container-fluid")
             div(class="header-body")
                 div(class="row align-items-center py-4")
                     div(class="col-lg-6 col-7")
@@ -31,7 +31,7 @@ block content
                                     a(href="/projects/" + project.dataname + "/edit", class="dropdown-item", disabled)
                                         i(class="fas fa-edit")
                                         | Edit project
-    div(class="container mt-3")
+    div(class="container-fluid mt-3")
         nav(aria-label="breadcrumb")
             ol(class="breadcrumb")
                 li(class="breadcrumb-item")
@@ -44,13 +44,26 @@ block content
                 | Pages
             div(class="row")
                 each val, key in pages
-                    div(class="col-sm-6 col-md-6 col-12 col-lg-4 col-xl-4")
+                    div(class="col-sm-6 col-md-6 col-12 col-lg-3 col-xl-2")
                         div(class="card")
                             a(href="/projects/" + project.dataname + '/page/' + val.uuid)
                                 img(src='/' + project.dataname + "/" + val.uuid + '/init.jpg', class="card-img-top")
                             div(class="card-body text-center")
                                 a(href="projects/" + project.dataname + '/page/' + val.uuid)
                                     h4(class="card-title text-center")=val.name
+                                div(class="dropdown")
+                                    button(class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+                                        | Actions
+                                    div(class="dropdown-menu" aria-labelledby="dropdownMenuButton")
+                                        a(href="/projects/" + project.dataname + '/page/' + val.uuid, class="dropdown-item")
+                                            i(class="fas fa-file")
+                                            | View components
+                                        a(href="/projects/" + project.dataname + "/page/" + val.uuid + "/edit", class="dropdown-item")
+                                            i(class="fas fa-edit")
+                                            | Edit page
+                                        a(href="/projects/" + project.dataname + "/page/" + val.uuid + "/delete", class="dropdown-item")
+                                            i(class="fas fa-minus-circle")
+                                            | Delete page
         else
             div(class="row justify-content-center")
                 div(class="col-6")

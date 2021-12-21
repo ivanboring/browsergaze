@@ -3,6 +3,7 @@ const user = require('../services/user');
 const form = require('../services/form');
 const validate = require('../services/validate');
 const devices = require('../services/devices');
+const capabilities = require('../services/capabilities');
 
 module.exports = {
     getServers: async function(req, res) {
@@ -43,10 +44,18 @@ module.exports = {
         if (user.isAdmin(req)) {
             let serverObject = await servers.getServerById(req.params.serverId);
             let deviceList = await devices.getDevicesForServer(serverObject);
+            let selectedDevices = await capabilities.getCapabilitiesForServer(serverObject.id);
+            let knownDevices = [];
+            for (let t in selectedDevices) {
+                if (selectedDevices[t].unique_id) {
+                    knownDevices.push(selectedDevices[t].unique_id);
+                }
+            }
             res.render('select-devices', {
                 title: 'Select Devices for server: ' + serverObject.name,
                 devices: deviceList,
                 server: serverObject,
+                chosen: knownDevices,
                 user: user.getUser(req)
             })
         } else {

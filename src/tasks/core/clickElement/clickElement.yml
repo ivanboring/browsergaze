@@ -1,0 +1,17 @@
+id: clickElement
+optionsText: I click {element}
+prependText: I click/press the
+inputs:
+  - identifier: selector
+    type: select
+    options:
+      js-path: JS Path
+      css-selector: CSS selector
+      xpath: Xpath
+    validation:
+      required: true
+  - identifier: element
+    type: text
+    mainElement: true
+    validation:
+      required: true

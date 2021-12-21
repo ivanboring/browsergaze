@@ -14,7 +14,6 @@ function baseline() {
             $("#visual-regression-" + result.id).html('0%');
         }
     });
-    console.log($(this).attr('data-id'));
     return false;
 }
 
@@ -46,8 +45,11 @@ function statusUpdate() {
                         $("#diff-" + row.id + " img").attr('src', row.path.substr(8).replace('.png', '_diff.png'));
                         $("#visual-regression-" + row.id).html(row.visual_regression + '%');
                         break;
+                    case 5:
+                        message = "Failed";
+                        break;
                 }
-                if (row.status !== 4) {
+                if (row.status < 4) {
                     allFinished = false;
                 }
                 $("#status-" + row.id).html(message);
