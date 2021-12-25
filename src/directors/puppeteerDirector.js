@@ -2,20 +2,20 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const helper = require('../services/helper');
 
-const puppeteerDirector = {
-    browser: null,
-    page: {},
-    domain: null,
-    username: null,
-    password: null,
-    init: async function(domain, jobId, capabilityObject) {
+const puppeteerDirector = function() {
+    this.browser = null;
+    this.page = {};
+    this.domain = null;
+    this.username = null;
+    this.password = null;
+    this.init = async function(domain, jobId, capabilityObject) {
         if (!this.browser) {
             this.browser = await puppeteer.launch();
         }
         this.domain = domain;
         this.page[jobId] = await this.browser.newPage();
-    },
-    resizeWindow: async function(width, height, jobId) {
+    }
+    this.resizeWindow = async function(width, height, jobId) {
         const session = await this.page[jobId].target().createCDPSession();
         await this.page[jobId].setViewport({width: width, height: height});
         const {windowId} = await session.send('Browser.getWindowForTarget');
@@ -23,21 +23,21 @@ const puppeteerDirector = {
             bounds: {height, width},
             windowId,
         });
-    },
-    goto: async function(path, jobId) {
+    }
+    this.goto = async function(path, jobId) {
         if (this.domain.substr(-1) == '/' && (path.substr(0, 1) == '/')) {
             path = path.substr(1);
         }
-        await this.page[jobId].goto(this.domain + path);
-    },
-    reload: async function(jobId) {
+        await this.page[jobId].goto(this.domain + path, {waitUntil: 'networkidle0'});
+    }
+    this.reload = async function(jobId) {
         await this.page[jobId].reload();
-    },
-    screenshot: async function(filePath, jobId) {
+    }
+    this.screenshot = async function(filePath, jobId) {
         await this.page[jobId].screenshot({ path: filePath });
-    },
+    }
     // Special function just for puppeteer.
-    getFaviconUrl: async function(jobId) {
+    this.getFaviconUrl = async function(jobId) {
         const elements = await this.page[jobId].$$eval('link', e => e.map((a) => {return {rel: a.rel, href: a.href, sizes: a.sizes}})); 
         let widest = 0;
         let url = '';
@@ -55,8 +55,8 @@ const puppeteerDirector = {
             return domain + '/favicon.ico';
         }
         return url;
-    },
-    runStep: async function(taskName, parameters, jobId) {
+    }
+    this.runStep = async function(taskName, parameters, jobId) {
         for (let dir of ['custom', 'core']) {
             let requirement = `./src/tasks/${dir}/${taskName}/src/puppeteer`;
             if (fs.existsSync(requirement + '.js')) {
@@ -67,7 +67,7 @@ const puppeteerDirector = {
         }
         throw ' Coult not find the task ' + taskName;
     },
-    close: async function(jobId) {
+    this.close = async function(jobId) {
         if (Object.keys(this.page).length > 1) {
             await this.page[jobId].close();
         } else {
@@ -79,4 +79,6 @@ const puppeteerDirector = {
     }
 }
 
-module.exports = puppeteerDirector;
+module.exports = {
+    PuppeteerDirector: puppeteerDirector
+};

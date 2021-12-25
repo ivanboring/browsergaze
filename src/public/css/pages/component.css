@@ -23,6 +23,10 @@ ul.draggable li input {
     cursor: pointer;
 }
 
+.capabilities-table .capability {
+    display: inline-block;
+}
+
 .chosen-container-single .chosen-single {
     padding: 0;
     border: none;
@@ -53,4 +57,15 @@ ul.draggable li input {
 
 .chosen-container-single .chosen-single div b {
     margin-top: 10px;
+}
+
+.capabilities-table .checkbox-wrapper {
+    padding-top: 5px;
+    display: inline-block;
+}
+
+.select-wrapper {
+    vertical-align: top;
+    margin-left: 5px;
+    display: inline-block;
 }

@@ -69,7 +69,7 @@ module.exports = {
         if (user.hasPermission(req, "edit project")) {
             let capabiltyRows = await capabilities.getCapabilities()
             const projectObject = await project.getEditableProjectByName(req, req.params.projectName);
-            res.render('projects-create', {
+            res.render('projects-edit', {
                 title: 'Edit Project',
                 form: form.populateFormDefaults('project', req, projectObject),
                 id: projectObject.id,
@@ -100,5 +100,5 @@ module.exports = {
             await project.deleteProject(req, projectObject);
         }
         res.redirect(301, '/projects');
-    }
+    },
 }

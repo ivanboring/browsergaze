@@ -5,6 +5,8 @@ const fs = require('fs')
 const db = require('../models/db');
 const screenshot = require('../services/screenshot');
 const { Generator } = require('./generator');
+const { PuppeteerDirector } = require('./puppeteerDirector');
+const { SeleniumDirector } = require('./seleniumDirector');
 
 const runner = {
     runningJobs: {},
@@ -33,9 +35,9 @@ const runner = {
     preprocess: function(processor) {
         switch (processor) {
             case 'puppeteer':
-                return require('./puppeteerDirector')
+                return new PuppeteerDirector();
             case 'selenium':
-                return require('./seleniumDirector')
+                return new SeleniumDirector();
         }
     },
     process: async function(rules, capabilities, jobId) {
@@ -76,9 +78,12 @@ const runner = {
         this.resultJobs[jobId].push({process: 'close', success: true, message: 'Finished'});
     },
     startGenerators: async function() {
-        let generators = await this.getGenerators();
+        let generators = await runner.getGenerators();
         for (let i in generators) { 
-            runner.generators[generators[i].id] = new Generator(generators[i]);
+            runner.generators[generators[i].id] = [];
+            for (let b = 0; b < generators[i].concurrency; b++) {
+                runner.generators[generators[i].id].push(new Generator(generators[i]));
+            }
         }
         
         setTimeout(runner.checkForJobs, 1000);
@@ -129,7 +134,16 @@ const runner = {
                     }
                 }
             }
-            runner.generators[b].addToQueue(jobGroups[b]);
+            // Check againt concurrency.
+            let v = 0;
+            for (let t in jobGroups[b]) {
+                if(typeof runner.generators[b][v] !== 'undefined') {
+                    let newObject = {};
+                    newObject[t] = jobGroups[b][t];
+                    runner.generators[b][v].addToQueue(newObject);
+                }
+                v++;
+            }
         }
         setTimeout(runner.checkForJobs, 5000);
     },

@@ -4,6 +4,9 @@ const {
     v1: uuidv1,
 } = require('uuid');
 const capabilities = require('../services/capabilities');
+const util = require('util')
+const { PuppeteerDirector } = require('./puppeteerDirector');
+const { SeleniumDirector } = require('./seleniumDirector');
 
 const generator = function(generatorObject) {
     this.generator = generatorObject;
@@ -35,22 +38,32 @@ const generator = function(generatorObject) {
                         let runs = pageToRun[page_id][component_id];
                         let rules = await job.getRunschemaForComponentId(component_id);
                         for (let t in runs.jobs) {
-                            runJob = runs.jobs[t];
-                            await screenshot.setScreenshotStatus(runJob.id, 1);
+                            let runJob = runs.jobs[t];
+                            console.log(runJob.capability_id, runJob.width, 'Start');
                             // Start the director if it's closed.
                             if (!this.director) {
+                                console.log(runJob.capability_id, runJob.width, 'Start 2');
                                 this.director = this.preprocess(this.generator.server_type);
+                                console.log(runJob.capability_id, runJob.width, 'Start 3');
                                 this.currentJobId = uuidv1();
+                                console.log(runJob.capability_id, runJob.width, 'Start 4');
                                 await this.director.init(runJob.default_host_path, this.currentJobId, capabilityObject);
+                                console.log(runJob.capability_id, runJob.width, 'Start 5');
                             }
+                            await screenshot.setScreenshotStatus(runJob.id, 1);
                             // Goto page if not visited.
                             if (this.currentPath !== runJob.page_path) {
+                                console.log(runJob.capability_id, runJob.width, 'Goto ' + runJob.page_path);
                                 await this.director.goto(runJob.page_path, this.currentJobId);
+                                this.currentPath = runJob.page_path;
                                 // Then resize.
+                                console.log(runJob.capability_id, runJob.width, 'Resize ' + runJob.width);
                                 await this.director.resizeWindow(parseInt(runJob.width), parseInt(runJob.height), this.currentJobId);
                             } else {
                                 // Otherwise resize and reload.
+                                console.log(runJob.capability_id, runJob.width, 'Resize ' + runJob.width);
                                 await this.director.resizeWindow(parseInt(runJob.width), parseInt(runJob.height), this.currentJobId);
+                                console.log(runJob.capability_id, runJob.width, 'Reload');
                                 await this.director.reload(this.currentJobId);
                             }
 
@@ -59,17 +72,22 @@ const generator = function(generatorObject) {
                                 let parameters = JSON.parse(rule.ruleset);
                                 if (rule.key == "screenshotElement") {
                                     parameters.value = runJob.path;
+                                    console.log(runJob.capability_id, runJob.width, 'Screenshot values ' + runJob.path);
                                 }
                                 try {
+                                    console.log(runJob.capability_id, runJob.width, rule.key);
                                     await this.director.runStep(rule.key, parameters, this.currentJobId);
+                                    if (rule.key == "screenshotElement") {
+                                        console.log('save', runJob.capability_id, runJob.width, rule.key);
+                                        await screenshot.setScreenshotStatus(runJob.id, 2);
+                                    }
                                 } catch (e) {
+                                    console.log('Failed', e);
                                     screenshot.setScreenshotStatus(runJob.id, 5);
                                     screenshot.setScreenshotError(runJob.id, e.toString());
-                                    await this.director.close(this.currentJobId);
-                                    return;
+                                    console.log('Set failure');
                                 }
                             }
-                            await screenshot.setScreenshotStatus(runJob.id, 2);
                         }
                     }
                 }
@@ -77,8 +95,10 @@ const generator = function(generatorObject) {
         }
         if (this.queue.length === 0) {
             await this.director.close(this.currentJobId);
+            console.log('all closed', this.generator.server_type)
             this.currentJobId = null;
             this.director = null;
+            this.currentPath = null;
             this.running = false;
         } else {
             this.startRunning();
@@ -87,9 +107,9 @@ const generator = function(generatorObject) {
     this.preprocess = function(processor) {
         switch (processor) {
             case 'puppeteer':
-                return require('./puppeteerDirector');
+                return new PuppeteerDirector();
             case 'selenium':
-                return require('./seleniumDirector');
+                return new SeleniumDirector();
         }
     }
 }

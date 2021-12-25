@@ -5,12 +5,15 @@ let puppeteer = {
         if (parameters.element == '') {
             throw 'No element/xpath given';
         }
-        let file = parameters.value;
         try {
             let element = await puppeteerHelper.getElement(page, parameters.selector, parameters.element);
-            await element.evaluate((el) => el.style.display = 'none');
-        } catch(e) {
-            throw `Could not hide the selector: ${parameters.selector}.`;
+            try {
+                await element.evaluate((el) => el.style.display = 'none');
+            } catch(e) {
+                throw `Could not hide the selector: ${parameters.element}.`;
+            }
+        } catch (e) {
+            
         }
         return parameters.value;
     },

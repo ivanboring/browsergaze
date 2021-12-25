@@ -18,8 +18,8 @@ const screenshot = {
         rows = capabilities.getCapabilitiesForStyling(rows);
         return rows;
     },
-    getScreenshotsFromJob: async function (jobObject) {
-        let rows = await screenshotDb.getScreenshotsFromJob(jobObject);
+    getScreenshotsFromJob: async function (jobId) {
+        let rows = await screenshotDb.getScreenshotsFromJob(jobId);
         for (let i in rows) {
             rows[i].created_time_formatted = helper.prettyDate(rows[i].created_time);
         }

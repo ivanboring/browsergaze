@@ -38,6 +38,18 @@ const projectDb = {
             }
         )
     },
+    getProjectByIdWithoutReq: async function(id) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.get("SELECT * FROM projects WHERE id=?;", id, function(err, rows) {
+                        resolve(rows)
+                    });
+                });
+            }
+        )
+    },
     getProjectByName: async function(req, name) {
         let query = db.getDb();
         return new Promise(

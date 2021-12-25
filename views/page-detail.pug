@@ -54,8 +54,6 @@ block content
                                     | Image
                                 th(scope="col", class="sort", data-sort="name")
                                     | Name
-                                th(scope="col", class="sort", data-sort="testrun")
-                                    | Last Test Run
                                 th(scope="col")
                                     | Actions
                         tbody 
@@ -65,8 +63,6 @@ block content
                                         img(src='/' + project.dataname + "/" + page.uuid + '/' + val.uuid + '/default.png', style="max-width: 200px; max-height:100px;")
                                     th(scope="row")
                                         | #{val.name}
-                                    th(scope="row")
-                                        | 2021-12-01 14:00:00
                                     th(scope="row")
                                         div(class="dropdown")
                                             button(class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
@@ -84,6 +80,9 @@ block content
                                                 a(href="/projects/" + project.dataname + '/results?component_id=' + val.id, class="dropdown-item", disabled)
                                                     i(class="fas fa-poll")
                                                     | View results of test runs
+                                                a(href="/projects/" + project.dataname + '/browser_diffs?component_id=' + val.id, class="dropdown-item", disabled)
+                                                    i(class="fas fa-poll")
+                                                    | View browser diff results
                                                 a(href="/projects/" + project.dataname + "/component/" + val.uuid + "/delete", class="dropdown-item", disabled)
                                                     i(class="fas fa-poll")
                                                     | Delete component

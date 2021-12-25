@@ -1,13 +1,11 @@
-const { 
-    v1: uuidv1,
-} = require('uuid');
-const fs = require('fs')
-const db = require('../models/db');
-const generator = require('./generator');
-const job = require('../services/job');
 const screenshot = require('../services/screenshot');
 const baseline = require('../services/baseline');
+const component = require('../services/component');
+const defaults = require('../services/defaults');
 const shell = require('shelljs');
+const browserDiff = require('../services/browserDiff');
+const project = require('../services/project');
+const job = require('../services/job');
 
 const differ = {
     running: false,
@@ -46,10 +44,86 @@ const differ = {
                     scr.visual_regression = regression.trim() == 'inf' ? 0 : parseFloat(regression.trim());
                     scr.status = 4;
                     await screenshot.updateScreenshot(scr);
+                    setTimeout(() => { differ.checkForBrowserDiffs(scr) }, 200);
                     resolve(true);
                 });
             }
         );
+    },
+    checkForBrowserDiffs: async function(scr) {
+        let diffJobs = await this.checkWhoToDiff(scr);
+        let projectObject = await project.getProjectByIdWithoutReq(scr.project_id);
+        let uuid = await job.getUuidFromId(scr.job_id);
+        let toPath = defaults.imageLocation + projectObject.dataname + '/jobs/' + uuid + '/';
+        for (let job of diffJobs) {
+            let filename = job.fromObject.capability_id + '_' + job.toObject.capability_id + '_' + job.fromObject.breakpoint_id + '.png';
+            let command = hawkConfig.usedBinaryCommand + ' -metric AE -fuzz 0.5% ' + job.fromObject.path + ' ' + job.toObject.path + ' ' + toPath + filename;
+            shell.exec(command, {async: true, silent: true}, async function(code, stdout, stderr) {
+                let regression = code ? stderr : stdout;
+                let failedPixels = regression.trim() == 'inf' ? 0 : parseFloat(regression.trim())
+                let realRegression = Math.round((failedPixels / (scr.width*scr.height)) * 10000)/100;
+                let endStatus = realRegression > job.browser_threshold ? 2 : 1;
+                await browserDiff.createBrowserDiff({
+                    job_id: scr.job_id,
+                    project_id: scr.project_id,
+                    page_id: job.toObject.page_id,
+                    component_id: job.toObject.component_id,
+                    from_capability: job.fromObject.capability_id,
+                    from_screenshot_id: job.fromObject.id,
+                    to_capability: job.toObject.capability_id,
+                    to_screenshot_id: job.toObject.id,
+                    breakpoint_id: job.toObject.breakpoint_id,
+                    diff: realRegression,
+                    status: endStatus,
+                    created_time: Date.now(),
+                    path: toPath + filename
+                });
+            });
+        }
+    },
+    checkWhoToDiff: async function(scr) {
+        // Check if finished.
+        let allScreenshots = await screenshot.getScreenshotsFromJob(scr.job_id);
+        let finished = true;
+        let componentsList = [];
+        for (let i in allScreenshots) {
+            if (!componentsList.includes(allScreenshots[i].component_id)) {
+                componentsList.push(allScreenshots[i].component_id);
+            }
+            if (allScreenshots[i].status < 4) {
+                finished = false;
+            }
+        }
+        let jobsToRun = [];
+        if (finished) {
+            if (componentsList.length > 0) {
+                for (let componentId of componentsList) {
+                    let runList = await this.getRunScheduleForComponent(componentId);
+                    for(let nextRun of runList) {
+                        if (nextRun.active) {
+                            let found = 0;
+                            for (let i in allScreenshots) {
+                                if (allScreenshots[i].status == 4 && allScreenshots[i].capability_id == nextRun.capabilities_id_from && allScreenshots[i].breakpoint_id == nextRun.breakpoint_id) {
+                                    nextRun.fromObject = allScreenshots[i];
+                                    found++;
+                                }
+                                if (allScreenshots[i].status == 4 && allScreenshots[i].capability_id == nextRun.capabilities_id_to && allScreenshots[i].breakpoint_id == nextRun.breakpoint_id) {
+                                    nextRun.toObject = allScreenshots[i];
+                                    found++;
+                                }
+                            }
+                            if (found == 2) {
+                                jobsToRun.push(nextRun);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return jobsToRun;
+    },
+    getRunScheduleForComponent: async function(componentId) {
+        return await component.getBrowserDiffsForComponent(componentId)
     }
 }
 

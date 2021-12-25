@@ -223,6 +223,85 @@ const component = {
             }
         )
     },
+    createBrowserDiffs: async function(componentObject, projectObject, matrix) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    for (let main in matrix) {
+                        for (let br in matrix[main]) {
+                            for (let diff in matrix[main][br]) {
+                                query.run("INSERT INTO browser_threshold (capabilities_id_from, capabilities_id_to, breakpoint_id, browser_threshold, component_id, project_id, active) \
+                                values (?, ?, ?, ?, ?, ?, 1)",
+                                main,
+                                diff,
+                                br,
+                                componentObject.default_browser_regression_threshold,
+                                componentObject.id,
+                                projectObject.id
+                                )
+                            }
+                        }
+                    }
+                    resolve(true);
+                })
+            }
+        );
+    },
+    updateBrowserDiffs: async function(componentObject, projectObject, matrix) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.all("SELECT * FROM browser_threshold WHERE component_id=?", componentObject.id, function(err, rows) {
+                        for (let main in matrix) {
+                            for (let br in matrix[main]) {
+                                for (let diff in matrix[main][br]) {
+                                    let found = false;
+                                    for (let i in rows) {
+                                        let row = rows[i];
+                                        if (row.capabilities_id_from == main && row.capabilities_id_to == diff && row.breakpoint_id == br) {
+                                            found = true;
+                                            rows.splice(i, 1);
+                                        }
+                                    }
+                                    if (!found) {
+                                        query.run("INSERT INTO browser_threshold (capabilities_id_from, capabilities_id_to, breakpoint_id, browser_threshold, component_id, project_id, active) \
+                                        values (?, ?, ?, ?, ?, ?, 1)",
+                                        main,
+                                        diff,
+                                        br,
+                                        componentObject.default_browser_regression_threshold,
+                                        componentObject.id,
+                                        projectObject.id
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // Let's destroy!!!
+                        for (let row of rows) {
+                            query.run("DELETE FROM browser_threshold WHERE id=?", row.id);
+                        }
+                        resolve(true);
+                    })
+                });
+            }
+        )
+    },
+    getBrowserDiffsForComponent: async function(componentId) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.all("SELECT * FROM browser_threshold WHERE component_id=?", componentId, function(err, rows) {
+                        resolve(rows)
+                    })
+                })
+            }
+        );
+    },
     deleteCapabilityBreakpointFromComponent: async function(componentObject) {
         let query = db.getDb();
         return new Promise(

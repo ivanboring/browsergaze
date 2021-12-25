@@ -59,6 +59,10 @@ $(document).ready(function() {
     })
 });
 
+function checkDiffVisible() {
+    console.log('test');
+}
+
 function toggleAllCapabilities() {
     let val = $(this).attr('data-capability');
     // First check if all are checked.

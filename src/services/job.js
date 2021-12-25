@@ -17,7 +17,7 @@ const job = {
         return await jobDb.createJob(projectId);
     },
     getUuidFromId: async function(id) {
-        return await jobDb.createJob(id);
+        return await jobDb.getUuidFromId(id);
     },
     deleteJobFromProjectId: async function(id) {
         return await jobDb.deleteJobFromProjectId(id);

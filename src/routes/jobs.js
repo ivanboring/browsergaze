@@ -9,8 +9,76 @@ const fs = require('fs');
 const screenshot = require('../services/screenshot');
 const helper = require('../services/helper');
 const baseline = require('../services/baseline');
+const browserDiff = require('../services/browserDiff');
 
 const jobs = {
+    browserDiffs: async function(req, res) {
+        if (user.hasPermission(req, 'view-results')) {
+            const projectObject = await project.getProjectByName(req, req.params.projectName);
+            const jobOptions = helper.createSelectOptions(await job.getJobFromProjectId(projectObject.id), 'id', 'uuid', 'Any', req.query.job_id);
+            const pageOptions = helper.createSelectOptions(await page.getPagesByProjectId(req, projectObject.id), 'id', 'name', 'Any', req.query.page_id);
+            const componentOptions = helper.createSelectOptions(await component.getComponentsForProject(req, projectObject.id), 'id', 'name', 'Any', req.query.component_id);
+            const capRender = [
+                {type: 'value', value: 'browser_name'},
+                {type: 'space', value: ' '},
+                {type: 'value', value: 'browser_version'},
+                {type: 'space', value: ' on '},
+                {type: 'value', value: 'platform'},
+                {type: 'space', value: ' '},
+                {type: 'value', value: 'platform_version'},
+                {type: 'space', value: ' ('},
+                {type: 'value', value: 'server_name'},
+                {type: 'space', value: ')'},
+            ];
+            const capabilityOptions = helper.createSelectOptions(await capabilities.getCapabilitiesForProject(projectObject.id), 'id', capRender, 'Any', req.query.capability_id);
+
+            const bpRender = [
+                {type: 'value', value: 'width'},
+                {type: 'space', value: 'x'},
+                {type: 'value', value: 'height'},
+            ];
+            const breakpointOptions = helper.createSelectOptions(await project.getProjectBreakpoints(req, projectObject.id), 'id', bpRender, 'Any', req.query.breakpoint_id);
+
+            const browserDiffList = await browserDiff.getBrowserDiffs(projectObject.id, {
+                job_id: req.query.job_id,
+                page_id: req.query.page_id,
+                component_id: req.query.component_id,
+                capability_id_1: req.query.capability_id,
+                capability_id_2: req.query.capability_id,
+                breakpoint_id: req.query.breakpoint_id,
+            });
+
+            let screenshotIds = [];
+            for (let i in browserDiffList) {
+                screenshotIds.push(browserDiffList[i].id)
+            }
+
+            const baselines = await baseline.getBaselineForScreenshots(browserDiffList, projectObject.id);
+
+            let queryString = [];
+            for (let o in req.query) {
+                queryString.push(o + '=' + req.query[o]);
+            }
+
+            res.render('browser-diff-list', {
+                title: 'glitch-hawk: Results for ' + projectObject.name,
+                pageTitle: 'Visual Test Results for ' + projectObject.name + ' Project',
+                isAdmin: user.isAdmin(req),
+                jobOptions: jobOptions,
+                pageOptions: pageOptions,
+                componentOptions: componentOptions,
+                capabilityOptions: capabilityOptions,
+                breakpointOptions: breakpointOptions,
+                queryString: encodeURIComponent("/projects/" + projectObject.dataname + "/results?" + queryString.join("&")),
+                baseline: baselines,
+                project: projectObject,
+                browserDiffs: browserDiffList,
+                user: user.getUser(req),
+            });
+        } else {
+            res.status(403).send('No access');
+        }
+    },
     getJobs: async function(req, res) {
         const projectObject = await project.getProjectByName(req, req.params.projectName);
         const jobOptions = helper.createSelectOptions(await job.getJobFromProjectId(projectObject.id), 'id', 'uuid', 'Any', req.query.job_id);
@@ -80,7 +148,7 @@ const jobs = {
             res.status(404).send('Not found')
             return;
         }
-        const screenshots = await screenshot.getScreenshotsFromJob(jobObject);
+        const screenshots = await screenshot.getScreenshotsFromJob(jobObject.id);
         res.json(screenshots);
     },
     getStatusPerId: async function(req, res) {

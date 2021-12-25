@@ -56,48 +56,51 @@ const capabilities = {
                 return 'chrome';
         }
     },
-    getCapabilitiesForStyling: function(rows) {
+    getCapabilitiesForStyling: function(rows, prefix) {
+        if (typeof prefix == 'undefined') {
+            prefix = '';
+        }
         for (let x in rows) {
-            switch (rows[x].browser_name) {
+            switch (rows[x][prefix + 'browser_name']) {
                 case 'Chromium':
-                    rows[x].browser_icon = 'google';
+                    rows[x][prefix + 'browser_icon'] = 'google';
                     break;
                 case 'Chrome':
-                    rows[x].browser_icon = 'chrome';
+                    rows[x][prefix + 'browser_icon'] = 'chrome';
                     break;
                 case 'Microsoft Edge':
                 case 'Edge':
-                    rows[x].browser_icon = 'edge';
+                    rows[x][prefix + 'browser_icon'] = 'edge';
                     break;
                 case 'IE':
-                    rows[x].browser_icon = 'internet-explorer';
+                    rows[x][prefix + 'browser_icon'] = 'internet-explorer';
                     break;
                 case 'Firefox':
-                    rows[x].browser_icon = 'firefox-browser';
+                    rows[x][prefix + 'browser_icon'] = 'firefox-browser';
                     break;
                 case 'Opera':
-                    rows[x].browser_icon = 'opera';
+                    rows[x][prefix + 'browser_icon'] = 'opera';
                     break;
                 case 'Safari':
-                    rows[x].browser_icon = 'safari';
+                    rows[x][prefix + 'browser_icon'] = 'safari';
                     break;
             }
-            switch(rows[x].platform) {
+            switch(rows[x][prefix + 'platform']) {
                 case 'Windows':
-                    if (rows[x].platform_version == '10' || rows[x].platform_version == '11') {
-                        rows[x].os_icon = 'windows';
+                    if (rows[x][prefix + 'platform_version'] == '10' || rows[x][prefix + 'platform_version'] == '11') {
+                        rows[x][prefix + 'os_icon'] = 'windows';
                     } else {
-                        rows[x].os_icon = 'microsoft';
+                        rows[x][prefix + 'os_icon'] = 'microsoft';
                     }
                     break;
                 case 'OS X':
-                    rows[x].os_icon = 'apple';
+                    rows[x][prefix + 'os_icon'] = 'apple';
                     break;
                 case 'Linux':
-                    rows[x].os_icon = 'linux';
+                    rows[x][prefix + 'os_icon'] = 'linux';
                     break;
                 default:
-                    rows[x].os_icon = 'desktop';
+                    rows[x][prefix + 'os_icon'] = 'desktop';
                     break;
             }
         }

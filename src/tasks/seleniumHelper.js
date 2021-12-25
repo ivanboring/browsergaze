@@ -1,28 +1,29 @@
-let puppeteerHelper = {
-    getElement: async function(page, type, value) {
+const {Builder, By, Key, until} = require('selenium-webdriver');
+
+let seleniumHelper = {
+    getElement: async function(driver, type, value) {
         switch (type) {
             case 'js-path':
                 try {
-                    return await page.evaluateHandle(value);
+                    return await driver.findElement(By.js('return ' + value));
                 } catch(e) {
+                    console.log('error', e);
                     throw `Could not find element that matches js-path: ${value}.`;
                 }
             case 'xpath':
                 try {
-                    return (await page.$x(value))[0];
+                    return await driver.findElement(By.xpath(value));
                 } catch(e) {
                     throw `Could not find element that matches xpath: ${value}. If the path included a shadow dom, only JS path works.`;
                 }
             default:
                 try {
-                    let css = await page.$$(value);
-                    return css[0];
+                    return await driver.findElement(By.css(value));
                 } catch(e) {
-                    console.log('error', e);
                     throw `Could not find element that matches CSS selector: ${value}. If the path included a shadow dom, only JS path works.`;
                 }
         }
-    },
+    }
 }
 
-module.exports = puppeteerHelper;
+module.exports = seleniumHelper;

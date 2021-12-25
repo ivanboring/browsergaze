@@ -96,7 +96,7 @@ const screenshotDb = {
             }
         )
     },
-    getScreenshotsFromJob: async function (jobObject) {
+    getScreenshotsFromJob: async function (jobId) {
         let query = db.getDb();
         return new Promise(
             (resolve, reject) => {
@@ -109,7 +109,7 @@ const screenshotDb = {
                         LEFT JOIN capabilities cb ON pc.capability_id=cb.id \
                         LEFT JOIN generator_servers gs ON gs.id=cb.generator_server_id \
                         LEFT JOIN project_breakpoints pb ON pb.id=s.breakpoint_id \
-                        WHERE s.job_id=? ORDER BY s.created_time ASC;", jobObject.id, function(err, rows) {
+                        WHERE s.job_id=? ORDER BY s.created_time ASC;", jobId, function(err, rows) {
                         resolve(rows)
                     });
                 });

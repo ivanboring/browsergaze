@@ -46,6 +46,8 @@ function statusUpdate() {
                         $("#visual-regression-" + row.id).html(row.visual_regression + '%');
                         break;
                     case 5:
+                        $("#screenshot-" + row.id + " img").attr('src', '/pics/failed.png').css('height', '50px');
+                        $("#diff-" + row.id + " img").attr('src', '/pics/failed.png').css('height', '50px');
                         message = "Failed";
                         break;
                 }

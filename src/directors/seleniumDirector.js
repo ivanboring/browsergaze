@@ -5,47 +5,53 @@ const capabilities = require('../services/capabilities');
 const chrome = require("selenium-webdriver/chrome");
 const firefox = require("selenium-webdriver/firefox");
 const edge = require("selenium-webdriver/edge");
+const opera = require("selenium-webdriver/opera");
 
-const seleniumDirector = {
-    drivers: {},
-    domains: {},
-    init: async function(domain, jobId, capabilityObject) {
-        console.log('starting');
+const seleniumDirector = function() {
+    this.drivers = {};
+    this.domains = {};
+    this.init = async function(domain, jobId, capabilityObject) {
+        let builder = await new Builder();
         this.domains[jobId] = domain;
         let options = {};
+        console.log(capabilityObject.browser_name);
         if (capabilityObject.browser_name == 'Chrome') {
             options = new chrome.Options();
             options.addArguments('--disable-gpu');
             options.addArguments("--force-device-scale-factor=1");
+            options.setPlatform(capabilityObject.platform + ' ' + capabilityObject.platform_version);
+            builder.withCapabilities(options);
         }
         if (capabilityObject.browser_name == 'Microsoft Edge') {
             options = new edge.Options();
             options.addArguments('--disable-gpu');
             options.addArguments("--force-device-scale-factor=1");
+            options.setPlatform(capabilityObject.platform + ' ' + capabilityObject.platform_version);
+            builder.withCapabilities(options);
         }
         if (capabilityObject.browser_name == 'Firefox') {
             options = new firefox.Options();
+            options.setPlatform(capabilityObject.platform + ' ' + capabilityObject.platform_version);
+            builder.withCapabilities(options);
         }
-        options.setPlatform(capabilityObject.platform + ' ' + capabilityObject.platform_version);
-        this.drivers[jobId] = await new Builder()
-        .withCapabilities(options)
-        .usingServer(capabilityObject.hostname + ':' + capabilityObject.port + '/wd/hub')
+        if (capabilityObject.browser_name == 'Opera') {
+            builder.forBrowser('opera');
+        }
+        
+        
+        this.drivers[jobId] = await builder.usingServer(capabilityObject.hostname + ':' + capabilityObject.port + '/wd/hub')
         .build();
-        console.log('finished starting up', jobId);
         return
-    },
-    resizeWindow: async function(width, height, jobId) {
-        console.log('resize', width, height);
+    }
+    this.resizeWindow = async function(width, height, jobId) {
         try {
             await this.drivers[jobId].manage().window().setRect({width: width, height: height, x: 0, y: 0});
         } catch (e) {
             console.log('resize error', e);
         }
-        console.log('finished resize');
         return
-    },
-    goto: async function(path, jobId) {
-        console.log('goto', path, jobId);
+    }
+    this.goto = async function(path, jobId) {
         if (this.domains[jobId].substr(-1) == '/' && (path.substr(0, 1) == '/')) {
             path = path.substr(1);
         }
@@ -54,61 +60,34 @@ const seleniumDirector = {
         } catch (e) {
             console.log('error goto', e);
         }
-        console.log('finished goto', path);
         return
-    },
-    close: async function(jobId) {
-        console.log('close');
-        await this.drivers[jobId].quit();
-        console.log('finished close');
-        return
-    },
-    reload: async function(jobId) {
-        await this.drivers[jobId].navigate().refresh();
-    },
-    // Screenshot element.
-    screenshotElement: async function(parameters, jobId) {
-        console.log('screenshot');
-        if (parameters.element == '') {
-            throw 'No element/xpath given';
-        }
-        let file = parameters.value;
-        try {
-            console.log('get element');
-            let element = await this.getElement(jobId, parameters.selector, parameters.element);
-            console.log('start screenshot');
-            let fileString = await element.takeScreenshot(true);
-            console.log('start saving');
-            await fs.writeFileSync(file, fileString, 'base64');
-        } catch(e) {
-            console.log('error', e);
-            throw `Could not write the file for the screenshot of: ${parameters.selector}.`;
-        }
-        console.log('finished screenshot');
-        return parameters.value;
-    },
-    getElement: async function(jobId, type, value) {
-        switch (type) {
-            case 'js-path':
-                try {
-                    return await this.drivers[jobId].findElement(By.js(value));
-                } catch(e) {
-                    throw `Could not find element that matches js-path: ${value}.`;
-                }
-            case 'xpath':
-                try {
-                    return await this.drivers[jobId].findElement(By.xpath(value));
-                } catch(e) {
-                    throw `Could not find element that matches xpath: ${value}. If the path included a shadow dom, only JS path works.`;
-                }
-            default:
-                try {
-                    return await this.drivers[jobId].findElement(By.css(value));
-                } catch(e) {
-                    throw `Could not find element that matches CSS selector: ${value}. If the path included a shadow dom, only JS path works.`;
-                }
-        }
     }
+    this.runStep = async function(taskName, parameters, jobId) {
+        for (let dir of ['custom', 'core']) {
+            let requirement = `./src/tasks/${dir}/${taskName}/src/selenium`;
+            if (fs.existsSync(requirement + '.js')) {
+                let base = require(requirement.replace('./src/', '../'));
+                // Run the task.
+                return base[taskName](parameters, this.drivers[jobId]);
+            }
+        }
+        throw ' Coult not find the task ' + taskName;
+    }
+    this.close = async function(jobId) {
+        await this.drivers[jobId].quit();
+        return
+    }
+    this.reload = async function(jobId) {
+        await this.drivers[jobId].navigate().refresh();
+        return new Promise(function(resolve, reject) { 
+            setTimeout(async function() {
+                resolve(true);
+            }, 500)
+        });
+    }
+    
 }
 
-module.exports = seleniumDirector;
+module.exports = {
+    SeleniumDirector: seleniumDirector
+};

@@ -1,6 +1,10 @@
 id: clickButtonTitled
-optionsText: I click/press button with title {title}
-prependText: I click/press button with title 
+optionsText: I click/press button with title
+prependText: I click/press button with title
+description: >
+  This will search for any <button> or <submit> element and look at the value of the button an do a click/press event on it.
+
+  It is based on realistic cliking, so if it is covered by other layers this will not work.
 inputs:
   - identifier: title
     type: text

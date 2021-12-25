@@ -40,6 +40,8 @@ const routing = {
         app.get('/projects/:projectName/results', require('./jobs').getJobs);
         app.get('/projects/:projectName/results/:screenshotId/diff', require('./screenshots').diff);
         app.get('/projects/:projectName/results/:screenshotId/delete', require('./screenshots').deleteForm);
+        app.get('/projects/:projectName/browser_diffs', require('./jobs').browserDiffs);
+        app.get('/projects/:projectName/browser_diffs/:browserDiffId/diff', require('./screenshots').browser_diff);
         app.post('/projects/:projectName/screenshot/delete', require('./screenshots').deleteScreenshot);
 
         app.get('/projects/:projectName/component/:componentUuid/edit', require('./components').editForm);

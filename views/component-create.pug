@@ -58,12 +58,13 @@ block content
                                         span(class="input-group-text")
                                             i(class="fas fa-percent")
                                 small
+                                    | This is the amount of pixles in percent the component can diff between two browsers before the system marks it as browser diff error.
                                     if form.default_browser_regression_threshold.error
                                         ul(class="error")
                                             each error in form.default_browser_regression_threshold.errors
                                                 li(style="color:red;")=error
                             h2
-                                | Devices / Breakpoints
+                                | Devices / Breakpoints / Browser Diffs
                                 table(class="table align-items-center capabilities-table")
                                     thead 
                                         tr 
@@ -72,16 +73,32 @@ block content
                                             each breakpoint in breakpoints
                                                 th(scope="col", class="breakpoint", data-breakpoint=breakpoint.id) 
                                                     | #{breakpoint.width}x#{breakpoint.height}
-                                    each capability in capabilities 
+                                    each capability in capabilities
                                         tr 
-                                            td(class="capability", data-capability=capability.id)
-                                                i(class="fab fa-" + capability.os_icon)
-                                                | &nbsp; |  
-                                                i(class="fab fa-" + capability.browser_icon)
-                                                | &nbsp; #{capability.browser_version} (#{capability.server_name})
+                                            td
+                                                div(class="capability", data-capability=capability.id)
+                                                    i(class="fab fa-" + capability.os_icon)
+                                                    | &nbsp; |  
+                                                    i(class="fab fa-" + capability.browser_icon)
+                                                    | &nbsp; #{capability.browser_version} (#{capability.server_name})
+                                                div(class="select-wrapper")
+                                                    select(class="small browser-diff", name="browser_diffs[]")
+                                                        option(value="")
+                                                            | No Diff
+                                                        option(value="main_" + capability.id, selected=browserDiffs.includes("main_" + capability.id) ? true : false)
+                                                            | Main Diff
+                                                        option(value="diff_" + capability.id, selected=browserDiffs.includes("diff_" + capability.id) ? true : false)
+                                                            | Diff
                                             each breakpoint in breakpoints
                                                 td 
                                                     input(type="checkbox", checked=form.device_breakpoint.value.includes(capability.id + "--" + breakpoint.id), name="device_breakpoint", value=capability.id + "--" + breakpoint.id, data-breakpoint=breakpoint.id, data-capability=capability.id)
+                                small
+                                    | Choose which devices and capabilities to use and which browser comparisons to do.
+                                    if form.device_breakpoint.error
+                                        ul(class="error")
+                                            each error in form.device_breakpoint.errors
+                                                li(style="color:red;")=error                    
+                                            
                             h2 
                                 | Rules
                             ul(id="rules" class="draggable")                                

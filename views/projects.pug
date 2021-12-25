@@ -39,10 +39,13 @@ block content
                                             | View pages
                                         a(href="/projects/" + val.dataname + '/results', class="dropdown-item")
                                             i(class="fas fa-poll")
-                                            | View results
+                                            | View regression results
                                         a(href="/projects/" + val.dataname + "/edit", class="dropdown-item")
                                             i(class="fas fa-edit")
                                             | Edit project
+                                        a(href="/projects/" + val.dataname + "/browser_diffs", class="dropdown-item")
+                                            i(class="fas fa-images")
+                                            | Setup Browser Diffs
                                         a(href="/projects/" + val.dataname + "/delete", class="dropdown-item")
                                             i(class="fas fa-minus-circle")
                                             | Delete project

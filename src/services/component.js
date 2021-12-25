@@ -39,6 +39,21 @@ const component = {
     createComponent: async function(componentObject, pageObject, projectObject) {
         // Validate normal values.
         let validationErrors = validate.validateEntity(componentObject, 'component');
+
+        // Check so two main diffs does not exist.
+        let mainCount = 0;
+        let diffCount = 0;
+        for (let diff of componentObject.browser_diffs) {
+            if (diff.substr(0, 5) == 'main_') {
+                mainCount++;
+            }
+            if (diff.substr(0, 5) == 'diff_') {
+                diffCount++;
+            }
+        }
+        if (mainCount > 1 || mainCount == 1 && diffCount == 0 || diffCount > 0 && mainCount == 0) {
+            validationErrors.push({id: 'device_breakpoint', error: 'You have to only have one main and at least one diff or nothing at all.'});
+        }
         if (validationErrors.length) {
             return validationErrors
         }
@@ -52,11 +67,27 @@ const component = {
         await componentDb.saveCapabilityBreakpoint(componentObject)
         // Store the image
         this.saveDefaultImage(componentObject, pageObject, projectObject);
+        await component.createBrowserDiffs(componentObject, projectObject);
         return null;
     },
     editComponent: async function(componentObject, pageObject, projectObject) {
         // Validate normal values.
         let validationErrors = validate.validateEntity(componentObject, 'component');
+
+        // Check so two main diffs does not exist.
+        let mainCount = 0;
+        let diffCount = 0;
+        for (let diff of componentObject.browser_diffs) {
+            if (diff.substr(0, 5) == 'main_') {
+                mainCount++;
+            }
+            if (diff.substr(0, 5) == 'diff_') {
+                diffCount++;
+            }
+        }
+        if (mainCount > 1 || mainCount == 1 && diffCount == 0 || diffCount > 0 && mainCount == 0) {
+            validationErrors.push({id: 'device_breakpoint', error: 'You have to only have one main and at least one diff or nothing at all.'});
+        }
         if (validationErrors.length) {
             return validationErrors
         }
@@ -68,7 +99,9 @@ const component = {
         // Store rules
         await componentDb.saveRules(componentObject, true)
         // Store components capability/breakpoints
-        await componentDb.saveCapabilityBreakpoint(componentObject, true)
+        await componentDb.saveCapabilityBreakpoint(componentObject, true);
+        // Store browser diffs
+        await component.updateBrowserDiffs(componentObject, projectObject);
         return null;
     },
     deleteComponent: async function(req, componentObject, pageObject) {
@@ -104,6 +137,77 @@ const component = {
         if (fs.existsSync(file)) {
             fs.unlinkSync(file);
         }
+    },
+    createBrowserDiffs: async function(componentObject, projectObject) {
+        let matrix = this.getBrowserDiffMatrix(componentObject);
+        componentDb.createBrowserDiffs(componentObject, projectObject, matrix);
+    },
+    updateBrowserDiffs: async function(componentObject, projectObject) {
+        let matrix = this.getBrowserDiffMatrix(componentObject);
+        componentDb.updateBrowserDiffs(componentObject, projectObject, matrix);
+    },
+    getBrowserDiffsForComponent: async function(componentId) {
+        return await componentDb.getBrowserDiffsForComponent(componentId);
+    },
+    getBrowserDiffs: async function(componentObject) {
+        let browserDiffs = await componentDb.getBrowserDiffsForComponent(componentObject.id);
+        let values = [];
+        for (let row of browserDiffs) {
+            let mainValue = 'main_' + row.capabilities_id_from;
+            let diffValue = 'diff_' + row.capabilities_id_to;
+            if (!values.includes(mainValue)) {
+                values.push(mainValue);
+            }
+            if (!values.includes(diffValue)) {
+                values.push(diffValue);
+            }
+        }
+        return values;
+    },
+    getBrowserDiffMatrix: function(componentObject) {
+        let diffs = [];
+        let main = '';
+
+        for (let diff of componentObject.browser_diffs) {
+            switch (diff.substr(0, 5)) {
+                case 'diff_':
+                    diffs.push(diff.substr(5));
+                    break;
+                case 'main_':
+                    main = diff.substr(5);
+                    break;
+            }
+        }
+
+        let breakpoints = [];
+        let others = {};
+        for (let devbr of componentObject.device_breakpoint) {
+            let parts = devbr.split('--');
+            if (parts[0] == main) {
+                breakpoints.push(parts[1])
+            } else {
+                if (!(parts[1] in others)) {
+                    others[parts[1]] = {};
+                }
+                others[parts[1]][parts[0]] = parts[0];
+            }
+        }
+        
+        let matrix = {}
+        matrix[main] = {}
+        for (let mainbr of breakpoints) {
+            if (mainbr in others) {
+                if (!(mainbr in matrix)) {
+                    matrix[main][mainbr] = {};
+                }
+                for (let i in others[mainbr]) {
+                    if (diffs.includes(i)) {
+                        matrix[main][mainbr][i] = i;
+                    }
+                }
+            }
+        }
+        return matrix;
     }
 }
 

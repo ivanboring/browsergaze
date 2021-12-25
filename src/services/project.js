@@ -18,6 +18,9 @@ const project = {
     getProjectById: async function(req, id) {
         return await projectDb.getProjectById(req, id);
     },
+    getProjectByIdWithoutReq: async function(id) {
+        return await projectDb.getProjectByIdWithoutReq(id);
+    },
     getProjectByName: async function(req, name) {
         return await projectDb.getProjectByName(req, name);
     },

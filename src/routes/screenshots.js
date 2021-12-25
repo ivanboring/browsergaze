@@ -1,9 +1,9 @@
 const project = require('../services/project');
-const component = require('../services/component');
 const user = require('../services/user');
 const page = require('../services/page');
 const screenshot = require('../services/screenshot');
 const baseline = require('../services/baseline');
+const browserDiff = require('../services/browserDiff');
 
 const screenshots = {
     diff: async function(req, res) {
@@ -21,6 +21,24 @@ const screenshots = {
             project: projectObject,
             screenshot: screenshotObject,
             baseline: baselineObject,
+            user: user.getUser(req),
+        });
+    },
+    browser_diff: async function(req, res) {
+        const projectObject = await project.getProjectByName(req, req.params.projectName);
+        const browserDiffObject = await browserDiff.getBrowserDiff(req.params.browserDiffId);
+        if (!projectObject || projectObject.id != browserDiffObject.project_id) {
+            res.redirect(301, '/projects')
+            return
+        }
+        res.render('browser-diff-detail', {
+            title: 'glitch-hawk: compare component shots ' + projectObject.name,
+            pageTitle: 'Compare component shots on ' + projectObject.name,
+            isAdmin: user.isAdmin(req),
+            project: projectObject,
+            fromPath: browserDiffObject.from_path,
+            toPath: browserDiffObject.to_path,
+            diffPath: browserDiffObject.path,
             user: user.getUser(req),
         });
     },

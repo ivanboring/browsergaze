@@ -61,6 +61,7 @@ const components = {
             return
         }
         let rulesObject = await rules.collectRules();
+        let browserDiffs = await component.getBrowserDiffs(componentObject);
         if (user.isAdmin(req)) {
             res.render('component-create', {
                 title: 'Edit Component ' + componentObject.name + ' for ' + projectObject.name,
@@ -70,6 +71,7 @@ const components = {
                 form: form.populateFormDefaults('component', req, componentObject),
                 rules: rulesObject,
                 user: user.getUser(req),
+                browserDiffs: browserDiffs,
                 buttonText: 'Edit component',
                 capabilities: capabilities.getCapabilitiesForStyling(projectCapabilites),
                 breakpoints: projectBreakpoints,

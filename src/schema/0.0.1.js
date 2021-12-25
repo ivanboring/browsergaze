@@ -179,7 +179,9 @@ module.exports = {
             capabilities_id_from INTEGER, \
             capabilities_id_to INTEGER, \
             breakpoint_id INTEGER, \
-            browser_threshold INTEGER \
+            project_id INTEGER, \
+            active INTEGER, \
+            browser_threshold FLOAT \
         )");
 
         // Create notifications table
@@ -204,5 +206,21 @@ module.exports = {
             'puppeteer',
             1
         );
+
+        // Create browser diff
+        db.run("CREATE TABLE browser_diffs ( \
+            id	INTEGER PRIMARY_KEY AUTOINCREMENT, \
+            job_id	INTEGER, \
+            component_id	INTEGER, \
+            page_id	INTEGER, \
+            project_id	INTEGER, \
+            created_time INTEGER, \
+            from_capability INTEGER, \
+            to_capability INTEGER, \
+            breakpoint	INTEGER, \
+            diff FLOAT, \
+            path VARCHAR(255), \
+            status	INTEGER \
+        );")
     }
 }
