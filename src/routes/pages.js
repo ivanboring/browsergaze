@@ -14,7 +14,7 @@ module.exports = {
                 project: projectData,
                 form: form.populateFormDefaults('page', req),
                 user: user.getUser(req),
-                action: "/projects/" + project.dataname + "/page/create",
+                action: "/projects/" + projectData.dataname + "/page/create",
                 submitText: "Create Page",
             })
         } else {
@@ -56,7 +56,6 @@ module.exports = {
     post: async function(req, res) {
         if (user.isAdmin(req)) {
             const projectObject = await project.getProjectByName(req, req.params.projectName)
-            
             if (!projectObject) {
                 res.redirect(301, '/projects')
                 return

@@ -2,7 +2,7 @@ const fs = require('fs');
 const validate = require('./validate');
 const defaults = require('./defaults');
 const helper = require('./helper');
-const puppeteerDirector = require('../directors/puppeteerDirector');
+const { PuppeteerDirector } = require('../directors/puppeteerDirector');
 const svgexport = require('svgexport');
 const capabilities = require('./capabilities');
 const projectDb = require('../models/projectDb');
@@ -50,28 +50,36 @@ const project = {
         // Validate normal values.
         let formErrors = validate.validateEntity(project, 'project');
         let validationErrors = formErrors.concat(await this.extraProjectValidation(project, true));
+        for (let width of project.breakpoint_width) {
+            if (parseInt(width) < 500) {
+                validationErrors.push({id: 'breakpoint_width', error: 'Width can not be under 500px.'});
+            }
+        }
         if (validationErrors.length) {
             return validationErrors
         }
         
         // Download favicon.
-        let url = await puppeteerDirector.getFaviconUrl('test');
+        let pup = new PuppeteerDirector();
+        await pup.init(project.default_host_path, 'test');
+        let url = await pup.getFaviconUrl('test');
 
         let imageDir = this.createProjectDir(project.dataname);
         if (url) {
             if (url.substr(-4) == '.svg') {
-                svgexport.render([{
+                await svgexport.render([{
                     input: [url],
                     output: imageDir + 'icon.png'
                 }]);
             } else {
-                helper.download(url, imageDir + 'icon.png');
+                await helper.download(url, imageDir + 'icon.png');
             }
         }
         // Download screenshot.
-        await puppeteerDirector.resizeWindow(1280, 720, 'test');
-        await puppeteerDirector.screenshot(imageDir + 'init.jpg', 'test');
-        await puppeteerDirector.close('test');
+        await pup.goto('/', 'test');
+        await pup.resizeWindow(1280, 720, 'test');
+        await pup.screenshot(imageDir + 'init.jpg', 'test');
+        await pup.close('test');
         // Store in db.
         let projectId = await projectDb.createProject(project);
         // Store capabilities and breakpoints.
@@ -82,24 +90,32 @@ const project = {
     updateProject: async function(project) {
         let formErrors = validate.validateEntity(project, 'project');
         let validationErrors = formErrors.concat(await this.extraProjectValidation(project, false));
+        for (let width of project.breakpoint_width) {
+            if (parseInt(width) < 500) {
+                validationErrors.push({id: 'breakpoint_width', error: 'Width can not be under 500px.'});
+            }
+        }
         if (validationErrors.length) {
             return validationErrors
         }
         await projectDb.updateProject(project);
         await projectDb.updateProjectCapabilities(project.id, project.capability);
+        await projectDb.updateProjectBreakpoints(project.id, project.breakpoint_width, project.breakpoint_height);
         //TODO: update breakpoints
         return null;
     },
     extraProjectValidation: async function(project, checkDataname) {
         let validationErrors = [];
         // Validate so we can take screenshots
-        await puppeteerDirector.init(project.default_host_path, 'test');
+        let pup = new PuppeteerDirector();
+        await pup.init(project.default_host_path, 'test');
         try {
-            await puppeteerDirector.goto('/', 'test');
+            await pup.goto('/', 'test');
         }
         catch (err) {
             validationErrors.push({id: 'default_host_path', error: 'We could not reach that domain.'});
         }
+        pup.close('test');
 
         // Validate that the dataname is unique.
         if (checkDataname) {
@@ -142,7 +158,6 @@ const project = {
         await capabilities.deleteCapabilitiesForProjectId(project.id);
         await user.deleteUserFromProjectId(project.id);
         await projectDb.deleteProject(project);
-        console.log('ffff');
         if (fs.existsSync(defaults.imageLocation + project.dataname)) {
             fs.rmSync(defaults.imageLocation + project.dataname, { recursive: true });
         }

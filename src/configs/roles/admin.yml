@@ -1,6 +1,7 @@
 id: 2
 name: Administrator
 permissions:
+  change-settings: true
   create-project: true
   edit-all-projects: true
   edit-own-projects: true

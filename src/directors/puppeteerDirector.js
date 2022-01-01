@@ -28,7 +28,11 @@ const puppeteerDirector = function() {
         if (this.domain.substr(-1) == '/' && (path.substr(0, 1) == '/')) {
             path = path.substr(1);
         }
-        await this.page[jobId].goto(this.domain + path, {waitUntil: 'networkidle0'});
+        try {
+            await this.page[jobId].goto(this.domain + path, {waitUntil: 'networkidle0'});
+        } catch(e) {
+            throw e.toString()
+        }
     }
     this.reload = async function(jobId) {
         await this.page[jobId].reload();

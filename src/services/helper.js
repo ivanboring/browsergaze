@@ -24,9 +24,9 @@ const helper = {
         let monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
         let m = monthNames[date.getMonth()];
         let y = date.getFullYear();
-        let h = date.getHours();
-        let i = date.getMinutes();
-        let s = date.getSeconds();
+        let h = `${date.getHours()}`.padStart(2, '0')
+        let i = `${date.getMinutes()}`.padStart(2, '0')
+        let s = `${date.getSeconds()}`.padStart(2, '0')
         return `${d} ${m} ${y} ${h}:${i}:${s}`;
     },
     createSelectOptions: function(rows, id, value, any, default_value) {

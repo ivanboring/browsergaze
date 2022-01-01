@@ -10,11 +10,12 @@ const opera = require("selenium-webdriver/opera");
 const seleniumDirector = function() {
     this.drivers = {};
     this.domains = {};
+    this.browsers = {};
     this.init = async function(domain, jobId, capabilityObject) {
         let builder = await new Builder();
         this.domains[jobId] = domain;
         let options = {};
-        console.log(capabilityObject.browser_name);
+        this.browsers[jobId] = capabilityObject.browser_name;
         if (capabilityObject.browser_name == 'Chrome') {
             options = new chrome.Options();
             options.addArguments('--disable-gpu');
@@ -37,15 +38,35 @@ const seleniumDirector = function() {
         if (capabilityObject.browser_name == 'Opera') {
             builder.forBrowser('opera');
         }
-        
-        
+
         this.drivers[jobId] = await builder.usingServer(capabilityObject.hostname + ':' + capabilityObject.port + '/wd/hub')
         .build();
         return
     }
     this.resizeWindow = async function(width, height, jobId) {
+        let newWidth = width;
+        let newHeight = height;
+        let displayWidth = 0;
+        let displayHeight = 0;
+        let tries = 0;
         try {
-            await this.drivers[jobId].manage().window().setRect({width: width, height: height, x: 0, y: 0});
+            while (tries < 4) {
+                // Recurse until fit.
+                await this.drivers[jobId].manage().window().setRect({width: newWidth, height: newHeight, x: 0, y: 0});
+                displayWidth = await this.drivers[jobId].executeScript("return window.innerWidth");
+                displayHeight = await this.drivers[jobId].executeScript("return window.innerHeight");
+                if (displayWidth != width && displayHeight != height) {
+                    newWidth = (newWidth - displayWidth) + width;
+                    newHeight = (newHeight - displayHeight) + height;
+                } else if (displayWidth != width) {
+                    newWidth = (newWidth - displayWidth) + width;
+                } else if (displayHeight != height) {
+                    newHeight = (newHeight - displayHeight) + height;
+                } else {
+                    tries = 4;
+                }
+                tries++;
+            }
         } catch (e) {
             console.log('resize error', e);
         }

@@ -82,22 +82,6 @@ block content
                                         ul(class="error")
                                             each error in form.default_password.errors
                                                 li(style="color:red;")=error
-
-                            div(class="form-group mb-3")
-                                div(class="custom-control custom-control-alternative custom-checkbox")
-                                    input(type="checkbox", class="custom-control-input", name="fail_directly", id="check1")
-                                    label(class="custom-control-label", for="check1")
-                                        | Always fail tests directly
-                                small 
-                                    | If one tests fails or is over the threshold the testing stops.
-                            
-                            div(class="form-group mb-3")
-                                div(class="custom-control custom-control-alternative custom-checkbox")
-                                    input(type="checkbox", class="custom-control-input", name="run_sync", id="check2")
-                                    label(class="custom-control-label", for="check2")
-                                        | Always run tests synchrounosly 
-                                small 
-                                    |  If you have a very unoptimized site you might want to enable this. Then the test will run one browser after another until finished.
                             h2
                                 | Breakpoints/Widths/Heights
                             small 

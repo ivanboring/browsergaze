@@ -85,9 +85,9 @@ block content
                                                     select(class="small browser-diff", name="browser_diffs[]")
                                                         option(value="")
                                                             | No Diff
-                                                        option(value="main_" + capability.id, selected=browserDiffs.includes("main_" + capability.id) ? true : false)
+                                                        option(value="main_" + capability.id, selected=browserDiffs && browserDiffs.includes("main_" + capability.id) ? true : false)
                                                             | Main Diff
-                                                        option(value="diff_" + capability.id, selected=browserDiffs.includes("diff_" + capability.id) ? true : false)
+                                                        option(value="diff_" + capability.id, selected=browserDiffs && browserDiffs.includes("diff_" + capability.id) ? true : false)
                                                             | Diff
                                             each breakpoint in breakpoints
                                                 td 

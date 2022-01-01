@@ -10,10 +10,19 @@ const browserDiff = {
         }
         rows = capabilities.getCapabilitiesForStyling(rows, 'from_');
         rows = capabilities.getCapabilitiesForStyling(rows, 'to_');
+        if (typeof rows == 'undefined') {
+            rows = [];
+        }
         return rows;
+    },
+    getBrowserDiffsCount: async function(projectId, conditions) {
+        return await browserDiffDb.getBrowserDiffsCount(projectId, conditions);
     },
     getBrowserDiff: async function(browserDiffId) {
         return await browserDiffDb.getBrowserDiff(browserDiffId);
+    },
+    deleteBrowserDiff: async function(browserDiffId) {
+        return await browserDiffDb.deleteBrowserDiff(browserDiffId);
     },
     createBrowserDiff: async function (browserDiffObject) {
         return await browserDiffDb.createBrowserDiff(browserDiffObject);

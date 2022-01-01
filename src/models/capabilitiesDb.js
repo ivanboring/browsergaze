@@ -68,7 +68,7 @@ const capabilities = {
         return new Promise(
             (resolve, reject) => {
                 query.serialize(function() {
-                    query.all("SELECT c.*, gs.name as server_name \
+                    query.all("SELECT c.*, pc.id as project_capability_id, gs.id as generator_id, gs.name as server_name \
                         FROM project_capabilities pc \
                         LEFT JOIN capabilities c ON c.id=pc.capability_id \
                         LEFT JOIN generator_servers gs ON gs.id=c.generator_server_id \
@@ -94,6 +94,19 @@ const capabilities = {
             }
         )
     },
+    deleteCapabilitiesForServer: async function(serverId) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.run("DELETE FROM capabilities WHERE generator_server_id=?",
+                    serverId, function(err) {
+                        resolve(true);
+                    });
+                });
+            }
+        );
+    },
     deleteBreakpointForProjectId: async function(projectId) {
         let query = db.getDb();
         return new Promise(
@@ -102,6 +115,30 @@ const capabilities = {
                     query.run("DELETE FROM project_breakpoints WHERE project_id=?",
                     projectId, function(err) {
                         resolve(true);
+                    });
+                });
+            }
+        );
+    },
+    getCapabilityForProjectCapability: async function(capabilityId) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.get("SELECT * FROM project_capabilities WHERE capability_id=?", capabilityId, function(err, row) {
+                        resolve(row)
+                    });
+                });
+            }
+        );
+    },
+    deleteCapabilityForProjectCapability: async function(capabilityId) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.all("DELETE FROM project_capabilities WHERE capability_id=?", capabilityId, function(err, rows) {
+                        resolve(rows)
                     });
                 });
             }

@@ -18,6 +18,9 @@ const screenshot = {
         rows = capabilities.getCapabilitiesForStyling(rows);
         return rows;
     },
+    getScreenshotsCount: async function(projectId, conditions) {
+        return await screenshotDb.getScreenshotsCount(projectId, conditions);
+    },
     getScreenshotsFromJob: async function (jobId) {
         let rows = await screenshotDb.getScreenshotsFromJob(jobId);
         for (let i in rows) {
@@ -28,6 +31,14 @@ const screenshot = {
     },
     getScreenshotsFromIds: async function (ids) {
         let rows = await screenshotDb.getScreenshotsFromIds(ids);
+        for (let i in rows) {
+            rows[i].created_time_formatted = helper.prettyDate(rows[i].created_time);
+        }
+        rows = capabilities.getCapabilitiesForStyling(rows);
+        return rows;
+    },
+    getScreenshotsFromCapability: async function (capabilityId) {
+        let rows = await screenshotDb.getScreenshotsFromCapability(capabilityId);
         for (let i in rows) {
             rows[i].created_time_formatted = helper.prettyDate(rows[i].created_time);
         }

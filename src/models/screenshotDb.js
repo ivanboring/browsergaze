@@ -41,23 +41,89 @@ const screenshotDb = {
             }
         )
     },
+    getScreenshotsFromCapability: async function (capabilityId) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.all("SELECT s.*, c.name as component_name, p.name as page_name, pb.width, pb.height, cb.browser_name, cb.browser_version, \
+                        cb.platform, cb.platform_version, gs.server_type \
+                        FROM screenshots s LEFT JOIN pages p ON p.id=s.page_id \
+                        LEFT JOIN components c ON c.id=s.component_id \
+                        LEFT JOIN project_capabilities pc ON pc.id=s.capability_id \
+                        LEFT JOIN capabilities cb ON pc.capability_id=cb.id \
+                        LEFT JOIN generator_servers gs ON gs.id=cb.generator_server_id \
+                        LEFT JOIN project_breakpoints pb ON pb.id=s.breakpoint_id \
+                        WHERE s.capability_id=? ORDER BY s.created_time ASC;", capabilityId, function(err, rows) {
+                        resolve(rows)
+                    });
+                });
+            }
+        )
+    },
     getScreenshots: async function (projectId, conditions, sortKey, sortOrder, limit, page) {
-        if (typeof conditions == 'undefined') {
+        if (typeof conditions == 'undefined' || conditions == null) {
             conditions = {};
         }
-        if (typeof sortKey == 'undefined' || !sortKey.includes['created_time']) {
+        if (typeof sortKey == 'undefined' || sortKey == null || !sortKey.includes['created_time']) {
             sortKey = 'created_time';
         }
-        if (typeof sortOrder == 'undefined' || !sortOrder.includes['ASC', 'DESC']) {
+        if (typeof sortOrder == 'undefined' || sortOrder == null || !sortOrder.includes['ASC', 'DESC']) {
             sortOrder = 'DESC';
         }
         if (typeof limit != 'number') {
             limit = 50;
         }
+
         if (typeof page != 'number') {
-            limit = 0;
+            page = 0;
         }
 
+        let offset = page*limit;
+
+        let whereString = ['s.project_id=?'];
+        let whereParameters = [projectId];
+        for (let key in conditions) {
+            switch (key) {
+                case 'page_id':
+                case 'component_id':
+                case 'job_id':
+                case 'status':
+                case 'capability_id':
+                case 'breakpoint_id':
+                case 'is_baseline':
+                case 'error':
+                    if (conditions[key]) {
+                        whereString.push('s.' + key + '=?');
+                        whereParameters.push(conditions[key]);
+                    }
+                    break;
+            }
+        }
+
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.all("SELECT s.*, c.name as component_name, p.name as page_name, pb.width, pb.height, cb.browser_name, cb.browser_version, \
+                        cb.platform, cb.platform_version, gs.server_type \
+                        FROM screenshots s LEFT JOIN pages p ON p.id=s.page_id \
+                        LEFT JOIN components c ON c.id=s.component_id \
+                        LEFT JOIN project_capabilities pc ON pc.id=s.capability_id \
+                        LEFT JOIN capabilities cb ON pc.capability_id=cb.id \
+                        LEFT JOIN generator_servers gs ON gs.id=cb.generator_server_id \
+                        LEFT JOIN project_breakpoints pb ON pb.id=s.breakpoint_id \
+                        WHERE " + whereString.join(' AND ') + " ORDER BY " + sortKey + " " + sortOrder + " LIMIT " + offset + "," + limit + ";", whereParameters, function(err, rows) {
+                        resolve(rows)
+                    });
+                });
+            }
+        )
+    },
+    getScreenshotsCount: async function(projectId, conditions) {
+        if (typeof conditions == 'undefined' || conditions == null) {
+            conditions = {};
+        }
         let whereString = ['s.project_id=?'];
         let whereParameters = [projectId];
         for (let key in conditions) {
@@ -81,16 +147,18 @@ const screenshotDb = {
         return new Promise(
             (resolve, reject) => {
                 query.serialize(function() {
-                    query.all("SELECT s.*, c.name as component_name, p.name as page_name, pb.width, pb.height, cb.browser_name, cb.browser_version, \
-                        cb.platform, cb.platform_version, gs.server_type \
+                    query.get("SELECT count(*) as total \
                         FROM screenshots s LEFT JOIN pages p ON p.id=s.page_id \
                         LEFT JOIN components c ON c.id=s.component_id \
                         LEFT JOIN project_capabilities pc ON pc.id=s.capability_id \
                         LEFT JOIN capabilities cb ON pc.capability_id=cb.id \
                         LEFT JOIN generator_servers gs ON gs.id=cb.generator_server_id \
                         LEFT JOIN project_breakpoints pb ON pb.id=s.breakpoint_id \
-                        WHERE " + whereString.join(' AND ') + " ORDER BY " + sortKey + " " + sortOrder + ";", whereParameters, function(err, rows) {
-                        resolve(rows)
+                        WHERE " + whereString.join(' AND '), whereParameters, function(err, row) {
+                            if ('total' in row) {
+                                resolve(row.total);
+                            }
+                            resolve(0);
                     });
                 });
             }

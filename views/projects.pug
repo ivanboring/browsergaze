@@ -40,6 +40,9 @@ block content
                                         a(href="/projects/" + val.dataname + '/results', class="dropdown-item")
                                             i(class="fas fa-poll")
                                             | View regression results
+                                        a(href="/projects/" + val.dataname + '/results', class="dropdown-item run-project", data-name=val.dataname)
+                                            i(class="fas fa-poll")
+                                            | Run all tests
                                         a(href="/projects/" + val.dataname + "/edit", class="dropdown-item")
                                             i(class="fas fa-edit")
                                             | Edit project
@@ -65,3 +68,4 @@ block content
                                     i(class="ni ni-fat-add")
                                 span(class="btn-inner--text")
                                     | Create your first project
+    script(src="/js/pages/projects.js")

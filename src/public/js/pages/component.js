@@ -59,10 +59,6 @@ $(document).ready(function() {
     })
 });
 
-function checkDiffVisible() {
-    console.log('test');
-}
-
 function toggleAllCapabilities() {
     let val = $(this).attr('data-capability');
     // First check if all are checked.
@@ -119,10 +115,12 @@ function addRule() {
     newRule += '</div></li>';
     $(newRule).insertBefore('#the-screenshot');
 
+    globalRulesCounter++;
+
     $('.delete-rule').off('click').on('click', function() {
         $(this).parents('li').remove();
+        globalRulesCounter--;
     })
-    console.log(globalRulesCounter);
 
     Sortable.create(document.getElementById('rules'), {
         handle: '.drag-hook',

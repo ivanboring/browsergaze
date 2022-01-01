@@ -2149,7 +2149,6 @@ var Fullcalendar = (function() {
 					currentEvent[0].description = currentDesc;
 					currentEvent[0].className = [currentClass];
 
-					console.log(currentClass);
 					$this.fullCalendar('updateEvent', currentEvent[0]);
 					$('#edit-event').modal('hide');
 				} else {

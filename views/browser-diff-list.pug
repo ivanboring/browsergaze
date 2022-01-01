@@ -14,14 +14,6 @@ block content
                                 img(src="/" + project.dataname +"/icon.png")
                             div(class="media-body ml-2 d-none d-lg-block")
                                 h2(class="h1 text-white mb-0")=pageTitle
-                    div(class="col-lg-6 col-5 text-right")
-                        div(class="dropdown")
-                            button(class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
-                                | Page Menu
-                            div(class="dropdown-menu" aria-labelledby="dropdownMenuButton")
-                                a(href="/projects/run/all/", class="dropdown-item", disabled)
-                                    i(class="fas fa-poll")
-                                    | All results
     div(class="container-fluid mt-3")
         nav(aria-label="breadcrumb")
             ol(class="breadcrumb")
@@ -32,11 +24,12 @@ block content
                     a(href="/projects/detail/" + project.dataname)
                         | #{project.name}
                 li(class="breadcrumb-item active" aria-current="page")
-                        | Jobs
+                        | Browser Diff
 
         h1
             | Browser Diff Results
-        form(action="/projects/fastdesign/browser_diff?", method="GET")
+        form(action="/projects/fastdesign/browser_diffs?", method="GET")
+            input(type="hidden", name="page", value="0")
             div(class="row")
                 div(class="col-md-2")
                     div(class="form-group")
@@ -65,9 +58,17 @@ block content
                 div(class="col-md-2")
                     div(class="form-group")
                         label(for="device")
-                            | Device
-                        select(class="form-control", name="capability_id", id="device")
-                            each val, key in capabilityOptions
+                            | Device #1
+                        select(class="form-control", name="capability_from_id", id="device")
+                            each val, key in capabilityOptionsFrom
+                                option(value=val.id, selected=val.selected)
+                                    | #{val.value}
+                div(class="col-md-2")
+                    div(class="form-group")
+                        label(for="device")
+                            | Device #2
+                        select(class="form-control", name="capability_to_id", id="device")
+                            each val, key in capabilityOptionsTo
                                 option(value=val.id, selected=val.selected)
                                     | #{val.value}
                 div(class="col-md-2")
@@ -78,10 +79,18 @@ block content
                             each val, key in breakpointOptions
                                 option(value=val.id, selected=val.selected)
                                     | #{val.value}
+                div(class="col-md-2")
+                    div(class="form-group")
+                        label(for="status")
+                            | Status
+                        select(class="form-control", name="status", id="status")
+                            each val, key in statusOptions
+                                option(value=val.id, selected=val.selected)
+                                    | #{val.value}
             div(class="row")
                 div(class="col-md-2")
                     input(class="btn btn-primary", type="submit", value="Filter")
-        div(class="table-responsive")
+        div(class="table-responsive", style="overflow-x: visible;")
             div 
                 table(style="width: 100%;")
                     thead(class="thead-light")
@@ -150,22 +159,43 @@ block content
                                 td(scope="row")
                                     | #{val.height}
                                 td(scope="row", class="visual-regression", id="visual-regression-" + val.id)
-                                    | #{val.diff}%
+                                    | #{val.diff ? val.diff : 0}%
                                 td(scope="row")
                                     div(class="dropdown")
                                         button(class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
-                                            | Actions
+                                            | Actions on this Diff
                                         div(class="dropdown-menu" aria-labelledby="dropdownMenuButton")
                                             a(href="/projects/" + project.dataname + "/browser_diffs/" + val.id + '/diff', class="dropdown-item", disabled)
-                                                i(class="fas fa-poll")
-                                                | View Browser Diff
-                                            a(href="/projects/run/all" class="dropdown-item", disabled)
-                                                i(class="fas fa-poll")
-                                                | View Browser Diffs
-                                            a(href="/api/baseline/set/" + val.id, data-id=val.id, class="dropdown-item set-baseline", disabled)
-                                                i(class="fas fa-poll")
-                                                | Set as Baseline
-                                            a(href="/projects/" + project.dataname + "/results/" + val.id + '/delete?redirect=' + queryString, class="dropdown-item", disabled)
-                                                i(class="fas fa-poll")
+                                                i(class="fas fa-images")
+                                                | View Diff Detail
+                                            a(href="/projects/" + project.dataname + "/change_browser_threshold/" + val.threshold_id + '?redirect=' + queryString, class="dropdown-item", disabled)
+                                                i(class="fas fa-sort-amount-up-alt")
+                                                | Change Threshold
+                                            a(href="/projects/" + project.dataname + "/browser_diffs/" + val.id + '/delete?redirect=' + queryString, class="dropdown-item", disabled)
+                                                i(class="fas fa-minus-square")
                                                 | Delete Result
 
+    div(class="container")
+        div(class="row justify-content-md-center")
+            - var n = 0;
+            if paginationTotal > 1
+                nav(aria-label="Pagination")
+                    ul(class="pagination pagination-sm")
+                        if currentPage !== 0
+                            li(class="page-item")
+                                a(class="page-link", href=paginationString + '&page=' + (currentPage-1), aria-label="Previous")
+                                    i(class="fa fa-angle-left")
+                                    span(class="sr-only")
+                                        | Previous
+                        while n < paginationTotal
+                            - var className = n == currentPage ? 'active page-item' : 'page-item';
+                            li(class=className)
+                                a(class="page-link" href=paginationString + '&page=' + n)
+                                    | #{n+1}
+                            - n++
+                        if currentPage !== (paginationTotal-1)
+                            li(class="page-item")
+                                a(class="page-link", href=paginationString + '&page=' + (currentPage+1), aria-label="Next")
+                                    i(class="fa fa-angle-right")
+                                    span(class="sr-only")
+                                        | Next

@@ -3,7 +3,7 @@ const pjson = require('../../package.json');
 const fs = require('fs');
 const semver = require('semver');
 
-const schemaFolder = './schema/';
+const schemaFolder = './src/schema/';
 
 const db = {
     db: null,
@@ -56,7 +56,7 @@ const db = {
         const versions = this.getVersions(pjson.version);
         db.db.serialize(function() {
             for (let version of versions) {
-                let schema = require('../src/schema/' + version);
+                let schema = require('../schema/' + version);
                 if (typeof schema.up === "function")  {
                     schema.up(db.db)
                 }

@@ -21,13 +21,7 @@ fields:
     sanitize:
       escape: ''
       blacklist: ''
-      trim: ' '        
-  fail_directly:
-    validate:
-      type: 'boolean'
-  run_sync:
-    validate:
-      type: 'boolean'
+      trim: ' '
   default_host_path:
     validate:
       type: 'string'

@@ -7,6 +7,7 @@ const {
 } = require('uuid');
 const puppeteerDirector = require('../directors/puppeteerDirector');
 const pageDb = require('../models/pageDb');
+const { PuppeteerDirector } = require('../directors/puppeteerDirector');
 
 const page = {
     getPagesByProjectId: async function(req, projectId) {
@@ -21,7 +22,7 @@ const page = {
     deletePage: async function (req, pageObject, projectObject) {
         const componentsList = await component.getComponentsForPage(req, pageObject, projectObject, pageObject);
         for (let x in componentsList) {
-            await component.deleteComponent(req, componentsList[x], pageObject);
+            await component.deleteComponent(req, componentsList[x], projectObject, pageObject);
         }
         return await pageDb.deletePage(pageObject);
     },
@@ -32,9 +33,10 @@ const page = {
         // Validate normal values.
         let validationErrors = validate.validateEntity(pageObject, 'page');
         // Validate so we can take screenshots
-        await puppeteerDirector.init(projectObject.default_host_path);
+        let pup = new PuppeteerDirector();
+        await pup.init(projectObject.default_host_path, 'test');
         try {
-            await puppeteerDirector.goto(pageObject.path);
+            await pup.goto(pageObject.path, 'test');
         }
         catch (err) {
             validationErrors.push({id: 'path', error: 'We could not reach that path.'});
@@ -55,9 +57,9 @@ const page = {
         let imagedir = this.createPageDir(projectObject.dataname, pageObject.uuid);
 
         // Download screenshot.
-        await puppeteerDirector.resizeWindow(1280, 720);
-        await puppeteerDirector.screenshot(imagedir + 'init.jpg');
-        await puppeteerDirector.close();
+        await pup.resizeWindow(1280, 720, 'test');
+        await pup.screenshot(imagedir + 'init.jpg', 'test');
+        await pup.close('test');
         // Store in db
         if (updateId) {
             await pageDb.updatePage(pageObject);

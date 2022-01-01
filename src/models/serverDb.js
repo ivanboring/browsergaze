@@ -25,6 +25,18 @@ const serverDb = {
             }
         )
     },
+    deleteServerById: async function(serverId) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.run("DELETE FROM generator_servers WHERE id=?;", serverId, function(err, rows) {
+                        resolve(rows)
+                    });
+                });
+            }
+        )
+    },
     saveServer: async function(server) {
         let query = db.getDb();
         return new Promise(
@@ -42,7 +54,26 @@ const serverDb = {
                 });
             }
         );       
-    }
+    },
+    updateServer: async function(server) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.run("UPDATE generator_servers SET name=?, hostname=?, port=?, server_type=?, concurrency=? WHERE id=?;", 
+                        server.name,
+                        server.hostname,
+                        server.port,
+                        server.server_type,
+                        server.concurrency,
+                        server.id,
+                    function(err) {
+                        resolve(this.lastID)
+                    });
+                });
+            }
+        );       
+    },
 }
 
 module.exports = serverDb;

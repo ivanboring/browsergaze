@@ -102,7 +102,6 @@ const runner = {
     },
     checkForJobs: async function() {
         let jobsList = await screenshot.getUnrunScreenshots(runner.lastJobId);
-
         // Group by page and add to the queue.
         let jobGroups = {}
         for (let i in jobsList) {

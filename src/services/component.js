@@ -3,7 +3,6 @@ const fs = require('fs');
 const validate = require('./validate');
 const defaults = require('./defaults')
 const capabilities = require('./capabilities');
-const project = require('./project');
 const screenshot = require('./screenshot');
 const baseline = require('./baseline');
 
@@ -104,8 +103,7 @@ const component = {
         await component.updateBrowserDiffs(componentObject, projectObject);
         return null;
     },
-    deleteComponent: async function(req, componentObject, pageObject) {
-        const projectObject = await project.getProjectById(req, componentObject.project_id);
+    deleteComponent: async function(req, componentObject, projectObject, pageObject) {
         this.deleteComponentForProject(req, componentObject, projectObject, pageObject);
     },
     deleteComponentForProject: async function(req, componentObject, projectObject, pageObject) {
@@ -149,6 +147,12 @@ const component = {
     getBrowserDiffsForComponent: async function(componentId) {
         return await componentDb.getBrowserDiffsForComponent(componentId);
     },
+    getBrowserThreshold: async function(thresholdId) {
+        return await componentDb.getBrowserThreshold(thresholdId);
+    },
+    updateBrowserThreshold: async function(thresholdId, threshold) {
+        return await componentDb.updateBrowserThreshold(thresholdId, threshold);
+    },
     getBrowserDiffs: async function(componentObject) {
         let browserDiffs = await componentDb.getBrowserDiffsForComponent(componentObject.id);
         let values = [];
@@ -181,15 +185,17 @@ const component = {
 
         let breakpoints = [];
         let others = {};
-        for (let devbr of componentObject.device_breakpoint) {
-            let parts = devbr.split('--');
-            if (parts[0] == main) {
-                breakpoints.push(parts[1])
-            } else {
-                if (!(parts[1] in others)) {
-                    others[parts[1]] = {};
+        if ('device_breakpoint' in componentObject) {
+            for (let devbr of componentObject.device_breakpoint) {
+                let parts = devbr.split('--');
+                if (parts[0] == main) {
+                    breakpoints.push(parts[1])
+                } else {
+                    if (!(parts[1] in others)) {
+                        others[parts[1]] = {};
+                    }
+                    others[parts[1]][parts[0]] = parts[0];
                 }
-                others[parts[1]][parts[0]] = parts[0];
             }
         }
         

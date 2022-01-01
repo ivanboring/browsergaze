@@ -6,6 +6,7 @@ const shell = require('shelljs');
 const browserDiff = require('../services/browserDiff');
 const project = require('../services/project');
 const job = require('../services/job');
+const settings = require('../services/settings');
 
 const differ = {
     running: false,
@@ -38,10 +39,12 @@ const differ = {
 
         return new Promise(
             (resolve, reject) => {
-                let command = hawkConfig.usedBinaryCommand + ' -metric PSNR ' + scr.path + ' ' + baselineObject.path + ' ' + scr.path.replace('.png', '_diff.png');
+                let command = hawkConfig.usedBinaryCommand + ' -metric AE -fuzz ' + settings.getSetting('visual_regression_fuzz') +  '% ' + scr.path + ' ' + baselineObject.path + ' ' + scr.path.replace('.png', '_diff.png');
                 shell.exec(command, {async: true, silent: true}, async function(code, stdout, stderr) {
                     let regression = code ? stderr : stdout;
-                    scr.visual_regression = regression.trim() == 'inf' ? 0 : parseFloat(regression.trim());
+                    let failedPixels = regression.trim() == 'inf' ? 0 : parseFloat(regression.trim())
+                    let realRegression = Math.round((failedPixels / (scr.width*scr.height)) * 10000)/100;
+                    scr.visual_regression = realRegression ? realRegression : 0;
                     scr.status = 4;
                     await screenshot.updateScreenshot(scr);
                     setTimeout(() => { differ.checkForBrowserDiffs(scr) }, 200);
@@ -56,8 +59,8 @@ const differ = {
         let uuid = await job.getUuidFromId(scr.job_id);
         let toPath = defaults.imageLocation + projectObject.dataname + '/jobs/' + uuid + '/';
         for (let job of diffJobs) {
-            let filename = job.fromObject.capability_id + '_' + job.toObject.capability_id + '_' + job.fromObject.breakpoint_id + '.png';
-            let command = hawkConfig.usedBinaryCommand + ' -metric AE -fuzz 0.5% ' + job.fromObject.path + ' ' + job.toObject.path + ' ' + toPath + filename;
+            let filename = job.fromObject.component_id + '_' + job.fromObject.capability_id + '_' + job.toObject.capability_id + '_' + job.fromObject.breakpoint_id + '.png';
+            let command = hawkConfig.usedBinaryCommand + ' -metric AE -fuzz ' + settings.getSetting('browser_diff_fuzz') + '% ' + job.fromObject.path + ' ' + job.toObject.path + ' ' + toPath + filename;
             shell.exec(command, {async: true, silent: true}, async function(code, stdout, stderr) {
                 let regression = code ? stderr : stdout;
                 let failedPixels = regression.trim() == 'inf' ? 0 : parseFloat(regression.trim())
@@ -72,6 +75,7 @@ const differ = {
                     from_screenshot_id: job.fromObject.id,
                     to_capability: job.toObject.capability_id,
                     to_screenshot_id: job.toObject.id,
+                    threshold_id: job.id,
                     breakpoint_id: job.toObject.breakpoint_id,
                     diff: realRegression,
                     status: endStatus,
@@ -103,11 +107,13 @@ const differ = {
                         if (nextRun.active) {
                             let found = 0;
                             for (let i in allScreenshots) {
-                                if (allScreenshots[i].status == 4 && allScreenshots[i].capability_id == nextRun.capabilities_id_from && allScreenshots[i].breakpoint_id == nextRun.breakpoint_id) {
+                                if (allScreenshots[i].component_id == componentId && allScreenshots[i].status == 4 && 
+                                    allScreenshots[i].capability_id == nextRun.capabilities_id_from && allScreenshots[i].breakpoint_id == nextRun.breakpoint_id) {
                                     nextRun.fromObject = allScreenshots[i];
                                     found++;
                                 }
-                                if (allScreenshots[i].status == 4 && allScreenshots[i].capability_id == nextRun.capabilities_id_to && allScreenshots[i].breakpoint_id == nextRun.breakpoint_id) {
+                                if (allScreenshots[i].component_id == componentId && allScreenshots[i].status == 4 &&
+                                    allScreenshots[i].capability_id == nextRun.capabilities_id_to && allScreenshots[i].breakpoint_id == nextRun.breakpoint_id) {
                                     nextRun.toObject = allScreenshots[i];
                                     found++;
                                 }

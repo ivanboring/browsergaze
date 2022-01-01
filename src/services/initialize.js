@@ -8,11 +8,12 @@ const defaults = require('./defaults');
 const puppeteer = require('puppeteer');
 const runner = require('../directors/runner');
 const differ = require('../directors/differ');
+const settings = require('./settings');
 
 const configPath = '../../config.yaml';
 
 const initialize = {
-    init: function() {
+    init: async function() {
         // Look for the config.
         if (fs.existsSync(__dirname + '/' + configPath)) {
             global.hawkConfig = yaml.load(fs.readFileSync(__dirname + '/' + configPath));
@@ -23,6 +24,7 @@ const initialize = {
         runner.startGenerators();
         differ.startDiffer();
         permissions.loadPermissions();
+        await settings.loadSettings();
     },
     checkRequirements: function() {
         this.checkImageMagickBinary();

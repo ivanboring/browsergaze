@@ -101,7 +101,7 @@ const components = {
         const componentObject = await component.getComponentById(req, req.body.component_id);
         const pageObject = await page.getPageById(req, componentObject.page_id);
         if (user.hasPermission(req, 'delete-component')) {
-            component.deleteComponent(req, componentObject);
+            component.deleteComponent(req, componentObject, projectObject, pageObject);
             res.redirect(301, '/projects/' + projectObject.dataname + '/page/' + pageObject.uuid);
         } else {
             res.redirect(301, '/projects');

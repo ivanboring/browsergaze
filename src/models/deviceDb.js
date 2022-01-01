@@ -21,7 +21,7 @@ const deviceDb = {
             }
         );
     },
-    removeDevices: async function(list, serverObject) {
+    removeDevices: async function(list) {
         let query = db.getDb();
         return new Promise(
             (resolve, reject) => {

@@ -82,8 +82,6 @@ const pageDb = {
                         pageObject.path,
                         pageObject.project_id,
                         pageObject.id, function(err, row) {
-                            console.log(err);
-                            console.log(pageObject);
                             resolve(true)
                         }
                     );

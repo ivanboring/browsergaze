@@ -27,13 +27,13 @@ block content
                                 button(class="btn btn-primary btn-sm dropdown-toggle" type="button", disabled=val.server_type == 'puppeteer', id="dropdownMenuButton" + val.id data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
                                     | Actions
                                 div(class="dropdown-menu" aria-labelledby="dropdownMenuButton" + val.id)
-                                    a(href="/server/" + val.id + "/edit", class="dropdown-item", disabled)
+                                    a(href="/servers/" + val.id + "/edit", class="dropdown-item", disabled)
                                         i(class="fas fa-poll")
                                         | Edit
                                     a(href="/servers/" + val.id + "/devices" class="dropdown-item", disabled)
                                         i(class="fas fa-poll")
                                         | Select Devices
-                                    a(href="/server/" + val.id + "/devices" class="dropdown-item", disabled)
+                                    a(href="/servers/" + val.id + "/delete" class="dropdown-item", disabled)
                                         i(class="fas fa-poll")
                                         | Delete
 

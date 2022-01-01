@@ -14,6 +14,7 @@ const routing = {
         app.post('/setup', require('./setup').post);
 
         app.post('/api/component/start/:uuid', require('./jobs').startComponent)
+        app.post('/api/page/start/:uuid', require('./jobs').startPage)
         app.post('/api/project/start/:project_name', require('./jobs').startProject)
         // Status for specific screenshots
         app.get('/api/job/status/:project_name', require('./jobs').getStatusPerId);
@@ -40,9 +41,13 @@ const routing = {
         app.get('/projects/:projectName/results', require('./jobs').getJobs);
         app.get('/projects/:projectName/results/:screenshotId/diff', require('./screenshots').diff);
         app.get('/projects/:projectName/results/:screenshotId/delete', require('./screenshots').deleteForm);
-        app.get('/projects/:projectName/browser_diffs', require('./jobs').browserDiffs);
-        app.get('/projects/:projectName/browser_diffs/:browserDiffId/diff', require('./screenshots').browser_diff);
         app.post('/projects/:projectName/screenshot/delete', require('./screenshots').deleteScreenshot);
+        app.get('/projects/:projectName/browser_diffs', require('./jobs').browserDiffs);
+        app.get('/projects/:projectName/browser_diffs/:browserDiffId/diff', require('./screenshots').browserDiff);
+        app.get('/projects/:projectName/change_browser_threshold/:thresholdId', require('./screenshots').browserDiffThreshold);
+        app.post('/projects/:projectName/change_browser_threshold/:thresholdId', require('./screenshots').browserDiffSave);
+        app.get('/projects/:projectName/browser_diffs/:browserDiffId/delete', require('./screenshots').browserDiffDelete);
+        app.post('/projects/:projectName/browser_diffs/delete', require('./screenshots').browserDiffDeletePost);
 
         app.get('/projects/:projectName/component/:componentUuid/edit', require('./components').editForm);
         app.get('/projects/:projectName/component/:componentUuid/delete', require('./components').deleteForm);
@@ -64,8 +69,15 @@ const routing = {
         app.get('/servers', require('./devices').getServers);
         app.get('/servers/create', require('./devices').createServerForm);
         app.post('/servers/create', require('./devices').serverPost);
+        app.get('/servers/:serverId/edit', require('./devices').editServerForm);
+        app.post('/servers/:serverId/edit', require('./devices').editServer);
         app.get('/servers/:serverId/devices', require('./devices').createDeviceForm);
         app.post('/servers/:serverId/devices', require('./devices').devicePost);
+        app.get('/servers/:serverId/delete', require('./devices').deleteForm);
+        app.post('/servers/:serverId/delete', require('./devices').deleteServer);
+
+        app.get('/settings', require('./settings').settingsForm);
+        app.post('/settings', require('./settings').saveSettings);
 
         app.get('/ajax/rules.json', require('./rules').rulesList);
     }

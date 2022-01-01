@@ -91,7 +91,7 @@ const user = {
             validationErrors.push({id: 'email', error: 'This email already exists.'});   
         }
 
-        if ((userData.role !== "1" || userData.role !== "2") && (userData.projects == null || userData.projects.length == 0)) {
+        if ((userData.role !== 1 && userData.role !== 2) && (userData.projects == null || userData.projects.length == 0)) {
             validationErrors.push({id: 'projects', error: 'You have to choose one project at least.'});   
         }
 

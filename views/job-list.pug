@@ -15,14 +15,6 @@ block content
                                 img(src="/" + project.dataname +"/icon.png")
                             div(class="media-body ml-2 d-none d-lg-block")
                                 h2(class="h1 text-white mb-0")=pageTitle
-                    div(class="col-lg-6 col-5 text-right")
-                        div(class="dropdown")
-                            button(class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
-                                | Page Menu
-                            div(class="dropdown-menu" aria-labelledby="dropdownMenuButton")
-                                a(href="/projects/run/all/", class="dropdown-item", disabled)
-                                    i(class="fas fa-poll")
-                                    | All results
     div(class="container-fluid mt-3")
         nav(aria-label="breadcrumb")
             ol(class="breadcrumb")
@@ -38,6 +30,7 @@ block content
         h1
             | Visual Test Results
         form(action="/projects/fastdesign/results?", method="GET")
+            input(type="hidden", name="page", value="0")
             div(class="row")
                 div(class="col-md-2")
                     div(class="form-group")
@@ -82,7 +75,7 @@ block content
             div(class="row")
                 div(class="col-md-2")
                     input(class="btn btn-primary", type="submit", value="Filter")
-        div(class="table-responsive")
+        div(class="table-responsive", style="overflow-x: visible;")
             div 
                 table(style="width: 100%;")
                     thead(class="thead-light")
@@ -130,7 +123,7 @@ block content
                                         img(src=baseline[key].path.substr(8), style="max-width: 200px; max-height:100px;")
                                 td(scope="row", class="diff", id="diff-" + val.id)
                                     if (val.is_baseline)
-                                        img(src=val.path.substr(8), style="max-width: 200px; max-height:100px;")
+                                        | No diff
                                     else if (val.status == 5)
                                         img(src='/pics/failed.png', style="max-width: 100px; max-height:50px;")
                                     else if (val.status > 1)
@@ -178,18 +171,42 @@ block content
                                 td(scope="row")
                                     div(class="dropdown")
                                         button(class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
-                                            | Actions
+                                            | Actions on this Screenshot
                                         div(class="dropdown-menu" aria-labelledby="dropdownMenuButton")
                                             a(href="/projects/" + project.dataname + "/results/" + val.id + '/diff', class="dropdown-item", disabled)
-                                                i(class="fas fa-poll")
+                                                i(class="fas fa-images")
                                                 | View Regression Diff
-                                            a(href="/projects/run/all" class="dropdown-item", disabled)
-                                                i(class="fas fa-poll")
+                                            a(href="/projects/" + project.dataname + "/browser_diffs?job_id=" +  val.job_id, class="dropdown-item", disabled)
+                                                i(class="fas fa-equals")
                                                 | View Browser Diffs
                                             a(href="/api/baseline/set/" + val.id, data-id=val.id, class="dropdown-item set-baseline", disabled)
-                                                i(class="fas fa-poll")
+                                                i(class="fas fa-star")
                                                 | Set as Baseline
                                             a(href="/projects/" + project.dataname + "/results/" + val.id + '/delete?redirect=' + queryString, class="dropdown-item", disabled)
-                                                i(class="fas fa-poll")
+                                                i(class="fas fa-minus-square")
                                                 | Delete Result
+    div(class="container")
+        div(class="row justify-content-md-center")
+            - var n = 0;
+            if paginationTotal > 1
+                nav(aria-label="Pagination")
+                    ul(class="pagination pagination-sm")
+                        if currentPage !== 0
+                            li(class="page-item")
+                                a(class="page-link", href=paginationString + '&page=' + (currentPage-1), aria-label="Previous")
+                                    i(class="fa fa-angle-left")
+                                    span(class="sr-only")
+                                        | Previous
+                        while n < paginationTotal
+                            - var className = n == currentPage ? 'active page-item' : 'page-item';
+                            li(class=className)
+                                a(class="page-link" href=paginationString + '&page=' + n)
+                                    | #{n+1}
+                            - n++
+                        if currentPage !== (paginationTotal-1)
+                            li(class="page-item")
+                                a(class="page-link", href=paginationString + '&page=' + (currentPage+1), aria-label="Next")
+                                    i(class="fa fa-angle-right")
+                                    span(class="sr-only")
+                                        | Next
     script(src="/js/pages/job-list.js")

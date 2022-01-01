@@ -1,6 +1,7 @@
 id: 3
 name: Project Owner
 permissions:
+  change-settings: false
   create-project: false
   edit-all-projects: false
   edit-own-projects: true

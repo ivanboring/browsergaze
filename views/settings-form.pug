@@ -1,0 +1,49 @@
+extends page
+block content
+    div(class="header bg-primary pb-6")
+        div(class="container")
+            div(class="header-body")
+                div(class="row align-items-center py-4")
+                    div(class="col-lg-6 col-7")
+                       div(class="media align-items-center")
+                            div(class="media-body ml-2 d-none d-lg-block")
+                                h2(class="h1 text-white mb-0")=title
+    div(class="container")
+        div(class="row justify-content-center")
+            div(class="col-9 mt--6")
+                div(class="card")
+                    div(class="card-header")
+                        h2
+                            | #{title}
+                    div(class="card-body")
+                        form(action="/settings", method="POST" role="form")
+                            div(class="form-group mb-3")
+                                label
+                                    | Visual Regression Fuzz
+                                div(class="input-group-merge input-group-alternative")
+                                    div(class="input-group-prepend")
+                                        span(class="input-group-text")
+                                            i(class="fas fa-signature")
+                                        input(type="text", class="form-control", name="visual_regression_fuzz", value=defaults.visual_regression_fuzz, placeholder="Visual Regression Fuzz", required)
+                            small
+                                | This is the amount of Fuzz the visual regression algorithm applies. If you set it to 0, it's enough that one pixel is not the same color to fail. 100% means that it can be completely off. A very low value makes sense here.
+                                if browser_diff_fuzz_error
+                                    ul(class="error")
+                                        li(style="color:red;")=browser_diff_fuzz_error
+
+                            div(class="form-group mb-3")
+                                label
+                                    | Browser Diff Fuzz
+                                div(class="input-group-merge input-group-alternative")
+                                    div(class="input-group-prepend")
+                                        span(class="input-group-text")
+                                            i(class="fas fa-signature")
+                                        input(type="text", class="form-control", name="browser_diff_fuzz", value=defaults.browser_diff_fuzz, placeholder="Browser Diff Fuzz", required)
+                            small
+                                | This is the amount of Fuzz the browser diff algorithm applies. If you set it to 0, it's enough that one pixel is not the same color to fail. 100% means that it can be completely off. This is used to make sure that the difference in anti aliasing of fonts do not fail browser diffs.
+                                if browser_diff_fuzz_error
+                                    ul(class="error")
+                                        li(style="color:red;")=browser_diff_fuzz_error
+
+                            div(class="text-center")
+                                input(type='submit', class="btn btn-primary my-4", value="Save Settings")

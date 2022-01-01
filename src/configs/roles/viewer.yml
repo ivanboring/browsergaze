@@ -1,6 +1,7 @@
 id: 5
 name: Viewer
 permissions:
+  change-settings: false
   create-project: false
   edit-all-projects: false
   edit-own-projects: false

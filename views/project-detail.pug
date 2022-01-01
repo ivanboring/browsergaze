@@ -58,6 +58,9 @@ block content
                                         a(href="/projects/" + project.dataname + '/page/' + val.uuid, class="dropdown-item")
                                             i(class="fas fa-file")
                                             | View components
+                                        a(href="", class="dropdown-item run-page", data-uuid=val.uuid)
+                                            i(class="fas fa-edit")
+                                            | Run test on page
                                         a(href="/projects/" + project.dataname + "/page/" + val.uuid + "/edit", class="dropdown-item")
                                             i(class="fas fa-edit")
                                             | Edit page

@@ -1,0 +1,28 @@
+extends page
+block content
+    div(class="header bg-primary pb-6")
+        div(class="container")
+            div(class="header-body")
+                div(class="row align-items-center py-4")
+                    div(class="col-lg-6 col-7")
+                       div(class="media align-items-center")
+                            span(class="avatar avatar-sm rounded-circle")
+                                img(src="/pics/" + server_type + ".png")
+                            div(class="media-body ml-2 d-none d-lg-block")
+                                h2(class="h1 text-white mb-0")=title
+    div(class="container")
+        div(class="row justify-content-center")
+            div(class="col-9 mt--6")
+                div(class="card")
+                    div(class="card-header")
+                        h2
+                            | #{title}
+                            | 
+                    div(class="card-body")
+                        form(action="/servers/" + id + "/delete", method="POST" role="form")
+                            input(type="hidden", value=id, name="server_id")
+                            | WARNING: This removes all history for all tests with the devices from this server!!!
+                            div(class="text-center")
+                                input(type='submit', class="btn btn-danger my-4", value='Delete')
+                                a(href="/servers", class="btn btn-secondary my-4")
+                                    | Cancel

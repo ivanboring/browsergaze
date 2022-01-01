@@ -84,7 +84,6 @@ const component = {
             (resolve, reject) => {
                 query.serialize(function() {
                     query.get("DELETE FROM components WHERE id=?;", id, function(err, rows) {
-                        console.log(err);
                         resolve(true)
                     });
                 });
@@ -302,6 +301,44 @@ const component = {
             }
         );
     },
+    getBrowserThreshold: async function(thresholdId) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.get("SELECT * FROM browser_threshold WHERE id=?", thresholdId, function(err, row) {
+                        resolve(row)
+                    })
+                })
+            }
+        );
+    },
+    updateBrowserThreshold: async function(thresholdId, threshold) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.run("UPDATE browser_threshold SET browser_threshold=? WHERE id=?", threshold, thresholdId, function (err, row) {
+                        resolve(true)
+                    })
+                })
+            }
+        )
+    },
+    deleteBrowserThresholdFromCapability: async function(capabilityId) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.run("DELETE FROM browser_threshold WHERE capabilities_id_to=? OR capabilities_id_from=?", capabilityId, capabilityId, function(err) {
+                        console.log('3', err);
+                        resolve(true);
+                    });
+                    
+                });
+            }
+        );
+    },
     deleteCapabilityBreakpointFromComponent: async function(componentObject) {
         let query = db.getDb();
         return new Promise(
@@ -309,6 +346,20 @@ const component = {
                 query.serialize(function() {
                     query.run("DELETE FROM component_capability_breakpoint WHERE component_id=?", componentObject.id);
                     resolve(true);
+                });
+            }
+        );
+    },
+    deleteCapabilityBreakpointFromCapability: async function(capabilityId) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.run("DELETE FROM component_capability_breakpoint WHERE capability_id=?", capabilityId, function(err, row) {
+                        console.log('1', err);
+                        resolve(true);
+                    });
+                    
                 });
             }
         );

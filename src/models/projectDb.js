@@ -135,7 +135,7 @@ const projectDb = {
                     query.all('SELECT * FROM project_capabilities WHERE project_id=?', projectId, (err, rows) => {
                         if (typeof rows !== 'undefined') {
                             for (let x in rows) {
-                                currentCapabilities.push(rows[x].id.toString());
+                                currentCapabilities.push(rows[x].capability_id.toString());
                             }
                         }
 
@@ -169,6 +169,56 @@ const projectDb = {
                 });
             }
         );
+    },
+    updateProjectBreakpoints: async function(projectId, breakpoint_width, breakpoint_height) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    let currentBreakpoints = [];
+                    let newBreakpoints = [];
+                    query.all('SELECT * FROM project_breakpoints WHERE project_id=?', projectId, (err, rows) => {
+                        if (typeof rows !== 'undefined') {
+                            for (let x in rows) {
+                                currentBreakpoints.push(rows[x].width.toString() + '__' + rows[x].height.toString());
+                            }
+                        }
+
+                        for (let x in breakpoint_width) {
+                            let newIndex = breakpoint_width[x] + '__' + breakpoint_height[x];
+                            if (!currentBreakpoints.includes(newIndex)) {
+                                newBreakpoints.push(newIndex);
+                            } else {
+                                const index = currentBreakpoints.indexOf(newIndex);
+                                if (index > -1) {
+                                    currentBreakpoints.splice(index, 1);
+                                }
+                            }
+                        }
+
+                        for (let capability of newBreakpoints) {
+                            let parts = capability.split('__');
+                            query.run("INSERT INTO project_breakpoints (project_id, width, height) VALUES (?, ?, ?);", 
+                                projectId,
+                                parts[0],
+                                parts[1],
+                            );
+                        }
+
+                        for (let capability of currentBreakpoints) {
+                            let parts = capability.split('__');
+                            query.run("DELETE FROM project_breakpoints WHERE project_id=? AND width=? AND height=?;", 
+                                projectId,
+                                parts[0],
+                                parts[1],
+                            );
+                        }
+
+                        resolve(true)
+                    });
+                })
+            }
+        )       
     },
     createProject(project) {
         let query = db.getDb();

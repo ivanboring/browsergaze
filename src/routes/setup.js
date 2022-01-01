@@ -11,8 +11,10 @@ module.exports = {
         })
     },
     'post': async function(req, res) {
-        let validationErrors = await user.createUser(req.body)
-
+        let userObject = req.body;
+        userObject.role = "1";
+        let validationErrors = await user.createUser(userObject)
+        console.log(validationErrors);
         if (validationErrors !== null) {
             validate.redirect('/setup', req.body, validationErrors, req, res)
         } else {

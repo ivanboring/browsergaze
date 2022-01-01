@@ -46,6 +46,20 @@ const baseline = {
             }
         );
     },
+    deleteBaselineForCapabilityId: async function (capabilityId) {
+        let query = db.getDb();
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    query.run("DELETE FROM baseline WHERE capability_id=?;", 
+                    capabilityId, function(err) {
+                        console.log('4', err);
+                        resolve(true);
+                    });
+                });
+            }
+        );
+    },
     deleteBaselineForProjectId: async function (projectId) {
         let query = db.getDb();
         return new Promise(
