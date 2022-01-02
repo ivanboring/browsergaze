@@ -3,8 +3,9 @@ const os = require('os');
 const yaml = require('js-yaml')
 require('colors');
 const prompt = require('prompt-sync')();
-const defaults = require('./services/defaults')
-const helper = require('./services/helper')
+const defaults = require('./services/defaults');
+const helper = require('./services/helper');
+const shell = require('shelljs');
 
 const configPath = 'config.yaml';
 
@@ -25,19 +26,19 @@ const install = {
             defaults.host = prompt('Host to listen to '.gray + '[' + defaults.host + ']'.brightWhite.bold + ' ', defaults.host)
             defaults.port = prompt('Port to listen to '.gray + '[' + defaults.port + ']'.brightWhite.bold + ' ', defaults.port)
         }
+
+        // Check so image directory exists, otherwise create.
+        if (!fs.existsSync(defaults.imageLocation)) {
+            fs.mkdirSync(defaults.imageLocation);
+        }
         
         // Check so ImageMagick exists.
         let binary = this.checkImageMagickBinary();
         if (!binary) {
-            console.log('No imagemagick found, downloading a portable version'.brightWhite.bold);
-            if (!fs.existsSync('bin')) {
-                fs.mkdirSync('bin');
-            }
+            this.downloadBinary();
             if (os.platform() !== 'win32') {
-                helper.download('https://download.imagemagick.org/ImageMagick/download/binaries/magick', 'bin/magick');
                 binary = 'bin/magick';
             } else {
-                helper.download('https://download.imagemagick.org/ImageMagick/download/binaries/ImageMagick-7.1.0-19-Q16-HDRI-x64-dll.exe', 'bin/magick.exe');
                 binary = 'bin/magick.exe';
             }
         }
@@ -47,6 +48,18 @@ const install = {
         }
         
         fs.writeFileSync(configPath, yaml.dump(defaults))
+    },
+    downloadBinary: async function() {
+        console.log('No imagemagick found, downloading a portable version'.brightWhite.bold);
+        if (!fs.existsSync('bin')) {
+            fs.mkdirSync('bin');
+        }
+        if (os.platform() !== 'win32') {
+            await helper.download('https://download.imagemagick.org/ImageMagick/download/binaries/magick', 'bin/magick');
+            shell.exec('chmod +x bin/magick');
+        } else {
+            await helper.download('https://download.imagemagick.org/ImageMagick/download/binaries/ImageMagick-7.1.0-19-Q16-HDRI-x64-dll.exe', 'bin/magick.exe');
+        }
     },
     checkImageMagickBinary: function() {
         // Try to check if exe file exists in path or in config path.
