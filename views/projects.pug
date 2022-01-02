@@ -33,25 +33,36 @@ block content
                                 div(class="dropdown")
                                     button(class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
                                         | Actions
-                                    div(class="dropdown-menu" aria-labelledby="dropdownMenuButton")
-                                        a(href="/projects/detail/" + val.dataname, class="dropdown-item")
-                                            i(class="fas fa-file")
-                                            | View pages
-                                        a(href="/projects/" + val.dataname + '/results', class="dropdown-item")
-                                            i(class="fas fa-poll")
-                                            | View regression results
-                                        a(href="/projects/" + val.dataname + '/results', class="dropdown-item run-project", data-name=val.dataname)
-                                            i(class="fas fa-poll")
-                                            | Run all tests
-                                        a(href="/projects/" + val.dataname + "/edit", class="dropdown-item")
-                                            i(class="fas fa-edit")
-                                            | Edit project
-                                        a(href="/projects/" + val.dataname + "/browser_diffs", class="dropdown-item")
-                                            i(class="fas fa-images")
-                                            | Setup Browser Diffs
-                                        a(href="/projects/" + val.dataname + "/delete", class="dropdown-item")
-                                            i(class="fas fa-minus-circle")
-                                            | Delete project
+                                    ul(class="dropdown-menu" aria-labelledby="dropdownMenuButton")
+                                        li(class="dropdown-submenu")
+                                            a(class="dropdown-item dropdown-toggle", href="#")
+                                                i(class="fas fa-eye")
+                                                | Visual Regression
+                                            ul(class="dropdown-menu")
+                                                li
+                                                    a(href="/projects/detail/" + val.dataname, class="dropdown-item")
+                                                        i(class="fas fa-file")
+                                                        | View visual regression pages
+                                                li
+                                                    a(href="/projects/" + val.dataname + '/results', class="dropdown-item")
+                                                        i(class="fas fa-poll")
+                                                        | View regression results
+                                                li
+                                                    a(href="/projects/" + val.dataname + "/browser_diffs", class="dropdown-item")
+                                                        i(class="fas fa-images")
+                                                        | View browser diff results
+                                                li
+                                                    a(href="/projects/" + val.dataname + '/results', class="dropdown-item run-project", data-name=val.dataname)
+                                                        i(class="fas fa-poll")
+                                                        | Run all visual tests
+                                        li
+                                            a(href="/projects/" + val.dataname + "/edit", class="dropdown-item")
+                                                i(class="fas fa-edit")
+                                                | Edit project
+                                        li
+                                            a(href="/projects/" + val.dataname + "/delete", class="dropdown-item")
+                                                i(class="fas fa-minus-circle")
+                                                | Delete project
         else
             div(class="row justify-content-center")
                 div(class="col-6")

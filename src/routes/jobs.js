@@ -14,7 +14,7 @@ const browserDiff = require('../services/browserDiff');
 const jobs = {
     browserDiffs: async function(req, res) {
         if (user.hasPermission(req, 'view-results')) {
-            const pagination = 10;
+            const pagination = 25;
             const projectObject = await project.getProjectByName(req, req.params.projectName);
             const jobOptions = helper.createSelectOptions(await job.getJobFromProjectId(projectObject.id), 'id', 'uuid', 'Any', req.query.job_id);
             const pageOptions = helper.createSelectOptions(await page.getPagesByProjectId(req, projectObject.id), 'id', 'name', 'Any', req.query.page_id);
@@ -110,7 +110,7 @@ const jobs = {
         }
     },
     getJobs: async function(req, res) {
-        const pagination = 50;
+        const pagination = 25;
         const projectObject = await project.getProjectByName(req, req.params.projectName);
         const jobOptions = helper.createSelectOptions(await job.getJobFromProjectId(projectObject.id), 'id', 'uuid', 'Any', req.query.job_id);
         const pageOptions = helper.createSelectOptions(await page.getPagesByProjectId(req, projectObject.id), 'id', 'name', 'Any', req.query.page_id);

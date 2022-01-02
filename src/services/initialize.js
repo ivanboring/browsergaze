@@ -35,9 +35,7 @@ const initialize = {
         hawkConfig.usedBinaryCommand = null;
         if ('imageMagicBinary' in hawkConfig) {
             const testBinary = os.platform() == 'win32' ? hawkConfig.imageMagicBinary.replace('.exe', '') : hawkConfig.imageMagicBinary;
-            //if (require('hasbin').sync(testBinary)) {
-                hawkConfig.usedBinaryCommand = testBinary + ' compare';
-            //}
+            hawkConfig.usedBinaryCommand = testBinary + ' compare';
         }
         if (!hawkConfig.usedBinaryCommand && require('hasbin').sync('compare')) {
             hawkConfig.usedBinaryCommand = 'compare';

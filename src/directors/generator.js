@@ -26,6 +26,7 @@ const generator = function(generatorObject) {
         }
     }
     this.startRunning = async function() {
+        let totalFailure = false;
         if (this.queue.length > 0) {
             this.running = true;
             // Load the director if it was not loaded.
@@ -43,7 +44,18 @@ const generator = function(generatorObject) {
                             if (!this.director) {
                                 this.director = this.preprocess(this.generator.server_type);
                                 this.currentJobId = uuidv1();
-                                await this.director.init(runJob.default_host_path, this.currentJobId, capabilityObject);
+                                try {
+                                    await this.director.init(runJob.default_host_path, this.currentJobId, capabilityObject);
+                                }
+                                catch (e) {
+                                    console.log('Failed', e);
+                                    totalFailure = true;
+                                    screenshot.setScreenshotStatus(runJob.id, 5);
+                                    screenshot.setScreenshotError(runJob.id, e.toString());
+                                    console.log('Set failure');
+                                    break;
+                                }
+                                
                             }
                             await screenshot.setScreenshotStatus(runJob.id, 1);
                             // Goto page if not visited.
@@ -81,13 +93,13 @@ const generator = function(generatorObject) {
                 }
             }
         }
-        if (this.queue.length === 0) {
+        if (this.queue.length === 0 && !totalFailure) {
             await this.director.close(this.currentJobId);
             this.currentJobId = null;
             this.director = null;
             this.currentPath = null;
             this.running = false;
-        } else {
+        } else if (!totalFailure) {
             this.startRunning();
         }
     }

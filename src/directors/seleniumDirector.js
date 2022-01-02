@@ -39,8 +39,13 @@ const seleniumDirector = function() {
             builder.forBrowser('opera');
         }
 
-        this.drivers[jobId] = await builder.usingServer(capabilityObject.hostname + ':' + capabilityObject.port + '/wd/hub')
-        .build();
+        try {
+            this.drivers[jobId] = await builder.usingServer(capabilityObject.hostname + ':' + capabilityObject.port + '/wd/hub')
+            .build();
+        }
+        catch (e) {
+            throw "Couldn't connect to Selenium server";
+        }
         return
     }
     this.resizeWindow = async function(width, height, jobId) {

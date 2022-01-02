@@ -10,8 +10,11 @@ const pageDb = require('../models/pageDb');
 const { PuppeteerDirector } = require('../directors/puppeteerDirector');
 
 const page = {
-    getPagesByProjectId: async function(req, projectId) {
-        return await pageDb.getPagesByProjectId(req, projectId);
+    getPagesByProjectId: async function(req, projectId, limit, page) {
+        return await pageDb.getPagesByProjectId(req, projectId, limit, page);
+    },
+    getCountPagesByProjectId: async function(req, projectId) {
+        return await pageDb.getCountPagesByProjectId(req, projectId);
     },
     getPageById: async function(req, id) {
         return await pageDb.getPageById(req, id);

@@ -111,7 +111,7 @@ block content
                             tr
                                 td(class="screenshot", id="screenshot-" + val.id)
                                     if (val.status == 5)
-                                        img(src='/pics/failed.png', style="max-width: 100px; max-height:50px;")
+                                        | ERROR: #{val.error}
                                     else if (val.status > 1)
                                         img(src=val.path.substr(8), style="max-width: 200px; max-height:100px;")
                                     else
@@ -125,7 +125,7 @@ block content
                                     if (val.is_baseline)
                                         | No diff
                                     else if (val.status == 5)
-                                        img(src='/pics/failed.png', style="max-width: 100px; max-height:50px;")
+                                        | ERROR: #{val.error}
                                     else if (val.status > 1)
                                         img(src=val.path.replace('.png', '_diff.png').substr(8), style="max-width: 200px; max-height:100px;")
                                     else

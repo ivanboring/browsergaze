@@ -16,12 +16,16 @@ module.exports = {
         });
     },
     detail: async function(req, res) {
+        const pagination = 12;
         const projectObject = await project.getProjectByName(req, req.params.projectName)
         if (!projectObject) {
             res.redirect(301, '/projects')
             return
         }
-        const pages = await page.getPagesByProjectId(req, projectObject.id)
+        let pageNumber = req.query.page ? parseInt(req.query.page) : 0;
+        const pages = await page.getPagesByProjectId(req, projectObject.id, pagination, pageNumber)
+        const count = await page.getCountPagesByProjectId(req, projectObject.id);
+        const total = Math.ceil(count/pagination);
         res.render('project-detail', {
             title: 'glitch-hawk: ' + projectObject.name,
             pageTitle: projectObject.name,
@@ -29,6 +33,9 @@ module.exports = {
             project: projectObject,
             pages: pages,
             user: user.getUser(req),
+            currentPage: pageNumber,
+            paginationTotal: total,
+            basePath: '/projects/detail/' + projectObject.dataname,
         });
     },
     post: async function(req, res) {

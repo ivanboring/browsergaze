@@ -5,5 +5,4 @@ module.exports = {
     certificateFile: '',
     host: '0.0.0.0',
     port: '9021',
-    browserDiffFuzz: 10,
 }

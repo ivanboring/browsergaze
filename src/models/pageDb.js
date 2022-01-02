@@ -2,18 +2,43 @@ const db = require('./db');
 const user = require('../services/user');
 
 const pageDb = {
-    getPagesByProjectId: async function(req, projectId) {
+    getPagesByProjectId: async function(req, projectId, limit, page) {
+        let offsetText = ''
+        if (typeof limit === 'number' && typeof page === 'number') {
+            let offset = page*limit;
+            offsetText = ' LIMIT ' + offset + ',' + limit;
+        }
         let query = db.getDb();
         let hasProject = await user.hasProject(req, projectId);
         return new Promise(
             (resolve, reject) => {
                 query.serialize(function() {
                     if (user.hasPermission(req, 'view-all-projects') || (user.hasPermission(req, 'view-own-projects') && hasProject)) {
-                        query.all("SELECT pg.* FROM pages pg WHERE pg.project_id=?;", projectId, function(err, rows) {
+                        query.all("SELECT pg.* FROM pages pg WHERE pg.project_id=?" + offsetText + ";", projectId, function(err, rows) {
                             resolve(rows)
                         });
                     }else {
                         resolve([]);
+                    }
+                });
+            }
+        )
+    },
+    getCountPagesByProjectId: async function(req, projectId) {
+        let query = db.getDb();
+        let hasProject = await user.hasProject(req, projectId);
+        return new Promise(
+            (resolve, reject) => {
+                query.serialize(function() {
+                    if (user.hasPermission(req, 'view-all-projects') || (user.hasPermission(req, 'view-own-projects') && hasProject)) {
+                        query.get("SELECT COUNT(*) as total FROM pages WHERE project_id=?;", projectId, function(err, row) {
+                            if ('total' in row) {
+                                resolve(row.total);
+                            }
+                            resolve(0);
+                        });
+                    }else {
+                        resolve(0);
                     }
                 });
             }
