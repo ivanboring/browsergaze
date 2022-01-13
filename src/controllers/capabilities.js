@@ -16,12 +16,14 @@ const capabilities = {
     getCapabilitiesForServer: async function(serverId) {
         return await capabilitiesDb.getCapabilitiesForServer(serverId);
     },
-    getDataFromSelPlatform: function(platform) {
+    getDataFromSelPlatform: function(platform, version) {
         switch (platform) {
             case 'WIN11':
                 return {platform: 'Windows', version: '11'};
             case 'WIN10':
                 return {platform: 'Windows', version: '10'};
+            case 'MAC':
+                return {platform: 'Mac OS', version: version};
         }
     },
     getHumanReadableFromSelPlatform: function(platform) {
@@ -30,6 +32,8 @@ const capabilities = {
                 return 'Windows 11';
             case 'WIN10':
                 return 'Windows 10';
+            case 'MAC':
+                return 'Mac Os';
         }
     },
     getHumanReadableFromSelBrowser: function(browserName) {
@@ -42,6 +46,8 @@ const capabilities = {
                 return 'Microsoft Edge';
             case 'chrome':
                 return 'Chrome';
+            case 'safari':
+                return 'Safari';
         }
     },
     getDataFromHumanBrowserName: function(browserName) {
@@ -54,6 +60,8 @@ const capabilities = {
                 return 'MicrosoftEdge';
             case 'Chrome':
                 return 'chrome';
+            case 'Safari':
+                return 'safari';
         }
     },
     getCapabilitiesForStyling: function(rows, prefix) {
@@ -93,7 +101,7 @@ const capabilities = {
                         rows[x][prefix + 'os_icon'] = 'microsoft';
                     }
                     break;
-                case 'OS X':
+                case 'Mac OS':
                     rows[x][prefix + 'os_icon'] = 'apple';
                     break;
                 case 'Linux':

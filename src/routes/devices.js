@@ -1,9 +1,9 @@
-const servers = require('../services/servers');
-const user = require('../services/user');
-const form = require('../services/form');
-const validate = require('../services/validate');
-const devices = require('../services/devices');
-const capabilities = require('../services/capabilities');
+const servers = require('../controllers/servers');
+const user = require('../controllers/user');
+const form = require('../controllers/form');
+const validate = require('../controllers/validate');
+const devices = require('../controllers/devices');
+const capabilities = require('../controllers/capabilities');
 
 module.exports = {
     getServers: async function(req, res) {

@@ -103,10 +103,10 @@ const component = {
         await component.updateBrowserDiffs(componentObject, projectObject);
         return null;
     },
-    deleteComponent: async function(req, componentObject, projectObject, pageObject) {
-        this.deleteComponentForProject(req, componentObject, projectObject, pageObject);
+    deleteComponent: async function(componentObject, projectObject, pageObject) {
+        this.deleteComponentForProject(componentObject, projectObject, pageObject);
     },
-    deleteComponentForProject: async function(req, componentObject, projectObject, pageObject) {
+    deleteComponentForProject: async function(componentObject, projectObject, pageObject) {
         await componentDb.deleteComponentById(componentObject.id);
         await this.deleteDefaultImage(componentObject, pageObject, projectObject);
         await componentDb.deleteCapabilityBreakpointFromComponent(componentObject);

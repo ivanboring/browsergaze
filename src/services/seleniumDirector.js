@@ -1,11 +1,9 @@
 const fs = require('fs');
-const helper = require('../services/helper');
 const {Builder, By, Key, until} = require('selenium-webdriver');
-const capabilities = require('../services/capabilities');
 const chrome = require("selenium-webdriver/chrome");
 const firefox = require("selenium-webdriver/firefox");
 const edge = require("selenium-webdriver/edge");
-const opera = require("selenium-webdriver/opera");
+const safari = require("selenium-webdriver/safari");
 
 const seleniumDirector = function() {
     this.drivers = {};
@@ -31,12 +29,17 @@ const seleniumDirector = function() {
             builder.withCapabilities(options);
         }
         if (capabilityObject.browser_name == 'Firefox') {
-            options = new firefox.Options();
-            options.setPlatform(capabilityObject.platform + ' ' + capabilityObject.platform_version);
-            builder.withCapabilities(options);
+            builder.forBrowser('gecko');
+            options = {setPlatform: capabilityObject.platform + ' ' + capabilityObject.platform_version};
+            builder.setFirefoxOptions(options);
         }
         if (capabilityObject.browser_name == 'Opera') {
             builder.forBrowser('opera');
+        }
+        if (capabilityObject.browser_name == 'Safari') {
+            builder.forBrowser('safari');
+            options = {setPlatform: capabilityObject.platform + ' ' + capabilityObject.platform_version};
+            builder.setSafariOptions(options);
         }
 
         try {
@@ -44,6 +47,8 @@ const seleniumDirector = function() {
             .build();
         }
         catch (e) {
+            console.log(capabilityObject.browser_name);
+            console.log(e);
             throw "Couldn't connect to Selenium server";
         }
         return
@@ -54,10 +59,15 @@ const seleniumDirector = function() {
         let displayWidth = 0;
         let displayHeight = 0;
         let tries = 0;
+        let caps = await this.drivers[jobId].getCapabilities();
         try {
             while (tries < 4) {
                 // Recurse until fit.
-                await this.drivers[jobId].manage().window().setRect({width: newWidth, height: newHeight, x: 0, y: 0});
+                if (caps.get("browserName") == 'safari') {
+                    await this.drivers[jobId].manage().window().setRect({width: newWidth, height: newHeight, x: 2, y: 2});
+                } else {
+                    await this.drivers[jobId].manage().window().setRect({width: newWidth, height: newHeight, x: 0, y: 0});
+                }
                 displayWidth = await this.drivers[jobId].executeScript("return window.innerWidth");
                 displayHeight = await this.drivers[jobId].executeScript("return window.innerHeight");
                 if (displayWidth != width && displayHeight != height) {

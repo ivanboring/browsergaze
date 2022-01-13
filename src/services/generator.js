@@ -1,9 +1,9 @@
-const job = require('../services/job');
-const screenshot = require('../services/screenshot');
+const job = require('../controllers/job');
+const screenshot = require('../controllers/screenshot');
 const { 
     v1: uuidv1,
 } = require('uuid');
-const capabilities = require('../services/capabilities');
+const capabilities = require('../controllers/capabilities');
 const util = require('util')
 const { PuppeteerDirector } = require('./puppeteerDirector');
 const { SeleniumDirector } = require('./seleniumDirector');
@@ -48,12 +48,14 @@ const generator = function(generatorObject) {
                                     await this.director.init(runJob.default_host_path, this.currentJobId, capabilityObject);
                                 }
                                 catch (e) {
+                                    this.director = null;
+                                    this.currentJobId = null;
                                     console.log('Failed', e);
                                     totalFailure = true;
                                     screenshot.setScreenshotStatus(runJob.id, 5);
                                     screenshot.setScreenshotError(runJob.id, e.toString());
                                     console.log('Set failure');
-                                    break;
+                                    continue;
                                 }
                                 
                             }

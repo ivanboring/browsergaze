@@ -7,7 +7,7 @@ const componentDb = require('../models/componentDb');
 const browserDiffDb = require('../models/browserDiffDb');
 const baselineDb = require('../models/baselineDb');
 const screenshot = require('./screenshot');
-const runner = require('../directors/runner');
+const runner = require('../services/runner');
 
 
 const servers = {

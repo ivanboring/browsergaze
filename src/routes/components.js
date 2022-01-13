@@ -1,12 +1,12 @@
-const validate = require('../services/validate');
-const project = require('../services/project');
-const component = require('../services/component');
-const user = require('../services/user');
-const form = require('../services/form');
-const page = require('../services/page');
-const capabilities = require('../services/capabilities');
-const runner = require('../directors/runner.js');
-const rules = require('../services/rules');
+const validate = require('../controllers/validate');
+const project = require('../controllers/project');
+const component = require('../controllers/component');
+const user = require('../controllers/user');
+const form = require('../controllers/form');
+const page = require('../controllers/page');
+const capabilities = require('../controllers/capabilities');
+const runner = require('../services/runner.js');
+const rules = require('../controllers/rules');
 
 const components = {
     createForm: async function(req, res) {

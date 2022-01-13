@@ -24,7 +24,7 @@ const devices = {
                     let node = response.body.value.nodes[t];
                     for (let o in node.slots) {
                         let slot = node.slots[o];
-                        let platform = capabilities.getDataFromSelPlatform(slot.stereotype.platformName);
+                        let platform = capabilities.getDataFromSelPlatform(slot.stereotype.platformName, node.osInfo.version);
                         if (!(slot.stereotype.platformName in returnCapabilities)) {
                             returnCapabilities[slot.stereotype.platformName] = {
                                 'platformName': capabilities.getHumanReadableFromSelPlatform(slot.stereotype.platformName), 
@@ -34,6 +34,7 @@ const devices = {
                         returnCapabilities[slot.stereotype.platformName]['browsers'][slot.stereotype.browserName] = {
                             'browserName': capabilities.getHumanReadableFromSelBrowser(slot.stereotype.browserName),
                             'version': 'default',
+                            'platformVersion': platform.version,
                             'uniqueId': this.getUniqueId({
                                 'generator_server_id': server,
                                 'browser_name': slot.stereotype.browserName,
@@ -44,6 +45,7 @@ const devices = {
                         }
                     }
                 }
+                console.log(returnCapabilities);
                 return returnCapabilities;
             }
         } catch (e) {
@@ -58,7 +60,7 @@ const devices = {
         let newDevices = {};
         for (let part of list.devices) {
             let parts = part.split('--');
-            newDevices[parts[2]] = {platform: capabilities.getDataFromSelPlatform(parts[0]), browserName: capabilities.getHumanReadableFromSelBrowser(parts[1])};
+            newDevices[parts[3]] = {platform: capabilities.getDataFromSelPlatform(parts[0], parts[1]), browserName: capabilities.getHumanReadableFromSelBrowser(parts[2])};
         }
 
         let deleteDevices = [];

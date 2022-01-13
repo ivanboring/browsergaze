@@ -1,8 +1,8 @@
-const permissions = require('../services/permissions');
-const user = require('../services/user');
-const form = require('../services/form');
-const validate = require('../services/validate');
-const project = require('../services/project');
+const permissions = require('../controllers/permissions');
+const user = require('../controllers/user');
+const form = require('../controllers/form');
+const validate = require('../controllers/validate');
+const project = require('../controllers/project');
 
 module.exports = {
     listUsers: async function(req, res) {

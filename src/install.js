@@ -3,8 +3,8 @@ const os = require('os');
 const yaml = require('js-yaml')
 require('colors');
 const prompt = require('prompt-sync')();
-const defaults = require('./services/defaults');
-const helper = require('./services/helper');
+const defaults = require('./controllers/defaults');
+const helper = require('./controllers/helper');
 const shell = require('shelljs');
 
 const configPath = 'config.yaml';

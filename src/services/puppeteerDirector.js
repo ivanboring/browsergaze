@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
-const helper = require('../services/helper');
+const helper = require('../controllers/helper');
 
 const puppeteerDirector = function() {
     this.browser = null;

@@ -2,7 +2,7 @@ const fs = require('fs');
 const validate = require('./validate');
 const defaults = require('./defaults');
 const helper = require('./helper');
-const { PuppeteerDirector } = require('../directors/puppeteerDirector');
+const { PuppeteerDirector } = require('../services/puppeteerDirector');
 const svgexport = require('svgexport');
 const capabilities = require('./capabilities');
 const projectDb = require('../models/projectDb');
@@ -150,7 +150,8 @@ const project = {
     deleteProject: async function(req, project) {
         const componentsList = await component.getComponentsForProject(req, project.id);
         for (let x in componentsList) {
-            await component.deleteComponentForProject(req, componentsList[x], project);
+            let pageObject = await page.getPageById(componentsList[x].page_id);
+            await component.deleteComponentForProject(componentsList[x], project, pageObject);
         }
         await job.deleteJobFromProjectId(project.id);
         await page.deletePageFromProjectId(project.id);

@@ -1,15 +1,15 @@
-const project = require('../services/project');
-const component = require('../services/component');
-const user = require('../services/user');
-const page = require('../services/page');
-const job = require('../services/job');
-const defaults = require('../services/defaults');
-const capabilities = require('../services/capabilities');
+const project = require('../controllers/project');
+const component = require('../controllers/component');
+const user = require('../controllers/user');
+const page = require('../controllers/page');
+const job = require('../controllers/job');
+const defaults = require('../controllers/defaults');
+const capabilities = require('../controllers/capabilities');
 const fs = require('fs');
-const screenshot = require('../services/screenshot');
-const helper = require('../services/helper');
-const baseline = require('../services/baseline');
-const browserDiff = require('../services/browserDiff');
+const screenshot = require('../controllers/screenshot');
+const helper = require('../controllers/helper');
+const baseline = require('../controllers/baseline');
+const browserDiff = require('../controllers/browserDiff');
 
 const jobs = {
     browserDiffs: async function(req, res) {

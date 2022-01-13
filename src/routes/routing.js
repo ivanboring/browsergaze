@@ -1,4 +1,4 @@
-const user = require('../services/user')
+const user = require('../controllers/user')
 
 const routing = {
     route: function(app) {

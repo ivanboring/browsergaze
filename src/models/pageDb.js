@@ -1,5 +1,5 @@
 const db = require('./db');
-const user = require('../services/user');
+const user = require('../controllers/user');
 
 const pageDb = {
     getPagesByProjectId: async function(req, projectId, limit, page) {

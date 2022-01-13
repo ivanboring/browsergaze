@@ -5,9 +5,9 @@ const component = require('./component');
 const { 
     v1: uuidv1,
 } = require('uuid');
-const puppeteerDirector = require('../directors/puppeteerDirector');
+const puppeteerDirector = require('../services/puppeteerDirector');
 const pageDb = require('../models/pageDb');
-const { PuppeteerDirector } = require('../directors/puppeteerDirector');
+const { PuppeteerDirector } = require('../services/puppeteerDirector');
 
 const page = {
     getPagesByProjectId: async function(req, projectId, limit, page) {
@@ -25,7 +25,7 @@ const page = {
     deletePage: async function (req, pageObject, projectObject) {
         const componentsList = await component.getComponentsForPage(req, pageObject, projectObject, pageObject);
         for (let x in componentsList) {
-            await component.deleteComponent(req, componentsList[x], projectObject, pageObject);
+            await component.deleteComponent(componentsList[x], projectObject, pageObject);
         }
         return await pageDb.deletePage(pageObject);
     },

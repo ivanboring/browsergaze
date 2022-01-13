@@ -1,5 +1,5 @@
-const user = require('../services/user');
-const settings = require('../services/settings');
+const user = require('../controllers/user');
+const settings = require('../controllers/settings');
 
 module.exports = {
     approvedSettings: [

@@ -1,9 +1,9 @@
-const validate = require('../services/validate');
-const project = require('../services/project');
-const user = require('../services/user');
-const form = require('../services/form');
-const page = require('../services/page');
-const component = require('../services/component');
+const validate = require('../controllers/validate');
+const project = require('../controllers/project');
+const user = require('../controllers/user');
+const form = require('../controllers/form');
+const page = require('../controllers/page');
+const component = require('../controllers/component');
 
 module.exports = {
     createForm: async function(req, res) {

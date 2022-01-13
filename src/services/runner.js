@@ -3,7 +3,7 @@ const {
 } = require('uuid');
 const fs = require('fs')
 const db = require('../models/db');
-const screenshot = require('../services/screenshot');
+const screenshot = require('../controllers/screenshot');
 const { Generator } = require('./generator');
 const { PuppeteerDirector } = require('./puppeteerDirector');
 const { SeleniumDirector } = require('./seleniumDirector');

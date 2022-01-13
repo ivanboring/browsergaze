@@ -1,10 +1,10 @@
-const project = require('../services/project');
-const user = require('../services/user');
-const page = require('../services/page');
-const screenshot = require('../services/screenshot');
-const baseline = require('../services/baseline');
-const browserDiff = require('../services/browserDiff');
-const component = require('../services/component');
+const project = require('../controllers/project');
+const user = require('../controllers/user');
+const page = require('../controllers/page');
+const screenshot = require('../controllers/screenshot');
+const baseline = require('../controllers/baseline');
+const browserDiff = require('../controllers/browserDiff');
+const component = require('../controllers/component');
 
 const screenshots = {
     diff: async function(req, res) {

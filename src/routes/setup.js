@@ -1,6 +1,6 @@
-const user = require('../services/user');
-const form = require('../services/form');
-const validate = require('../services/validate');
+const user = require('../controllers/user');
+const form = require('../controllers/form');
+const validate = require('../controllers/validate');
 
 module.exports = {
     'get': function(req, res) {

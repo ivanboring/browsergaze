@@ -1,4 +1,4 @@
-const user = require('../services/user');
+const user = require('../controllers/user');
 
 module.exports = {
     'get': function(req, res) {

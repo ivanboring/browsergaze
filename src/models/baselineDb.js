@@ -1,5 +1,5 @@
 const db = require('./db');
-const screenshot = require('../services/screenshot');
+const screenshot = require('../controllers/screenshot');
 
 const baseline = {
     getBaseline: async function (project_id, component_id, capability_id, breakpoint_id) {

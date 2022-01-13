@@ -1,5 +1,5 @@
 const db = require('./db');
-const user = require('../services/user');
+const user = require('../controllers/user');
 const { 
     v1: uuidv1,
 } = require('uuid');

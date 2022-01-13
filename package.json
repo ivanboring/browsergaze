@@ -24,6 +24,7 @@
     "puppeteer": "^11.0.0",
     "selenium-webdriver": "^4.1.0",
     "semver": "^7.3.5",
+    "sharp": "^0.29.3",
     "shelljs": "^0.8.4",
     "sqlite3": "^4.2.0",
     "svgexport": "^0.4.2",

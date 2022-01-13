@@ -1,20 +1,22 @@
 const express = require('express')
 const app = express()
-const user = require('./services/user')
+const user = require('./controllers/user')
 const fs = require('fs')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser');
 const routing = require('./routes/routing');
 const session = require('express-session');
-const defaults = require('./services/defaults')
+const defaults = require('./controllers/defaults')
 const MemoryStore = session.MemoryStore;
 const port = 'port' in hawkConfig ? hawkConfig.port : 9021
+const path = require('path');
 
 if (fs.existsSync('/tmp/sessions')) {
     user.initialSessions(JSON.parse(fs.readFileSync('/tmp/sessions')));
 }
 
 app.set('view engine', 'pug')
+app.set('views', path.join(__dirname, '/views'));
 
 // User session middleware.
 app.use(cookieParser());

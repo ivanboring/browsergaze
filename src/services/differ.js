@@ -1,12 +1,12 @@
-const screenshot = require('../services/screenshot');
-const baseline = require('../services/baseline');
-const component = require('../services/component');
-const defaults = require('../services/defaults');
+const screenshot = require('../controllers/screenshot');
+const baseline = require('../controllers/baseline');
+const component = require('../controllers/component');
+const defaults = require('../controllers/defaults');
 const shell = require('shelljs');
-const browserDiff = require('../services/browserDiff');
-const project = require('../services/project');
-const job = require('../services/job');
-const settings = require('../services/settings');
+const browserDiff = require('../controllers/browserDiff');
+const project = require('../controllers/project');
+const job = require('../controllers/job');
+const settings = require('../controllers/settings');
 
 const differ = {
     running: false,

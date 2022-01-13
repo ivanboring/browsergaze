@@ -6,8 +6,8 @@ const permissions = require('./permissions');
 const db = require('../models/db');
 const defaults = require('./defaults');
 const puppeteer = require('puppeteer');
-const runner = require('../directors/runner');
-const differ = require('../directors/differ');
+const runner = require('../services/runner');
+const differ = require('../services/differ');
 const settings = require('./settings');
 
 const configPath = '../../config.yaml';
